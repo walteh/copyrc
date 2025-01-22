@@ -217,6 +217,8 @@ func (me FileInfo) Status() FileStatus {
 func (me FileInfo) Type() FileType {
 	if me.IsUntracked {
 		return FileTypeLocal
+	} else if me.IsManaged {
+		return FileTypeManaged
 	} else {
 		return FileTypeCopy
 	}
@@ -228,7 +230,7 @@ func (l *Logger) formatFileOperation(opts FileInfo) string {
 
 	// Build type part with optional replacements
 	var typePart string
-	if opts.Replacements > 0 && opts.Type() == FileTypeCopy {
+	if opts.Replacements > 0 && opts.Type().Name == FileTypeCopy.Name {
 		typePart = fmt.Sprintf("%-*s", typeWidth-2, opts.Type().UncoloredStringWithReplacements(opts.Replacements))
 	} else {
 		typePart = fmt.Sprintf("%-*s", typeWidth-2, opts.Type().UncoloredString())
@@ -243,8 +245,8 @@ func (l *Logger) formatFileOperation(opts FileInfo) string {
 		strings.Repeat(" ", fileIndent),
 		color.New(opts.Status().Style.SymbolColor).Sprint(string(opts.Status().Symbol)),
 		nameWidth, namePart,
-		typeWidth, color.New(opts.Status().Style.SymbolColor).Sprint(typePart),
-		color.New(opts.Status().Style.TextColor).Sprint(statusPart))
+		typeWidth, typePart,
+		statusPart)
 }
 
 func (l *Logger) formatArchiveTag(isArchive bool) string {

@@ -21,17 +21,9 @@ func assertLogOutput(t *testing.T, line string) {
 	// Basic format checks
 	assert.True(t, len(line) >= 40, "line should be properly padded: %q", line)
 
-	// Check bullet/dash/symbol prefix
-	firstRune := []rune(strings.TrimLeft(line, " "))[0]
-	validRunes := []rune{'•', '-', '✓', '⟳'}
-	isValid := false
-	for _, r := range validRunes {
-		if firstRune == r {
-			isValid = true
-			break
-		}
-	}
-	assert.True(t, isValid, "line should start with bullet, dash, or status symbol: %q (got %U)", line, firstRune)
+	// Check bullet/dash prefix
+	assert.True(t, strings.HasPrefix(line, "    •") || strings.HasPrefix(line, "    -") || strings.HasPrefix(line, "•") || strings.HasPrefix(line, "-"),
+		"line should start with bullet or dash: %q", line)
 
 	// Split the line into fields, preserving spacing
 	parts := strings.Fields(line)
@@ -41,7 +33,7 @@ func assertLogOutput(t *testing.T, line string) {
 	// The type is usually after the filename and before any status
 	var foundType bool
 	for i, part := range parts {
-		if i > 0 && (part == "managed" || part == "local" || part == "copy" || strings.HasPrefix(part, "copy")) {
+		if i > 0 && (part == "managed" || part == "local" || part == "copy") {
 			foundType = true
 			break
 		}
@@ -69,28 +61,26 @@ func TestLogFileOperation(t *testing.T) {
 		{
 			name: "managed_file_new",
 			opts: FileInfo{
-				Name:      ".copyrc.lock",
-				IsNew:     true,
-				IsManaged: true,
+				Name:  ".copyrc.lock",
+				IsNew: true,
 			},
-			expected: "    ✓ .copyrc.lock                        copy            NEW            \n",
+			expected: "    • .copyrc.lock                        managed         NEW FILE       \n",
 		},
 		{
 			name: "managed_file_updated",
 			opts: FileInfo{
 				Name:       ".copyrc.lock",
 				IsModified: true,
-				IsManaged:  true,
 			},
-			expected: "    ⟳ .copyrc.lock                        copy            UPDATED        \n",
+			expected: "    • .copyrc.lock                        managed         UPDATED        \n",
 		},
 		{
 			name: "managed_file_unchanged",
 			opts: FileInfo{
-				Name:      ".copyrc.lock",
-				IsManaged: true,
+				Name:       ".copyrc.lock",
+				IsModified: false,
 			},
-			expected: "    • .copyrc.lock                        copy                           \n",
+			expected: "    • .copyrc.lock                        managed         no change      \n",
 		},
 		{
 			name: "local_file",
@@ -106,7 +96,7 @@ func TestLogFileOperation(t *testing.T) {
 				Name:         "README.copy.md",
 				Replacements: 7,
 			},
-			expected: "    • README.copy.md                      copy [7]                       \n",
+			expected: "    • README.copy.md                      copy [7]        no change      \n",
 		},
 		{
 			name: "copy_file_updated",
@@ -115,22 +105,21 @@ func TestLogFileOperation(t *testing.T) {
 				IsModified:   true,
 				Replacements: 11,
 			},
-			expected: "    ⟳ main.copy.go                        copy [11]       UPDATED        \n",
+			expected: "    • main.copy.go                        copy [11]       UPDATED        \n",
 		},
 		{
 			name: "embed_gen_file",
 			opts: FileInfo{
-				Name:      "embed.gen.go",
-				IsManaged: true,
+				Name: "embed.gen.go",
 			},
-			expected: "    • embed.gen.go                        copy                           \n",
+			expected: "    • embed.gen.go                        managed         no change      \n",
 		},
 		{
 			name: "tarball_file",
 			opts: FileInfo{
 				Name: "nvim-lspconfig.tar.gz",
 			},
-			expected: "    • nvim-lspconfig.tar.gz               copy                           \n",
+			expected: "    • nvim-lspconfig.tar.gz               copy            no change      \n",
 		},
 	}
 
@@ -152,6 +141,10 @@ func TestLogFileOperation(t *testing.T) {
 			// Verify output
 			assert.Equal(t, tt.expected, output, "output should match expected format")
 			assertLogOutput(t, strings.TrimSpace(output))
+
+			// Verify the file was marked as processed
+			_, loaded := processedFiles.Load(tt.opts.Name)
+			assert.True(t, loaded, "file should be marked as processed")
 		})
 	}
 }
@@ -176,9 +169,8 @@ func TestLogFileOperationAlignment(t *testing.T) {
 			Replacements: 100,
 		},
 		{
-			Name:      ".copyrc.lock",
-			IsNew:     true,
-			IsManaged: true,
+			Name:  ".copyrc.lock",
+			IsNew: true,
 		},
 	}
 
@@ -219,4 +211,5 @@ func TestLogSimple(t *testing.T) {
 	firstOutput := logger.CopyOfCurrentConsoleOutputInTest()
 	assert.NotEmpty(t, firstOutput, "first call should produce output")
 	assertLogOutput(t, strings.TrimSpace(firstOutput))
+
 }
