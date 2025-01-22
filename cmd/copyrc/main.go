@@ -271,6 +271,13 @@ func run(ctx context.Context, cfg *Config, provider RepoProvider) error {
 		if err := cleanDestination(ctx, status, destPath); err != nil {
 			return errors.Errorf("cleaning destination: %w", err)
 		}
+
+		if err := processUntracked(ctx, status, destPath); err != nil {
+			return errors.Errorf("processing untracked files: %w", err)
+		}
+
+		// for all
+		logger.LogNewline()
 		return nil
 	}
 
@@ -315,8 +322,7 @@ func run(ctx context.Context, cfg *Config, provider RepoProvider) error {
 		return errors.Errorf("writing status file: %w", err)
 	}
 
-	// Add final newline
-	fmt.Println()
+	logger.LogNewline()
 
 	return nil
 }

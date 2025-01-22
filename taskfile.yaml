@@ -69,13 +69,13 @@ tasks:
     copyrc:
         desc: copyrc
         cmds:
-            - go run ./cmd/copyrc -config=.copyrc.hcl
+            - go run ./cmd/copyrc -config=.copyrc.example.hcl
         sources:
-            - .copyrc.hcl
+            - .copyrc.example.hcl
         generates:
             - "**/*.copyrc.lock"
         status:
-            - go run ./cmd/copyrc -config=.copyrc.hcl -status
+            - go run ./cmd/copyrc -config=.copyrc.example.hcl -status
 
     go-mod-tidy:
         env:

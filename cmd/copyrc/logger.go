@@ -294,6 +294,12 @@ func (l *Logger) Header(msg string) {
 	l.zlog.Info().Msg(msg)
 }
 
+func (l *Logger) LogNewline() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprintln(l.consoleOut)
+}
+
 // func (l *Logger) Operation(msg string) {
 // 	l.mu.Lock()
 // 	defer l.mu.Unlock()

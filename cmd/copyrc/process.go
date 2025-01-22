@@ -279,6 +279,7 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 }
 
 func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
+
 	var files []string
 	var err error
 	if cfg.ArchiveArgs == nil {
@@ -330,14 +331,16 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, c
 		}
 	}
 
-	var dirPath string
-	if cfg.ArchiveArgs != nil {
-		dirPath = filepath.Join(cfg.DestPath, filepath.Base(cfg.ProviderArgs.Repo))
-	} else {
-		dirPath = cfg.DestPath
+	if err := processUntracked(ctx, status, destPath); err != nil {
+		return errors.Errorf("processing untracked files: %w", err)
 	}
 
-	entries, err := os.ReadDir(dirPath)
+	return nil
+}
+
+func processUntracked(ctx context.Context, status *StatusFile, destPath string) error {
+
+	entries, err := os.ReadDir(destPath)
 	if err != nil {
 		return errors.Errorf("reading directory: %w", err)
 	}
@@ -354,7 +357,7 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, c
 
 	for _, entry := range entries {
 		if _, err := writeFile(ctx, WriteFileOpts{
-			Path:        filepath.Join(dirPath, entry.Name()),
+			Path:        filepath.Join(destPath, entry.Name()),
 			IsUntracked: true,
 		}); err != nil {
 			return errors.Errorf("writing untracked file: %w", err)
@@ -362,4 +365,5 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, c
 	}
 
 	return nil
+
 }
