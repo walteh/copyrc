@@ -17,7 +17,6 @@ import (
 	_ "github.com/google/addlicense"
 	_ "github.com/google/go-containerregistry/cmd/crane"
 	_ "github.com/goreleaser/goreleaser/v2"
-	_ "github.com/hashicorp/copywrite"
 	_ "github.com/ianlewis/todos/internal/cmd/todos"
 	_ "github.com/oligot/go-mod-upgrade"
 	_ "github.com/srikrsna/protoc-gen-gotag"
