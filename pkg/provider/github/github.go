@@ -16,64 +16,79 @@ package github
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/google/go-github/v60/github"
-	"github.com/rs/zerolog"
 	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/provider"
+	"github.com/walteh/copyrc/pkg/provider/base"
 	"gitlab.com/tozd/go/errors"
-	"golang.org/x/oauth2"
 )
 
 func init() {
-	provider.Register("github", New)
+	base.Register("github", New)
 }
 
-// 🎯 Provider implements the provider interface for GitHub
+// 🔌 Provider implements the base.Provider interface for GitHub
 type Provider struct {
-	client *github.Client
-	logger zerolog.Logger
+	token string
 }
 
 // 🏭 New creates a new GitHub provider
-func New(ctx context.Context) (provider.Provider, error) {
-	logger := zerolog.Ctx(ctx)
-
-	// Get token from environment
+func New(ctx context.Context) (base.Provider, error) {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
-		return nil, errors.New("GITHUB_TOKEN environment variable not set")
+		return nil, errors.Errorf("GITHUB_TOKEN environment variable not set")
 	}
 
-	// Create OAuth2 client
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	// Create GitHub client
-	client := github.NewClient(tc)
-
 	return &Provider{
-		client: client,
-		logger: *logger,
+		token: token,
 	}, nil
 }
 
 // 🔍 parseRepo parses a GitHub repository URL
-func (p *Provider) parseRepo(repo string) (owner, name string, err error) {
-	parts := strings.Split(repo, "/")
-	if len(parts) < 2 {
-		return "", "", errors.Errorf("invalid repository format: %s", repo)
+func (p *Provider) parseRepo(repo string) (owner string, name string, err error) {
+	parts := strings.Split(strings.TrimPrefix(repo, "github.com/"), "/")
+	if len(parts) != 2 {
+		return "", "", errors.Errorf("invalid GitHub repository URL: %s", repo)
+	}
+	return parts[0], parts[1], nil
+}
+
+// 🌐 request makes an HTTP request to the GitHub API
+func (p *Provider) request(ctx context.Context, method string, path string, query url.Values) (*http.Response, error) {
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     "api.github.com",
+		Path:     path,
+		RawQuery: query.Encode(),
 	}
 
-	return parts[len(parts)-2], parts[len(parts)-1], nil
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), nil)
+	if err != nil {
+		return nil, errors.Errorf("creating request: %w", err)
+	}
+
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+	req.Header.Set("Authorization", "token "+p.token)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Errorf("making request: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return nil, errors.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	return resp, nil
 }
 
 // 📂 ListFiles returns a list of files in the given path
@@ -83,25 +98,37 @@ func (p *Provider) ListFiles(ctx context.Context, args config.ProviderArgs) ([]s
 		return nil, errors.Errorf("parsing repo: %w", err)
 	}
 
-	// Get repository tree
-	tree, _, err := p.client.Git.GetTree(ctx, owner, name, args.Ref, true)
+	// Get tree
+	query := url.Values{}
+	query.Set("recursive", "1")
+	resp, err := p.request(ctx, http.MethodGet, fmt.Sprintf("/repos/%s/%s/git/trees/%s", owner, name, args.Ref), query)
 	if err != nil {
-		return nil, errors.Errorf("getting repository tree: %w", err)
+		return nil, errors.Errorf("getting tree: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Parse response
+	var tree struct {
+		Tree []struct {
+			Path string `json:"path"`
+			Type string `json:"type"`
+		} `json:"tree"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&tree); err != nil {
+		return nil, errors.Errorf("parsing tree: %w", err)
 	}
 
-	// Filter files by path
+	// Filter files
 	var files []string
-	for _, entry := range tree.Entries {
-		if entry.GetType() != "blob" {
+	prefix := filepath.Clean(args.Path) + "/"
+	for _, item := range tree.Tree {
+		if item.Type != "blob" {
 			continue
 		}
-
-		path := entry.GetPath()
-		if !strings.HasPrefix(path, args.Path) {
+		if !strings.HasPrefix(item.Path, prefix) {
 			continue
 		}
-
-		files = append(files, strings.TrimPrefix(path, args.Path))
+		files = append(files, strings.TrimPrefix(item.Path, prefix))
 	}
 
 	return files, nil
@@ -115,20 +142,33 @@ func (p *Provider) GetFile(ctx context.Context, args config.ProviderArgs, path s
 	}
 
 	// Get file content
-	content, _, _, err := p.client.Repositories.GetContents(ctx, owner, name, filepath.Join(args.Path, path), &github.RepositoryContentGetOptions{
-		Ref: args.Ref,
-	})
+	query := url.Values{}
+	query.Set("ref", args.Ref)
+	resp, err := p.request(ctx, http.MethodGet, fmt.Sprintf("/repos/%s/%s/contents/%s", owner, name, filepath.Join(args.Path, path)), query)
 	if err != nil {
-		return nil, errors.Errorf("getting file content: %w", err)
+		return nil, errors.Errorf("getting file: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Parse response
+	var content struct {
+		Content  string `json:"content"`
+		Encoding string `json:"encoding"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&content); err != nil {
+		return nil, errors.Errorf("parsing content: %w", err)
 	}
 
 	// Decode content
-	data, err := content.GetContent()
+	if content.Encoding != "base64" {
+		return nil, errors.Errorf("unexpected content encoding: %s", content.Encoding)
+	}
+	data, err := base64.StdEncoding.DecodeString(content.Content)
 	if err != nil {
 		return nil, errors.Errorf("decoding content: %w", err)
 	}
 
-	return io.NopCloser(strings.NewReader(data)), nil
+	return io.NopCloser(strings.NewReader(string(data))), nil
 }
 
 // 🎯 GetCommitHash returns the commit hash for the current ref
@@ -139,12 +179,23 @@ func (p *Provider) GetCommitHash(ctx context.Context, args config.ProviderArgs) 
 	}
 
 	// Get reference
-	ref, _, err := p.client.Git.GetRef(ctx, owner, name, "refs/heads/"+args.Ref)
+	resp, err := p.request(ctx, http.MethodGet, fmt.Sprintf("/repos/%s/%s/git/refs/heads/%s", owner, name, args.Ref), nil)
 	if err != nil {
 		return "", errors.Errorf("getting reference: %w", err)
 	}
+	defer resp.Body.Close()
 
-	return ref.Object.GetSHA(), nil
+	// Parse response
+	var ref struct {
+		Object struct {
+			SHA string `json:"sha"`
+		} `json:"object"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&ref); err != nil {
+		return "", errors.Errorf("parsing reference: %w", err)
+	}
+
+	return ref.Object.SHA, nil
 }
 
 // 🔗 GetPermalink returns a permanent link to the file
@@ -169,33 +220,5 @@ func (p *Provider) GetArchiveURL(ctx context.Context, args config.ProviderArgs) 
 		return "", errors.Errorf("parsing repo: %w", err)
 	}
 
-	// Get download URL
-	url, _, err := p.client.Repositories.GetArchiveLink(ctx, owner, name, github.Tarball, &github.RepositoryContentGetOptions{
-		Ref: args.Ref,
-	}, true)
-	if err != nil {
-		return "", errors.Errorf("getting archive link: %w", err)
-	}
-
-	return url.String(), nil
-}
-
-// 🔍 downloadFile downloads a file from a URL
-func (p *Provider) downloadFile(ctx context.Context, url string) (io.ReadCloser, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, errors.Errorf("creating request: %w", err)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Errorf("downloading file: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
-		return nil, errors.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	return resp.Body, nil
+	return fmt.Sprintf("https://api.github.com/repos/%s/%s/tarball/%s", owner, name, args.Ref), nil
 }

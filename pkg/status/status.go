@@ -38,6 +38,7 @@ type Status struct {
 	Files      map[string]FileEntry `json:"files"`       // File entries
 	CommitHash string               `json:"commit_hash"` // Repository commit hash
 	Config     *config.Config       `json:"config"`      // Configuration snapshot
+	LogState   *LogState            `json:"log_state"`   // Logging state
 }
 
 // 🎯 Manager handles status tracking

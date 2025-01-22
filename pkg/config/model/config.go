@@ -12,45 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package model
 
 import (
-	"context"
-	"os"
 	"path/filepath"
 
-	"github.com/rs/zerolog"
 	"gitlab.com/tozd/go/errors"
 )
-
-// 🔌 Parser is the interface for config parsers
-type Parser interface {
-	// 📝 Parse parses the config from bytes
-	Parse(ctx context.Context, data []byte) (*Config, error)
-
-	// 🔍 CanParse checks if this parser can handle the given file
-	CanParse(filename string) bool
-}
-
-var (
-	// 🗺️ parsers is a list of available parsers
-	parsers []Parser
-)
-
-// 📝 Register registers a parser
-func Register(p Parser) {
-	parsers = append(parsers, p)
-}
-
-// 🎯 GetParser returns a parser that can handle the given file
-func GetParser(filename string) Parser {
-	for _, p := range parsers {
-		if p.CanParse(filename) {
-			return p
-		}
-	}
-	return nil
-}
 
 // 🔄 Replacement represents a string replacement in files
 type Replacement struct {
@@ -83,37 +51,6 @@ type Config struct {
 	RemoteStatus bool         // Whether to check remote status
 	Force        bool         // Whether to force update even if status is ok
 	Async        bool         // Whether to process files asynchronously
-}
-
-// 🎯 Load loads the configuration from a file
-func Load(ctx context.Context, path string) (*Config, error) {
-	logger := zerolog.Ctx(ctx)
-	logger.Debug().Str("path", path).Msg("loading configuration")
-
-	// Read config file
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, errors.Errorf("reading config file: %w", err)
-	}
-
-	// Get parser
-	p := GetParser(path)
-	if p == nil {
-		return nil, errors.Errorf("no parser found for file: %s", path)
-	}
-
-	// Parse config
-	cfg, err := p.Parse(ctx, data)
-	if err != nil {
-		return nil, errors.Errorf("parsing config: %w", err)
-	}
-
-	// Validate
-	if err := cfg.Validate(); err != nil {
-		return nil, errors.Errorf("validating config: %w", err)
-	}
-
-	return cfg, nil
 }
 
 // 🔍 Validate checks if the configuration is valid
