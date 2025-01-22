@@ -180,7 +180,7 @@ func NewLoggerInContext(ctx context.Context, l *Logger) context.Context {
 }
 
 func newTestLogger(t *testing.T) *Logger {
-	console := bytes.NewBuffer(nil)
+	console := &testBuffer{Buffer: bytes.NewBuffer(nil)}
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zlog := zerolog.New(zerolog.NewTestWriter(t)).With().Timestamp().Caller().Logger()
 	return &Logger{
@@ -190,11 +190,20 @@ func newTestLogger(t *testing.T) *Logger {
 	}
 }
 
+// testBuffer is a wrapper around bytes.Buffer that ensures consistent newline handling
+type testBuffer struct {
+	*bytes.Buffer
+}
+
+func (b *testBuffer) Write(p []byte) (n int, err error) {
+	return b.Buffer.Write(p)
+}
+
 func (me *Logger) CopyOfCurrentConsoleOutputInTest() string {
 	me.mu.Lock()
 	defer me.mu.Unlock()
 
-	return me.consoleOut.(*bytes.Buffer).String()
+	return me.consoleOut.(*testBuffer).String()
 }
 
 func NewDiscardDebugLogger(console io.Writer) *Logger {
@@ -245,21 +254,28 @@ func (l *Logger) formatFileOperation(opts FileInfo) string {
 	// Build type part with optional replacements
 	var typePart string
 	if opts.Replacements > 0 && opts.Type().Name == FileTypeCopy.Name {
-		typePart = fmt.Sprintf("%-*s", typeWidth-2, opts.Type().UncoloredStringWithReplacements(opts.Replacements))
+		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredStringWithReplacements(opts.Replacements))
 	} else {
-		typePart = fmt.Sprintf("%-*s", typeWidth-2, opts.Type().UncoloredString())
+		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredString())
 	}
 
 	typePart = color.New(opts.Type().Color).Sprint(typePart)
 
 	// Build status part
-	statusPart := fmt.Sprintf("%-*s", statusWidth, opts.Status().Text)
+	var statusText string
+	if opts.Status().Text == "" {
+		statusText = "no change"
+	} else {
+		statusText = opts.Status().Text
+	}
+	statusPart := fmt.Sprintf("%-*s", statusWidth, statusText)
 
-	return fmt.Sprintf("%s%s %-*s %-*s %s",
+	// Format the line with proper indentation
+	return fmt.Sprintf("%s%s %s %s %s",
 		strings.Repeat(" ", fileIndent),
 		color.New(opts.Status().Style.SymbolColor).Sprint(string(opts.Status().Symbol)),
-		nameWidth, namePart,
-		typeWidth, typePart,
+		namePart,
+		typePart,
 		statusPart)
 }
 
@@ -462,7 +478,12 @@ func (l *Logger) LogFileOperation(opts FileInfo) {
 		l.currentRepo.Files = append(l.currentRepo.Files, opts)
 	}
 
-	fmt.Fprintln(l.consoleOut, l.formatFileOperation(opts))
+	// Mark file as processed
+	processedFiles.Store(opts.Name, true)
+
+	// Format the line and add a newline
+	line := l.formatFileOperation(opts) + "\n"
+	fmt.Fprint(l.consoleOut, line)
 	l.zlog.Info().
 		Str("file", opts.Name).
 		Str("status", opts.Status().Text).

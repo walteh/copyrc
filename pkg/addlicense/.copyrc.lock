@@ -1,0 +1,74 @@
+{
+	"last_updated": "0001-01-01T00:00:00Z",
+	"commit_hash": "4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+	"branch": "master",
+	"coppied_files": {
+		"LICENSE.copy": {
+			"file": "LICENSE.copy",
+			"source": "github.com/google/addlicense@4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+			"permalink": "https://raw.githubusercontent.com/google/addlicense/4caba19b7ed7818bb86bc4cd20411a246aa4a524/LICENSE",
+			"last_updated": "2025-01-22T18:34:28.703765Z"
+		},
+		"main.copy.go": {
+			"file": "main.copy.go",
+			"source": "github.com/google/addlicense@4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+			"permalink": "https://raw.githubusercontent.com/google/addlicense/4caba19b7ed7818bb86bc4cd20411a246aa4a524/main.go",
+			"last_updated": "2025-01-22T18:34:28.722631Z",
+			"changes": [
+				"Line 21: Replaced 'package main' with 'package addlicense'"
+			]
+		},
+		"main_test.copy.go": {
+			"file": "main_test.copy.go",
+			"source": "github.com/google/addlicense@4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+			"permalink": "https://raw.githubusercontent.com/google/addlicense/4caba19b7ed7818bb86bc4cd20411a246aa4a524/main_test.go",
+			"last_updated": "2025-01-22T18:34:28.738997Z",
+			"changes": [
+				"Line 19: Replaced 'package main' with 'package addlicense'"
+			]
+		},
+		"tmpl.copy.go": {
+			"file": "tmpl.copy.go",
+			"source": "github.com/google/addlicense@4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+			"permalink": "https://raw.githubusercontent.com/google/addlicense/4caba19b7ed7818bb86bc4cd20411a246aa4a524/tmpl.go",
+			"last_updated": "2025-01-22T18:34:28.753885Z",
+			"changes": [
+				"Line 19: Replaced 'package main' with 'package addlicense'"
+			]
+		},
+		"tmpl_test.copy.go": {
+			"file": "tmpl_test.copy.go",
+			"source": "github.com/google/addlicense@4caba19b7ed7818bb86bc4cd20411a246aa4a524",
+			"permalink": "https://raw.githubusercontent.com/google/addlicense/4caba19b7ed7818bb86bc4cd20411a246aa4a524/tmpl_test.go",
+			"last_updated": "2025-01-22T18:34:28.769769Z",
+			"changes": [
+				"Line 19: Replaced 'package main' with 'package addlicense'"
+			]
+		}
+	},
+	"generated_files": {},
+	"args": {
+		"src_repo": "github.com/google/addlicense",
+		"src_ref": "master",
+		"src_path": ".",
+		"copy_args": {
+			"replacements": [
+				{
+					"old": "package main",
+					"new": "package addlicense"
+				}
+			],
+			"ignore_files": [
+				"README.md",
+				"go.mod",
+				"go.sum",
+				"go.work",
+				"go.work.sum",
+				"*.yaml",
+				"*.md",
+				"Dockerfile",
+				".gitignore"
+			]
+		}
+	}
+}

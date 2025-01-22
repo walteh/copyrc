@@ -1,3 +1,5 @@
+
+
 copy {
 	source {
 		repo = "github.com/google/addlicense"
@@ -23,7 +25,9 @@ copy {
 			"go.work",
 			"go.work.sum",
 			"*.yaml",
+			"*.md",
 			"Dockerfile",
+			".gitignore",
 		]
 	}
 }
