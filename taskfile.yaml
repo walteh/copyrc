@@ -69,13 +69,13 @@ tasks:
     copyrc:
         desc: copyrc
         cmds:
-            - go run ./cmd/copyrc -config=.copyrc.example.hcl
+            - go run ./cmd/copyrc -config=.copyrc.hcl
         sources:
-            - .copyrc.example.hcl
+            - .copyrc.hcl
         generates:
             - "**/*.copyrc.lock"
         status:
-            - go run ./cmd/copyrc -config=.copyrc.example.hcl -status
+            - go run ./cmd/copyrc -config=.copyrc.hcl -status
 
     copywrite:
         cmds:

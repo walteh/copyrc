@@ -14,6 +14,7 @@ require (
 	github.com/bufbuild/plugins v0.0.0-20250117170400-2b3d27dcd92d
 	github.com/go-task/task/v3 v3.41.0
 	github.com/golangci/golangci-lint v1.63.4
+	github.com/google/addlicense v1.1.1
 	github.com/google/go-containerregistry v0.20.3
 	github.com/goreleaser/goreleaser/v2 v2.5.1
 	github.com/hashicorp/copywrite v0.19.0

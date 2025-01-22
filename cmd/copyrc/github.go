@@ -1,5 +1,16 @@
-// Copyright (c) walteh LLC
-// SPDX-License-Identifier: MPL-2.0
+// Copyright 2025 walteh LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package main
 
@@ -99,11 +110,14 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]st
 	// Try to decode as array first
 	var files []struct {
 		Path string `json:"path"`
+		Type string `json:"type"`
 	}
 	if err := json.Unmarshal(body, &files); err == nil {
 		result := make([]string, 0, len(files))
 		for _, f := range files {
-			result = append(result, f.Path)
+			if f.Type == "file" {
+				result = append(result, f.Path)
+			}
 		}
 		return result, nil
 	}
@@ -111,6 +125,7 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]st
 	// If array decode fails, try single file object
 	var file struct {
 		Path string `json:"path"`
+		Type string `json:"type"`
 	}
 	if err := json.Unmarshal(body, &file); err != nil {
 		return nil, errors.Errorf("decoding response: %w", err)
