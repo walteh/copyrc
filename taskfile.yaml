@@ -77,6 +77,15 @@ tasks:
         status:
             - go run ./cmd/copyrc -config=.copyrc.example.hcl -status
 
+    copywrite:
+        cmds:
+            - ./scripts/run-tool.sh copywrite license --year=$(date +%Y)
+            - ./scripts/run-tool.sh copywrite headers
+        generates:
+            - LICENSE
+        sources:
+            - .copywrite.hcl
+
     go-mod-tidy:
         env:
             {

@@ -1,3 +1,6 @@
+// Copyright (c) walteh LLC
+// SPDX-License-Identifier: MPL-2.0
+
 //go:build tools
 
 package main
@@ -13,12 +16,11 @@ import (
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
 	_ "github.com/google/go-containerregistry/cmd/crane"
 	_ "github.com/goreleaser/goreleaser/v2"
+	_ "github.com/hashicorp/copywrite"
+	_ "github.com/ianlewis/todos/internal/cmd/todos"
 	_ "github.com/oligot/go-mod-upgrade"
 	_ "github.com/srikrsna/protoc-gen-gotag"
 	_ "github.com/vektra/mockery/v2"
 	_ "github.com/walteh/retab/v2/cmd/retab"
 	_ "gotest.tools/gotestsum"
-
-	_ "github.com/alecthomas/participle/v2/cmd/railroad"
-	_ "github.com/ianlewis/todos/internal/cmd/todos"
 )
