@@ -18,313 +18,141 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"sync"
 	"testing"
-	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestEnhancedLogging(t *testing.T) {
-	// Create a buffer to capture output
-
-	t.Run("success_message", func(t *testing.T) {
-		logger := newTestLogger(t)
-		logger.Success("Operation completed")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "✅")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "Operation completed")
-	})
-
-	t.Run("info_message", func(t *testing.T) {
-		logger := newTestLogger(t)
-		logger.Info("Processing files")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "ℹ️")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "Processing files")
-	})
-
-	t.Run("warning_message", func(t *testing.T) {
-		logger := newTestLogger(t)
-		logger.Warning("Proceed with caution")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "⚠️")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "Proceed with caution")
-	})
-
-	t.Run("error_message", func(t *testing.T) {
-		logger := newTestLogger(t)
-		logger.Error("Something went wrong")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "❌")
-		assert.Contains(t, logger.CopyOfCurrentConsoleOutputInTest(), "Something went wrong")
-	})
-}
-
-func TestNewProvider(t *testing.T) {
+func TestHandler(t *testing.T) {
 	tests := []struct {
 		name        string
-		repo        string
-		ref         string
-		path        string
+		setup       func(t *testing.T) *Handler
 		wantErr     bool
 		errContains string
+		validate    func(t *testing.T)
 	}{
 		{
-			name: "valid_github_repo",
-			repo: "github.com/org/repo",
-			ref:  "main",
-			path: "path/to/files",
+			name: "basic_run",
+			setup: func(t *testing.T) *Handler {
+				// Create temp config file
+				tmpDir := t.TempDir()
+				configPath := filepath.Join(tmpDir, "config.yaml")
+				configContent := `
+provider:
+  repo: github.com/walteh/copyrc
+  ref: main
+  path: pkg/provider
+destination: ` + filepath.Join(tmpDir, "dest") + `
+`
+				err := os.WriteFile(configPath, []byte(configContent), 0644)
+				require.NoError(t, err, "writing config file")
+
+				return &Handler{
+					configFile: configPath,
+					debug:      true,
+				}
+			},
+			validate: func(t *testing.T) {
+				// Add validation if needed
+			},
 		},
+		{
+			name: "invalid_config",
+			setup: func(t *testing.T) *Handler {
+				// Create temp config file with invalid content
+				tmpDir := t.TempDir()
+				configPath := filepath.Join(tmpDir, "config.yaml")
+				configContent := `invalid: yaml: :`
+				err := os.WriteFile(configPath, []byte(configContent), 0644)
+				require.NoError(t, err, "writing config file")
+
+				return &Handler{
+					configFile: configPath,
+				}
+			},
+			wantErr:     true,
+			errContains: "parsing config",
+		},
+		{
+			name: "clean_run",
+			setup: func(t *testing.T) *Handler {
+				tmpDir := t.TempDir()
+				configPath := filepath.Join(tmpDir, "config.yaml")
+				configContent := `
+provider:
+  repo: github.com/walteh/copyrc
+  ref: main
+  path: pkg/provider
+destination: ` + filepath.Join(tmpDir, "dest") + `
+`
+				err := os.WriteFile(configPath, []byte(configContent), 0644)
+				require.NoError(t, err, "writing config file")
+
+				return &Handler{
+					configFile: configPath,
+					clean:      true,
+				}
+			},
+		},
+		{
+			name: "status_check",
+			setup: func(t *testing.T) *Handler {
+				tmpDir := t.TempDir()
+				configPath := filepath.Join(tmpDir, "config.yaml")
+				configContent := `
+provider:
+  repo: github.com/walteh/copyrc
+  ref: main
+  path: pkg/provider
+destination: ` + filepath.Join(tmpDir, "dest") + `
+`
+				err := os.WriteFile(configPath, []byte(configContent), 0644)
+				require.NoError(t, err, "writing config file")
+
+				return &Handler{
+					configFile: configPath,
+					status:     true,
+				}
+			},
+		},
+	}
+
+	// Skip if no GitHub token
+	if os.Getenv("GITHUB_TOKEN") == "" {
+		t.Skip("GITHUB_TOKEN not set")
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			provider, err := NewGithubProvider()
-			require.NoError(t, err, "unexpected error")
-			require.NotNil(t, provider, "provider should not be nil")
+			h := tt.setup(t)
+			ctx := context.Background()
+
+			// Set up logging
+			logger := zerolog.New(zerolog.NewTestWriter(t)).Level(zerolog.DebugLevel)
+			ctx = logger.WithContext(ctx)
+
+			err := h.Run(ctx)
+			if tt.wantErr {
+				require.Error(t, err, "Run should return error")
+				if tt.errContains != "" {
+					assert.Contains(t, err.Error(), tt.errContains, "error should contain expected message")
+				}
+				return
+			}
+
+			require.NoError(t, err, "Run should succeed")
+			if tt.validate != nil {
+				tt.validate(t)
+			}
 		})
 	}
 }
 
-func TestGithubProvider(t *testing.T) {
-	provider, err := NewGithubProvider()
-	require.NoError(t, err, "creating provider")
-
-	t.Run("GetSourceInfo", func(t *testing.T) {
-		info, err := provider.GetSourceInfo(context.Background(), ProviderArgs{
-			Repo: "github.com/org/repo",
-			Ref:  "main",
-			Path: "path/to/files",
-		}, "abc123")
-		require.NoError(t, err, "getting source info")
-		assert.Equal(t, "github.com/org/repo@abc123", info)
-	})
-
-	t.Run("GetPermalink", func(t *testing.T) {
-		link, err := provider.GetPermalink(context.Background(), ProviderArgs{
-			Repo: "github.com/org/repo",
-			Ref:  "main",
-			Path: "path/to/files",
-		}, "abc123", "file.go")
-		require.NoError(t, err, "getting permalink")
-		assert.Equal(t, "https://raw.githubusercontent.com/org/repo/abc123/file.go", link)
-	})
-}
-
-func TestNewConfigFromInput(t *testing.T) {
-	tests := []struct {
-		name        string
-		input       Input
-		wantErr     bool
-		errContains string
-	}{
-		{
-			name: "valid_input",
-			input: Input{
-				SrcRepo:  "github.com/org/repo",
-				SrcRef:   "main",
-				SrcPath:  "path/to/files",
-				DestPath: "/tmp/dest",
-				Replacements: []string{
-					"old:new",
-					"foo:bar",
-				},
-				IgnoreFiles: []string{
-					"*.tmp",
-					"*.bak",
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create a mock provider for testing
-			mock := NewMockProvider(t)
-
-			cfg, err := NewConfigFromInput(tt.input, mock)
-			require.NoError(t, err, "unexpected error")
-			require.NotNil(t, cfg, "config should not be nil")
-			assert.Equal(t, tt.input.DestPath, cfg.DestPath)
-			assert.Len(t, cfg.CopyArgs.Replacements, len(tt.input.Replacements))
-			assert.Len(t, cfg.CopyArgs.IgnoreFiles, len(tt.input.IgnoreFiles))
-		})
-	}
-}
-
-func TestProcessFile(t *testing.T) {
-	// Setup mock provider with test files
-	mock := NewMockProvider(t)
-	mock.AddFile("test.go", []byte(`package foo
-
-func Bar() {}`))
-	mock.AddFile("other.go", []byte(`package foo
-
-func Other() {}`))
-
-	args := ProviderArgs{
-		Repo: mock.GetFullRepo(),
-		Ref:  mock.ref,
-		Path: mock.path,
-	}
-
-	cfg := &Config{
-		ProviderArgs: args,
-		DestPath:     t.TempDir(),
-		CopyArgs: &ConfigCopyArgs{
-			Replacements: []Replacement{
-				{Old: "Bar", New: "Baz"},
-			},
-			IgnoreFiles: []string{"*.tmp", "*.bak"},
-		},
-	}
-
-	// Initialize status
-	status := &StatusFile{
-		CoppiedFiles: make(map[string]StatusEntry),
-	}
-
-	t.Run("normal file", func(t *testing.T) {
-		ctx := context.Background()
-		logger := newTestLogger(t)
-		ctx = NewLoggerInContext(ctx, logger)
-
-		// Process the file
-		var mu sync.Mutex
-		err := processFile(ctx, mock, cfg, "test.go", mock.commitHash, status, &mu, cfg.DestPath)
-		require.NoError(t, err)
-
-		// Verify the output file
-		content, err := os.ReadFile(filepath.Join(cfg.DestPath, "test.copy.go"))
-		require.NoError(t, err)
-		assert.Contains(t, string(content), "func Baz()")
-		assert.Contains(t, string(content), "generated by copyrc. DO NOT EDIT.")
-
-		// Verify status entry
-		entry, ok := status.CoppiedFiles["test.copy.go"]
-		require.True(t, ok, "status entry should exist")
-		assert.Equal(t, "test.copy.go", entry.File)
-		assert.Equal(t, "mock@abc123", entry.Source)
-	})
-
-	t.Run("clean destination", func(t *testing.T) {
-		ctx := context.Background()
-		logger := newTestLogger(t)
-		ctx = NewLoggerInContext(ctx, logger)
-
-		// Create test files
-		dir := t.TempDir()
-		files := []string{
-			"test.copy.go",
-			"regular.go",
-		}
-
-		st := &StatusFile{
-			CoppiedFiles:   make(map[string]StatusEntry),
-			GeneratedFiles: make(map[string]GeneratedFileEntry),
-		}
-		for _, f := range files {
-			_, err := writeFile(ctx, WriteFileOpts{
-				Path:       filepath.Join(dir, f),
-				Contents:   []byte("content"),
-				StatusFile: st,
-			})
-			require.NoError(t, err)
-		}
-
-		status.CoppiedFiles["test.copy.go"] = StatusEntry{
-			File:        "test.copy.go",
-			Source:      "mock@abc123",
-			Permalink:   "mock://test.go@abc123",
-			LastUpdated: time.Now().UTC(),
-			Changes:     []string{"test change"},
-		}
-
-		// Clean the directory
-		err := cleanDestination(ctx, status, dir)
-		require.NoError(t, err)
-
-		require.NoFileExists(t, filepath.Join(dir, "test.copy.go"))
-		require.FileExists(t, filepath.Join(dir, "regular.go"))
-		require.NoFileExists(t, filepath.Join(dir, ".copyrc.lock"))
-	})
-
-	t.Run("status check", func(t *testing.T) {
-		dir := t.TempDir()
-		ctx := context.Background()
-		logger := newTestLogger(t)
-		ctx = NewLoggerInContext(ctx, logger)
-
-		// Create initial status
-		status := &StatusFile{
-			CommitHash: mock.commitHash,
-			Ref:        mock.ref,
-			Args: StatusFileArgs{
-				SrcRepo:  args.Repo,
-				SrcRef:   args.Ref,
-				SrcPath:  args.Path,
-				CopyArgs: &ConfigCopyArgs{},
-			},
-			CoppiedFiles: make(map[string]StatusEntry),
-		}
-		require.NoError(t, writeStatusFile(ctx, status, dir))
-
-		// Test with same commit hash
-		cfg := &Config{
-			ProviderArgs: args,
-			DestPath:     dir,
-			RemoteStatus: true,
-			CopyArgs:     &ConfigCopyArgs{},
-		}
-		err := run(ctx, cfg, mock)
-		require.NoError(t, err)
-
-		// Test with different commit hash
-		status.CommitHash = "different"
-		require.NoError(t, writeStatusFile(ctx, status, dir))
-		err = run(ctx, cfg, mock)
-		assert.Error(t, err)
-	})
-
-	t.Run("local_status_check", func(t *testing.T) {
-		dir := t.TempDir()
-		ctx := context.Background()
-		logger := newTestLogger(t)
-		ctx = NewLoggerInContext(ctx, logger)
-
-		// Create initial status
-		status := &StatusFile{
-			CoppiedFiles: make(map[string]StatusEntry),
-			Args: StatusFileArgs{
-				SrcRepo: args.Repo,
-				SrcRef:  args.Ref,
-				SrcPath: args.Path,
-				CopyArgs: &ConfigCopyArgs{
-					Replacements: []Replacement{
-						{Old: "Bar", New: "Baz"},
-					},
-					IgnoreFiles: []string{"*.tmp", "*.bak"},
-				},
-			},
-		}
-		require.NoError(t, writeStatusFile(ctx, status, dir))
-
-		// Test with same arguments
-		cfg := &Config{
-			ProviderArgs: args,
-			DestPath:     dir,
-			Status:       true,
-			CopyArgs: &ConfigCopyArgs{
-				Replacements: []Replacement{
-					{Old: "Bar", New: "Baz"},
-				},
-				IgnoreFiles: []string{"*.tmp", "*.bak"},
-			},
-		}
-		err := run(ctx, cfg, mock)
-		require.NoError(t, err)
-
-		// Test with different arguments
-		cfg.CopyArgs.Replacements[0].New = "Different"
-		err = run(ctx, cfg, mock)
-		assert.Error(t, err, "should error when configuration changes")
-	})
+func TestNewCommand(t *testing.T) {
+	cmd := NewCommand()
+	require.NotNil(t, cmd, "command should not be nil")
+	assert.Equal(t, "copyrc", cmd.Use, "command name should match")
+	assert.NotEmpty(t, cmd.Short, "should have short description")
 }

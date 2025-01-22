@@ -27,21 +27,21 @@ import (
 	"strings"
 
 	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/provider/base"
+	"github.com/walteh/copyrc/pkg/provider"
 	"gitlab.com/tozd/go/errors"
 )
 
 func init() {
-	base.Register("github", New)
+	provider.Register("github", New)
 }
 
-// 🔌 Provider implements the base.Provider interface for GitHub
+// 🔌 Provider implements the provider.Provider interface for GitHub
 type Provider struct {
 	token string
 }
 
 // 🏭 New creates a new GitHub provider
-func New(ctx context.Context) (base.Provider, error) {
+func New(ctx context.Context) (provider.Provider, error) {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		return nil, errors.Errorf("GITHUB_TOKEN environment variable not set")
@@ -54,6 +54,9 @@ func New(ctx context.Context) (base.Provider, error) {
 
 // 🔍 parseRepo parses a GitHub repository URL
 func (p *Provider) parseRepo(repo string) (owner string, name string, err error) {
+	// Remove https:// prefix if present
+	repo = strings.TrimPrefix(repo, "https://")
+
 	parts := strings.Split(strings.TrimPrefix(repo, "github.com/"), "/")
 	if len(parts) != 2 {
 		return "", "", errors.Errorf("invalid GitHub repository URL: %s", repo)

@@ -51,9 +51,13 @@ func TestParseRepo(t *testing.T) {
 			name:        "invalid_repo",
 			repo:        "invalid",
 			wantErr:     true,
-			errContains: "invalid repository format",
+			errContains: "invalid GitHub repository URL",
 		},
 	}
+
+	// Create provider with mock token
+	os.Setenv("GITHUB_TOKEN", "mock_token")
+	defer os.Unsetenv("GITHUB_TOKEN")
 
 	ctx := zerolog.New(os.Stderr).WithContext(context.Background())
 	p, err := New(ctx)
@@ -94,6 +98,10 @@ func TestGetSourceInfo(t *testing.T) {
 			want:       "github.com/walteh/copyrc@1234567",
 		},
 	}
+
+	// Create provider with mock token
+	os.Setenv("GITHUB_TOKEN", "mock_token")
+	defer os.Unsetenv("GITHUB_TOKEN")
 
 	ctx := zerolog.New(os.Stderr).WithContext(context.Background())
 	p, err := New(ctx)
@@ -145,9 +153,13 @@ func TestGetPermalink(t *testing.T) {
 			commitHash:  "1234567890abcdef",
 			file:        "github.go",
 			wantErr:     true,
-			errContains: "invalid repository format",
+			errContains: "invalid GitHub repository URL",
 		},
 	}
+
+	// Create provider with mock token
+	os.Setenv("GITHUB_TOKEN", "mock_token")
+	defer os.Unsetenv("GITHUB_TOKEN")
 
 	ctx := zerolog.New(os.Stderr).WithContext(context.Background())
 	p, err := New(ctx)
@@ -169,10 +181,9 @@ func TestGetPermalink(t *testing.T) {
 }
 
 func TestListFiles(t *testing.T) {
-	// Skip if no GitHub token
-	if os.Getenv("GITHUB_TOKEN") == "" {
-		t.Skip("GITHUB_TOKEN not set")
-	}
+	// Create provider with mock token
+	os.Setenv("GITHUB_TOKEN", "mock_token")
+	defer os.Unsetenv("GITHUB_TOKEN")
 
 	tests := []struct {
 		name        string
@@ -201,7 +212,7 @@ func TestListFiles(t *testing.T) {
 				Path: "pkg/provider",
 			},
 			wantErr:     true,
-			errContains: "invalid repository format",
+			errContains: "invalid GitHub repository URL",
 		},
 	}
 
@@ -227,10 +238,9 @@ func TestListFiles(t *testing.T) {
 }
 
 func TestGetFile(t *testing.T) {
-	// Skip if no GitHub token
-	if os.Getenv("GITHUB_TOKEN") == "" {
-		t.Skip("GITHUB_TOKEN not set")
-	}
+	// Create provider with mock token
+	os.Setenv("GITHUB_TOKEN", "mock_token")
+	defer os.Unsetenv("GITHUB_TOKEN")
 
 	tests := []struct {
 		name        string
@@ -262,7 +272,7 @@ func TestGetFile(t *testing.T) {
 			},
 			path:        "github.go",
 			wantErr:     true,
-			errContains: "invalid repository format",
+			errContains: "invalid GitHub repository URL",
 		},
 	}
 

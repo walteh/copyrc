@@ -17,17 +17,18 @@ package provider
 import (
 	"context"
 	"io"
+	"net/http"
 
 	"github.com/walteh/copyrc/pkg/config"
 	"gitlab.com/tozd/go/errors"
 )
 
-// 🔌 Provider is the interface that must be implemented by repository providers
+// 🔌 Provider is the interface for repository providers
 type Provider interface {
 	// 📂 ListFiles returns a list of files in the given path
 	ListFiles(ctx context.Context, args config.ProviderArgs) ([]string, error)
 
-	// 🔍 GetFile retrieves a single file's contents
+	// 📄 GetFile retrieves a single file's contents
 	GetFile(ctx context.Context, args config.ProviderArgs, path string) (io.ReadCloser, error)
 
 	// 🎯 GetCommitHash returns the commit hash for the current ref
@@ -36,18 +37,18 @@ type Provider interface {
 	// 🔗 GetPermalink returns a permanent link to the file
 	GetPermalink(ctx context.Context, args config.ProviderArgs, commitHash string, file string) (string, error)
 
-	// 📝 GetSourceInfo returns a string describing the source (e.g. "github.com/org/repo@hash")
+	// 📝 GetSourceInfo returns a string describing the source
 	GetSourceInfo(ctx context.Context, args config.ProviderArgs, commitHash string) (string, error)
 
 	// 📦 GetArchiveURL returns the URL to download the repository archive
 	GetArchiveURL(ctx context.Context, args config.ProviderArgs) (string, error)
 }
 
-// 🏭 Factory is a function that creates a new provider
+// 🏭 Factory creates a new provider
 type Factory func(ctx context.Context) (Provider, error)
 
 var (
-	// 🗺️ providers is a map of provider names to their factories
+	// 🗺️ providers is a map of provider names to factories
 	providers = make(map[string]Factory)
 )
 
@@ -57,23 +58,26 @@ func Register(name string, factory Factory) {
 }
 
 // 🎯 Get returns a provider by name
-func Get(ctx context.Context, name string) (Provider, error) {
-	factory, ok := providers[name]
-	if !ok {
-		return nil, errors.Errorf("unknown provider: %s", name)
-	}
-
-	return factory(ctx)
+func Get(name string) Factory {
+	return providers[name]
 }
 
-// 🔍 GetFromRepo determines the provider from a repo URL
-func GetFromRepo(ctx context.Context, repo string) (Provider, error) {
-	// TODO: Implement provider detection based on repo URL
-	// For now, just return GitHub provider
-	factory, ok := providers["github"]
-	if !ok {
-		return nil, errors.Errorf("github provider not registered")
+// 📥 DownloadFile downloads a file from a URL
+func DownloadFile(ctx context.Context, url string) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, errors.Errorf("creating request: %w", err)
 	}
 
-	return factory(ctx)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Errorf("making request: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return nil, errors.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	return resp.Body, nil
 }

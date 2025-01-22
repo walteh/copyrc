@@ -48,14 +48,9 @@ copy:
     - old: baz
       new: qux
       file: specific.go
-  ignore_files:
+  ignore_patterns:
     - "*.tmp"
     - "*.log"
-go_embed: true
-clean: true
-status: true
-remote_status: true
-force: false
 async: true
 `,
 			check: func(t *testing.T, cfg *Config) {
@@ -63,6 +58,7 @@ async: true
 				assert.Equal(t, "main", cfg.Provider.Ref, "ref should match")
 				assert.Equal(t, "pkg/provider", cfg.Provider.Path, "path should match")
 				assert.Equal(t, "/tmp/copyrc", cfg.Destination, "destination should match")
+				assert.NotNil(t, cfg.Copy, "copy should not be nil")
 				assert.Len(t, cfg.Copy.Replacements, 2, "should have 2 replacements")
 				assert.Equal(t, "foo", cfg.Copy.Replacements[0].Old, "first replacement old should match")
 				assert.Equal(t, "bar", cfg.Copy.Replacements[0].New, "first replacement new should match")
@@ -71,14 +67,9 @@ async: true
 				assert.Equal(t, "qux", cfg.Copy.Replacements[1].New, "second replacement new should match")
 				assert.NotNil(t, cfg.Copy.Replacements[1].File, "second replacement file should not be nil")
 				assert.Equal(t, "specific.go", *cfg.Copy.Replacements[1].File, "second replacement file should match")
-				assert.Len(t, cfg.Copy.IgnoreFiles, 2, "should have 2 ignore files")
-				assert.Equal(t, "*.tmp", cfg.Copy.IgnoreFiles[0], "first ignore file should match")
-				assert.Equal(t, "*.log", cfg.Copy.IgnoreFiles[1], "second ignore file should match")
-				assert.True(t, cfg.GoEmbed, "go_embed should be true")
-				assert.True(t, cfg.Clean, "clean should be true")
-				assert.True(t, cfg.Status, "status should be true")
-				assert.True(t, cfg.RemoteStatus, "remote_status should be true")
-				assert.False(t, cfg.Force, "force should be false")
+				assert.Len(t, cfg.Copy.IgnorePatterns, 2, "should have 2 ignore patterns")
+				assert.Equal(t, "*.tmp", cfg.Copy.IgnorePatterns[0], "first ignore pattern should match")
+				assert.Equal(t, "*.log", cfg.Copy.IgnorePatterns[1], "second ignore pattern should match")
 				assert.True(t, cfg.Async, "async should be true")
 			},
 		},
@@ -96,11 +87,6 @@ destination: /tmp/copyrc
 				assert.Equal(t, "pkg/provider", cfg.Provider.Path, "path should match")
 				assert.Equal(t, "/tmp/copyrc", cfg.Destination, "destination should match")
 				assert.Nil(t, cfg.Copy, "copy should be nil")
-				assert.False(t, cfg.GoEmbed, "go_embed should be false")
-				assert.False(t, cfg.Clean, "clean should be false")
-				assert.False(t, cfg.Status, "status should be false")
-				assert.False(t, cfg.RemoteStatus, "remote_status should be false")
-				assert.False(t, cfg.Force, "force should be false")
 				assert.False(t, cfg.Async, "async should be false")
 			},
 		},

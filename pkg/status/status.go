@@ -38,7 +38,6 @@ type Status struct {
 	Files      map[string]FileEntry `json:"files"`       // File entries
 	CommitHash string               `json:"commit_hash"` // Repository commit hash
 	Config     *config.Config       `json:"config"`      // Configuration snapshot
-	LogState   *LogState            `json:"log_state"`   // Logging state
 }
 
 // 🎯 Manager handles status tracking
@@ -50,16 +49,16 @@ type Manager struct {
 
 // 🏭 New creates a new status manager
 func New(path string) (*Manager, error) {
-	m := &Manager{
+	mgr := &Manager{
 		path: path,
 	}
 
-	// Load existing status if it exists
-	if err := m.load(); err != nil {
+	// Load existing status
+	if err := mgr.load(); err != nil {
 		return nil, errors.Errorf("loading status: %w", err)
 	}
 
-	return m, nil
+	return mgr, nil
 }
 
 // 🔍 load loads the status from disk
@@ -181,11 +180,6 @@ func (m *Manager) CheckStatus(ctx context.Context, cfg *config.Config, p provide
 	if remoteHash != m.status.CommitHash {
 		return errors.Errorf("commit hash mismatch: local=%s remote=%s", m.status.CommitHash, remoteHash)
 	}
-
-	// TODO: Add more status checks as needed
-	// - Check file hashes
-	// - Check replacements
-	// - Check config changes
 
 	return nil
 }

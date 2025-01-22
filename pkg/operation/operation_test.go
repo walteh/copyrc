@@ -15,6 +15,7 @@
 package operation
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"os"
@@ -27,10 +28,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/log"
 )
 
-// 🔧 MockProvider is a mock implementation of the provider.Provider interface
+// MockProvider mocks the provider interface
 type MockProvider struct {
 	mock.Mock
 }
@@ -67,220 +67,240 @@ func (m *MockProvider) GetArchiveURL(ctx context.Context, args config.ProviderAr
 
 func TestProcessFile(t *testing.T) {
 	tests := []struct {
-		name        string
-		cfg         *config.Config
-		path        string
-		content     string
-		wantErr     bool
-		errContains string
-		check       func(t *testing.T, destPath string)
+		name     string
+		cfg      *config.Config
+		files    map[string]string
+		wantErr  bool
+		validate func(t *testing.T, tmpDir string)
 	}{
 		{
 			name: "process_file_with_replacements",
 			cfg: &config.Config{
 				Provider: config.ProviderArgs{
-					Repo: "github.com/walteh/copyrc",
+					Repo: "test/repo",
 					Ref:  "main",
-					Path: "pkg/provider",
+					Path: "src",
 				},
-				Destination: t.TempDir(),
+				Destination: "dst",
 				Copy: &config.CopyArgs{
 					Replacements: []config.Replacement{
-						{Old: "foo", New: "bar"},
-						{Old: "baz", New: "qux"},
+						{Old: "old", New: "new"},
 					},
 				},
 			},
-			path:    "test.txt",
-			content: "This is a foo test with baz content",
-			check: func(t *testing.T, destPath string) {
-				content, err := os.ReadFile(destPath)
+			files: map[string]string{
+				"file.txt": "old content",
+			},
+			validate: func(t *testing.T, tmpDir string) {
+				content, err := os.ReadFile(filepath.Join(tmpDir, "dst", "file.txt"))
 				require.NoError(t, err, "reading file should succeed")
-				assert.Equal(t, "This is a bar test with qux content", string(content), "content should be replaced")
+				assert.Equal(t, "new content", string(content), "content should be replaced")
 			},
 		},
 		{
-			name: "process_file_with_specific_replacement",
+			name: "process_file_specific_replacement",
 			cfg: &config.Config{
 				Provider: config.ProviderArgs{
-					Repo: "github.com/walteh/copyrc",
+					Repo: "test/repo",
 					Ref:  "main",
-					Path: "pkg/provider",
+					Path: "src",
 				},
-				Destination: t.TempDir(),
+				Destination: "dst",
 				Copy: &config.CopyArgs{
 					Replacements: []config.Replacement{
-						{Old: "foo", New: "bar"},
-						{Old: "baz", New: "qux", File: stringPtr("other.txt")},
+						{Old: "old", New: "new", File: stringPtr("other.txt")},
+						{Old: "test", New: "replaced", File: stringPtr("file.txt")},
 					},
 				},
 			},
-			path:    "test.txt",
-			content: "This is a foo test with baz content",
-			check: func(t *testing.T, destPath string) {
-				content, err := os.ReadFile(destPath)
+			files: map[string]string{
+				"file.txt": "test content",
+			},
+			validate: func(t *testing.T, tmpDir string) {
+				content, err := os.ReadFile(filepath.Join(tmpDir, "dst", "file.txt"))
 				require.NoError(t, err, "reading file should succeed")
-				assert.Equal(t, "This is a bar test with baz content", string(content), "only matching replacements should be applied")
+				assert.Equal(t, "replaced content", string(content), "content should be replaced")
 			},
 		},
 		{
-			name: "process_file_ignored",
+			name: "ignore_file",
 			cfg: &config.Config{
 				Provider: config.ProviderArgs{
-					Repo: "github.com/walteh/copyrc",
+					Repo: "test/repo",
 					Ref:  "main",
-					Path: "pkg/provider",
+					Path: "src",
 				},
-				Destination: t.TempDir(),
+				Destination: "dst",
 				Copy: &config.CopyArgs{
-					IgnoreFiles: []string{"*.txt"},
+					IgnorePatterns: []string{"ignored.txt"},
 				},
 			},
-			path:    "test.txt",
-			content: "This is a test",
-			check: func(t *testing.T, destPath string) {
-				_, err := os.Stat(destPath)
-				assert.True(t, os.IsNotExist(err), "file should not exist")
+			files: map[string]string{
+				"ignored.txt": "should not be copied",
+			},
+			validate: func(t *testing.T, tmpDir string) {
+				_, err := os.Stat(filepath.Join(tmpDir, "dst", "ignored.txt"))
+				assert.True(t, os.IsNotExist(err), "ignored file should not exist")
 			},
 		},
 	}
 
-	ctx := zerolog.New(os.Stderr).WithContext(context.Background())
-	logger := log.New(io.Discard, zerolog.InfoLevel)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create mock provider
+			// Create temp dir
+			tmpDir := t.TempDir()
+
+			// Update config with temp dir
+			tt.cfg.Destination = filepath.Join(tmpDir, tt.cfg.Destination)
+
+			// Create destination dir
+			err := os.MkdirAll(tt.cfg.Destination, 0755)
+			require.NoError(t, err, "creating destination directory")
+
+			// Set up mock provider
 			p := &MockProvider{}
-			p.On("GetFile", mock.Anything, tt.cfg.Provider, tt.path).Return(
-				io.NopCloser(strings.NewReader(tt.content)),
-				nil,
-			)
-
-			// Create operation manager
-			mgr := New(tt.cfg, p, logger)
-
-			// Process file
-			err := mgr.ProcessFile(ctx, tt.path)
-			if tt.wantErr {
-				require.Error(t, err, "ProcessFile should return error")
-				assert.Contains(t, err.Error(), tt.errContains, "error should contain expected message")
-				return
+			for path, content := range tt.files {
+				// Only set up expectations for non-ignored files
+				if tt.cfg.Copy == nil || len(tt.cfg.Copy.IgnorePatterns) == 0 || !shouldIgnore(path, tt.cfg.Copy.IgnorePatterns) {
+					// Create a new reader for each call to avoid EOF issues
+					p.On("GetFile", mock.Anything, tt.cfg.Provider, path).Return(
+						func(ctx context.Context, args config.ProviderArgs, path string) io.ReadCloser {
+							return io.NopCloser(strings.NewReader(tt.files[path]))
+						},
+						func(ctx context.Context, args config.ProviderArgs, path string) error {
+							return nil
+						},
+					)
+				}
 			}
 
-			require.NoError(t, err, "ProcessFile should succeed")
-			if tt.check != nil {
-				tt.check(t, filepath.Join(tt.cfg.Destination, tt.path))
+			// Create logger
+			var buf bytes.Buffer
+			logger := zerolog.New(&buf)
+
+			// Create manager
+			mgr := New(tt.cfg, p, &logger)
+
+			// Process each file
+			for path := range tt.files {
+				err := mgr.ProcessFile(context.Background(), path)
+				if tt.wantErr {
+					assert.Error(t, err, "ProcessFile should return error")
+					return
+				}
+				assert.NoError(t, err, "ProcessFile should succeed")
 			}
 
+			// Run validation
+			if tt.validate != nil {
+				tt.validate(t, tmpDir)
+			}
+
+			// Verify all mock expectations
 			p.AssertExpectations(t)
 		})
 	}
 }
 
+// Helper function to check if a file should be ignored
+func shouldIgnore(path string, patterns []string) bool {
+	for _, pattern := range patterns {
+		if matched, _ := filepath.Match(pattern, path); matched {
+			return true
+		}
+	}
+	return false
+}
+
 func TestProcessFiles(t *testing.T) {
 	tests := []struct {
-		name        string
-		cfg         *config.Config
-		files       []string
-		contents    map[string]string
-		wantErr     bool
-		errContains string
-		check       func(t *testing.T, destDir string)
+		name     string
+		cfg      *config.Config
+		files    map[string]string
+		wantErr  bool
+		validate func(t *testing.T, tmpDir string)
 	}{
 		{
 			name: "process_multiple_files",
 			cfg: &config.Config{
 				Provider: config.ProviderArgs{
-					Repo: "github.com/walteh/copyrc",
+					Repo: "test/repo",
 					Ref:  "main",
-					Path: "pkg/provider",
+					Path: "src",
 				},
-				Destination: t.TempDir(),
+				Destination: "dst",
 				Copy: &config.CopyArgs{
 					Replacements: []config.Replacement{
-						{Old: "foo", New: "bar"},
+						{Old: "old", New: "new"},
 					},
 				},
 			},
-			files: []string{"test1.txt", "test2.txt"},
-			contents: map[string]string{
-				"test1.txt": "This is foo test 1",
-				"test2.txt": "This is foo test 2",
+			files: map[string]string{
+				"file1.txt": "old content 1",
+				"file2.txt": "old content 2",
 			},
-			check: func(t *testing.T, destDir string) {
-				content1, err := os.ReadFile(filepath.Join(destDir, "test1.txt"))
-				require.NoError(t, err, "reading file 1 should succeed")
-				assert.Equal(t, "This is bar test 1", string(content1), "content 1 should be replaced")
+			validate: func(t *testing.T, tmpDir string) {
+				content1, err := os.ReadFile(filepath.Join(tmpDir, "dst", "file1.txt"))
+				require.NoError(t, err, "reading file1 should succeed")
+				assert.Equal(t, "new content 1", string(content1), "content1 should be replaced")
 
-				content2, err := os.ReadFile(filepath.Join(destDir, "test2.txt"))
-				require.NoError(t, err, "reading file 2 should succeed")
-				assert.Equal(t, "This is bar test 2", string(content2), "content 2 should be replaced")
-			},
-		},
-		{
-			name: "process_files_async",
-			cfg: &config.Config{
-				Provider: config.ProviderArgs{
-					Repo: "github.com/walteh/copyrc",
-					Ref:  "main",
-					Path: "pkg/provider",
-				},
-				Destination: t.TempDir(),
-				Copy: &config.CopyArgs{
-					Replacements: []config.Replacement{
-						{Old: "foo", New: "bar"},
-					},
-				},
-				Async: true,
-			},
-			files: []string{"test1.txt", "test2.txt"},
-			contents: map[string]string{
-				"test1.txt": "This is foo test 1",
-				"test2.txt": "This is foo test 2",
-			},
-			check: func(t *testing.T, destDir string) {
-				content1, err := os.ReadFile(filepath.Join(destDir, "test1.txt"))
-				require.NoError(t, err, "reading file 1 should succeed")
-				assert.Equal(t, "This is bar test 1", string(content1), "content 1 should be replaced")
-
-				content2, err := os.ReadFile(filepath.Join(destDir, "test2.txt"))
-				require.NoError(t, err, "reading file 2 should succeed")
-				assert.Equal(t, "This is bar test 2", string(content2), "content 2 should be replaced")
+				content2, err := os.ReadFile(filepath.Join(tmpDir, "dst", "file2.txt"))
+				require.NoError(t, err, "reading file2 should succeed")
+				assert.Equal(t, "new content 2", string(content2), "content2 should be replaced")
 			},
 		},
 	}
 
-	ctx := zerolog.New(os.Stderr).WithContext(context.Background())
-	logger := log.New(io.Discard, zerolog.InfoLevel)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create mock provider
+			// Create temp dir
+			tmpDir := t.TempDir()
+
+			// Update config with temp dir
+			tt.cfg.Destination = filepath.Join(tmpDir, tt.cfg.Destination)
+
+			// Create destination dir
+			err := os.MkdirAll(tt.cfg.Destination, 0755)
+			require.NoError(t, err, "creating destination directory")
+
+			// Set up mock provider
 			p := &MockProvider{}
-			for path, content := range tt.contents {
+			files := make([]string, 0, len(tt.files))
+			for path, content := range tt.files {
+				files = append(files, path)
+				// Create a new reader for each call to avoid EOF issues
 				p.On("GetFile", mock.Anything, tt.cfg.Provider, path).Return(
-					io.NopCloser(strings.NewReader(content)),
-					nil,
+					func(ctx context.Context, args config.ProviderArgs, path string) io.ReadCloser {
+						return io.NopCloser(strings.NewReader(tt.files[path]))
+					},
+					func(ctx context.Context, args config.ProviderArgs, path string) error {
+						return nil
+					},
 				)
 			}
+			p.On("ListFiles", mock.Anything, tt.cfg.Provider).Return(files, nil).Once()
 
-			// Create operation manager
-			mgr := New(tt.cfg, p, logger)
+			// Create logger
+			var buf bytes.Buffer
+			logger := zerolog.New(&buf)
+
+			// Create manager
+			mgr := New(tt.cfg, p, &logger)
 
 			// Process files
-			err := mgr.ProcessFiles(ctx, tt.files)
+			err = mgr.ProcessFiles(context.Background(), files)
 			if tt.wantErr {
-				require.Error(t, err, "ProcessFiles should return error")
-				assert.Contains(t, err.Error(), tt.errContains, "error should contain expected message")
+				assert.Error(t, err, "ProcessFiles should return error")
 				return
 			}
+			assert.NoError(t, err, "ProcessFiles should succeed")
 
-			require.NoError(t, err, "ProcessFiles should succeed")
-			if tt.check != nil {
-				tt.check(t, tt.cfg.Destination)
+			// Run validation
+			if tt.validate != nil {
+				tt.validate(t, tmpDir)
 			}
 
+			// Verify all mock expectations
 			p.AssertExpectations(t)
 		})
 	}

@@ -16,11 +16,18 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/rs/zerolog"
+	"github.com/zclconf/go-cty/cty"
 	"gitlab.com/tozd/go/errors"
+	"gopkg.in/yaml.v3"
 )
 
 // 🔌 Parser is the interface for config parsers
@@ -68,21 +75,21 @@ type ProviderArgs struct {
 
 // 🔧 CopyArgs represents file copy configuration
 type CopyArgs struct {
-	Replacements []Replacement // String replacements to apply
-	IgnoreFiles  []string      // Files to ignore
+	Replacements   []Replacement `json:"replacements" yaml:"replacements"`       // String replacements to apply
+	IgnorePatterns []string      `json:"ignore_patterns" yaml:"ignore_patterns"` // Glob patterns for files to ignore
 }
 
 // 📚 Config represents the complete configuration
 type Config struct {
-	Provider     ProviderArgs // Repository provider configuration
-	Destination  string       // Local destination path
-	Copy         *CopyArgs    // Copy configuration
-	GoEmbed      bool         // Whether to generate Go embed code
-	Clean        bool         // Whether to clean destination directory
-	Status       bool         // Whether to check local status
-	RemoteStatus bool         // Whether to check remote status
-	Force        bool         // Whether to force update even if status is ok
-	Async        bool         // Whether to process files asynchronously
+	Provider     ProviderArgs `json:"provider" yaml:"provider"`
+	Destination  string       `json:"destination" yaml:"destination"`
+	Copy         *CopyArgs    `json:"copy,omitempty" yaml:"copy,omitempty"`
+	GoEmbed      bool         `json:"go_embed,omitempty" yaml:"go_embed,omitempty"`
+	Clean        bool         `json:"clean,omitempty" yaml:"clean,omitempty"`
+	Status       bool         `json:"status,omitempty" yaml:"status,omitempty"`
+	RemoteStatus bool         `json:"remote_status,omitempty" yaml:"remote_status,omitempty"`
+	Force        bool         `json:"force,omitempty" yaml:"force,omitempty"`
+	Async        bool         `json:"async,omitempty" yaml:"async,omitempty"`
 }
 
 // 🎯 Load loads the configuration from a file
@@ -143,5 +150,70 @@ func (cfg *Config) Validate() error {
 
 // 📝 String returns a string representation of the config
 func (cfg *Config) String() string {
-	return cfg.Provider.Repo + "@" + cfg.Provider.Ref + ":" + cfg.Provider.Path + " -> " + cfg.Destination
+	ref := cfg.Provider.Ref
+	if ref == "" {
+		ref = "main"
+	}
+	return fmt.Sprintf("%s@%s:%s -> %s", cfg.Provider.Repo, ref, cfg.Provider.Path, cfg.Destination)
+}
+
+// 🔧 YAMLParser implements the Parser interface for YAML files
+type YAMLParser struct{}
+
+func init() {
+	Register(&YAMLParser{})
+}
+
+func (p *YAMLParser) CanParse(filename string) bool {
+	return strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml")
+}
+
+func (p *YAMLParser) Parse(ctx context.Context, data []byte) (*Config, error) {
+	var cfg Config
+	decoder := yaml.NewDecoder(strings.NewReader(string(data)))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&cfg); err != nil {
+		return nil, errors.Errorf("parsing YAML: %w", err)
+	}
+
+	if err := cfg.Validate(); err != nil {
+		return nil, errors.Errorf("validating config: %w", err)
+	}
+
+	return &cfg, nil
+}
+
+// 🔧 HCLParser implements the Parser interface for HCL files
+type HCLParser struct{}
+
+func init() {
+	Register(&HCLParser{})
+}
+
+func (p *HCLParser) CanParse(filename string) bool {
+	return strings.HasSuffix(filename, ".hcl")
+}
+
+func (p *HCLParser) Parse(ctx context.Context, data []byte) (*Config, error) {
+	parser := hclparse.NewParser()
+	hclFile, diags := parser.ParseHCL(data, "config.hcl")
+	if diags.HasErrors() {
+		return nil, errors.Errorf("parsing HCL: %s", diags.Error())
+	}
+
+	evalCtx := &hcl.EvalContext{
+		Variables: map[string]cty.Value{},
+	}
+
+	var cfg Config
+	diags = gohcl.DecodeBody(hclFile.Body, evalCtx, &cfg)
+	if diags.HasErrors() {
+		return nil, errors.Errorf("decoding HCL: %s", diags.Error())
+	}
+
+	if err := cfg.Validate(); err != nil {
+		return nil, errors.Errorf("validating config: %w", err)
+	}
+
+	return &cfg, nil
 }
