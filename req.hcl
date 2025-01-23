@@ -144,6 +144,27 @@ packages {
 			     * Deletions
 			     * State changes
 			     * Errors
+
+			Q&A:
+			----
+			Q: Where should the state file be located?
+			A: Always use .copyrc.lock in the same directory as .copyrc. Future versions may make this configurable.
+
+			Q: How should schema versioning be handled?
+			A: Include a schema_version field in the state file to support future format changes.
+
+			Q: How should concurrent access be handled?
+			A: Use file-level locking when reading/writing the state file. The state package is responsible for ensuring safe concurrent access.
+
+			Q: What happens when no state file exists?
+			A: Create a clean state with empty collections. No error should be returned for missing state file.
+
+			Q: How is state validation performed?
+			A: Validation is purely local - no remote calls:
+			   - Verify all files exist at recorded paths
+			   - Check file hashes match recorded hashes
+			   - Ensure no extra files exist
+			   - State object should provide methods to check if current memory state matches lock file
 		EOT
 
 		structs {

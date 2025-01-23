@@ -178,18 +178,6 @@ func TestRepository(t *testing.T) {
 
 	t.Run("test_context_cancellation", func(t *testing.T) {
 		mockClient := mockery.NewMockGitHubClient_github(t)
-		mockClient.EXPECT().GetLatestRelease(mock.Anything, "walteh", "copyrc").Return(
-			nil,
-			nil,
-			context.Canceled,
-		)
-
-		mockClient.EXPECT().GetReleaseByTag(mock.Anything, "walteh", "copyrc", "v1.0.0").Return(
-			nil,
-			nil,
-			context.Canceled,
-		)
-
 		repo := &Repository{
 			provider: &Provider{
 				client: mockClient,

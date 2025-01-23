@@ -77,8 +77,8 @@ func (p *Provider) GetRepository(ctx context.Context, name string) (remote.Repos
 		return nil, errors.Errorf("invalid repository name: %s", name)
 	}
 
-	owner := parts[0]
-	repo := parts[1]
+	owner := strings.TrimSpace(parts[0])
+	repo := strings.TrimSpace(parts[1])
 
 	if owner == "" || repo == "" {
 		return nil, errors.Errorf("invalid repository name: %s", name)
@@ -118,8 +118,21 @@ func (r *Repository) GetLatestRelease(ctx context.Context) (remote.Release, erro
 	logger := zerolog.Ctx(ctx)
 	logger.Debug().Str("repo", r.Name()).Msg("getting latest release")
 
-	release, _, err := r.provider.client.GetLatestRelease(ctx, r.owner, r.repo)
+	// Check if context is already cancelled
+	if err := ctx.Err(); err != nil {
+		return nil, errors.Errorf("context error: %w", err)
+	}
+
+	release, resp, err := r.provider.client.GetLatestRelease(ctx, r.owner, r.repo)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, errors.Errorf("context error: %w", ctx.Err())
+		}
+		if resp != nil && resp.StatusCode == 403 {
+			if _, ok := err.(*github.RateLimitError); ok {
+				return nil, errors.Errorf("rate limit exceeded: %w", err)
+			}
+		}
 		return nil, errors.Errorf("getting latest release from GitHub: %w", err)
 	}
 
@@ -135,9 +148,21 @@ func (r *Repository) GetReleaseFromRef(ctx context.Context, ref string) (remote.
 	logger := zerolog.Ctx(ctx)
 	logger.Debug().Str("repo", r.Name()).Str("ref", ref).Msg("getting release from ref")
 
+	if ref == "" {
+		return nil, errors.Errorf("empty ref")
+	}
+
+	// Check if context is already cancelled
+	if err := ctx.Err(); err != nil {
+		return nil, errors.Errorf("context error: %w", err)
+	}
+
 	// Try to get release by tag name
 	release, _, err := r.provider.client.GetReleaseByTag(ctx, r.owner, r.repo, ref)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, errors.Errorf("context error: %w", ctx.Err())
+		}
 		// If not found, create a pseudo-release for the ref
 		return &Release{
 			repo:    r,
