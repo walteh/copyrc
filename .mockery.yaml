@@ -19,11 +19,31 @@ packages:
 
     github.com/walteh/copyrc/pkg/remote:
         interfaces:
-            Provider: {}
-            Repository: {}
-            Release: {}
-            RawTextFile: {}
+            FileFormatter:
+                config:
+                    with-expecter: true
+            GitHubClient:
+                config:
+                    with-expecter: true
+            Provider:
+                config:
+                    with-expecter: true
+            RawTextFile:
+                config:
+                    with-expecter: true
+            Release:
+                config:
+                    with-expecter: true
+            Repository:
+                config:
+                    with-expecter: true
 
     github.com/walteh/copyrc/pkg/remote/github:
         interfaces:
             GitHubClient: {}
+
+    github.com/walteh/copyrc/pkg/state:
+        interfaces:
+            StateManager:
+                config:
+                    with-expecter: true

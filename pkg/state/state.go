@@ -24,6 +24,22 @@ import (
 // CurrentSchemaVersion is the current version of the state file schema
 const CurrentSchemaVersion = "1.0.0"
 
+// StateManager defines the interface for managing state
+type StateManager interface {
+	// Load loads the state from disk
+	Load(ctx context.Context) error
+	// Save saves the state to disk
+	Save(ctx context.Context) error
+	// Dir returns the directory containing the state
+	Dir() string
+	// PutRemoteTextFile adds or updates a remote text file in the state
+	PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (bool, error)
+	// ValidateLocalState validates that all files match their recorded state
+	ValidateLocalState(ctx context.Context) error
+	// IsConsistent checks if the current memory state matches the filesystem
+	IsConsistent(ctx context.Context) (bool, error)
+}
+
 // 🔒 State represents the in-memory state manager with locking capabilities
 type State struct {
 	mu     sync.RWMutex // protects concurrent access to state
