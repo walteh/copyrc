@@ -277,3 +277,44 @@ func (p *HCLParser) Parse(ctx context.Context, data []byte) (*Config, error) {
 
 	return cfg, nil
 }
+
+// 📝 LoadFile loads and parses a config file
+func LoadFile(path string) (*Config, error) {
+	// Read file
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errors.Errorf("reading config file: %w", err)
+	}
+
+	// Parse YAML
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, errors.Errorf("parsing config file: %w", err)
+	}
+
+	// Validate config
+	if err := validateConfig(&cfg); err != nil {
+		return nil, errors.Errorf("validating config: %w", err)
+	}
+
+	return &cfg, nil
+}
+
+// 🔍 validateConfig validates the configuration
+func validateConfig(cfg *Config) error {
+	// Check required fields
+	if cfg.Provider.Repo == "" {
+		return errors.New("provider.repo is required")
+	}
+	if cfg.Provider.Ref == "" {
+		return errors.New("provider.ref is required")
+	}
+	if cfg.Destination == "" {
+		return errors.New("destination is required")
+	}
+
+	// Clean up destination path
+	cfg.Destination = filepath.Clean(cfg.Destination)
+
+	return nil
+}
