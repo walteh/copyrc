@@ -40,6 +40,7 @@ type StateFile struct {
 	RemoteTextFiles []RemoteTextFile       `json:"remote_text_files"`
 	GeneratedFiles  []GeneratedFile        `json:"generated_files"`
 	Config          map[string]interface{} `json:"config"`
+	ArchiveFiles    []ArchiveFile          `json:"archive_files"`
 }
 
 // 📦 Repository tracks state for a single repository
@@ -101,6 +102,12 @@ type GeneratedFile struct {
 	LocalPath     string    `json:"local_path"`     // where file is stored
 	LastUpdated   time.Time `json:"last_updated"`   // when file was generated
 	ReferenceFile string    `json:"reference_file"` // source file reference
+}
+
+// ArchiveFile represents a downloaded archive file
+type ArchiveFile struct {
+	LocalPath   string // Path to the local file
+	ContentHash string // SHA-256 hash of the file content
 }
 
 // 🆕 New creates a new state manager for the given directory
@@ -223,188 +230,187 @@ func WriteState(ctx context.Context, path string, state *State) error {
 	return errors.Errorf("not implemented")
 }
 
+// 🔏 hashFile computes the SHA-256 hash of a file
+func (s *State) hashFile(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", errors.Errorf("opening file: %w", err)
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", errors.Errorf("reading file: %w", err)
+	}
+
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
+}
+
+// 🔏 hashContent computes the SHA-256 hash of content from a reader
+func (s *State) hashContent(r io.Reader) (string, error) {
+	h := sha256.New()
+	if _, err := io.Copy(h, r); err != nil {
+		return "", errors.Errorf("reading content: %w", err)
+	}
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
+}
+
 // 🔄 PutRemoteTextFile adds or updates a remote text file in the state
 func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (*RemoteTextFile, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	logger := zerolog.Ctx(ctx)
+	logger.Debug().Str("path", localPath).Msg("putting remote text file")
+
 	// Validate file suffix
-	if !strings.HasSuffix(localPath, ".copy.") && !strings.HasSuffix(localPath, ".patch.") {
+	if !strings.Contains(localPath, ".copy.") && !strings.Contains(localPath, ".patch.") {
 		return nil, errors.Errorf("invalid file suffix: %s (must contain .copy. or .patch.)", localPath)
 	}
 
-	// Get content hash
+	// Get content hash and data
 	content, err := file.GetContent(ctx)
 	if err != nil {
 		return nil, errors.Errorf("getting file content: %w", err)
 	}
 	defer content.Close()
 
-	hash, err := hashContent(content)
+	// Read all content
+	data, err := io.ReadAll(content)
+	if err != nil {
+		return nil, errors.Errorf("reading file content: %w", err)
+	}
+
+	// Write content to file
+	if err := os.WriteFile(localPath, data, 0644); err != nil {
+		return nil, errors.Errorf("writing file content: %w", err)
+	}
+
+	// Compute hash of content
+	hash, err := s.hashContent(bytes.NewReader(data))
 	if err != nil {
 		return nil, errors.Errorf("hashing content: %w", err)
 	}
 
-	// Check if file already exists
-	for i, existing := range s.file.RemoteTextFiles {
-		if existing.LocalPath == localPath {
-			// Update existing file
-			s.file.RemoteTextFiles[i].LastUpdated = time.Now()
-			s.file.RemoteTextFiles[i].ContentHash = hash
-			s.file.RemoteTextFiles[i].IsPatched = strings.HasSuffix(localPath, ".patch.")
-			s.file.RemoteTextFiles[i].Permalink = file.WebViewPermalink()
-
-			s.logger.LogFileChange(FileChange{
-				Type:        FileUpdated,
-				Path:        localPath,
-				Description: "Updated from remote",
-			})
-			return &s.file.RemoteTextFiles[i], nil
-		}
-	}
-
-	// Add new file
-	newFile := RemoteTextFile{
-		LocalPath:   localPath,
-		LastUpdated: time.Now(),
+	// Create or update file entry
+	remoteFile := &RemoteTextFile{
+		Metadata:    make(map[string]string),
 		RepoName:    file.Release().Repository().Name(),
 		ReleaseRef:  file.Release().Ref(),
+		LocalPath:   localPath,
+		LastUpdated: time.Now(),
+		IsPatched:   false, // Will be set to true if/when patches are applied
 		ContentHash: hash,
-		IsPatched:   strings.HasSuffix(localPath, ".patch."),
 		Permalink:   file.WebViewPermalink(),
-		Metadata: map[string]string{
-			"path": file.Path(),
-		},
 	}
 
-	// Get license if available
-	if license, spdx, err := file.Release().GetLicense(ctx); err == nil {
-		defer license.Close()
-		newFile.License = &License{
-			SPDX:            spdx,
-			RemotePermalink: file.WebViewPermalink(),
-			LocalPath:       filepath.Join(filepath.Dir(localPath), "LICENSE"),
+	// Update state
+	found := false
+	for i, f := range s.file.RemoteTextFiles {
+		if f.LocalPath == localPath {
+			s.file.RemoteTextFiles[i] = *remoteFile
+			found = true
+			break
 		}
 	}
-
-	s.file.RemoteTextFiles = append(s.file.RemoteTextFiles, newFile)
+	if !found {
+		s.file.RemoteTextFiles = append(s.file.RemoteTextFiles, *remoteFile)
+	}
 
 	s.logger.LogFileChange(FileChange{
-		Type:        FileAdded,
+		Type:        FileUpdated,
 		Path:        localPath,
-		Description: "Added from remote",
+		Description: "Updated from remote",
 	})
-	return &newFile, nil
-}
 
-// hashContent computes the SHA-256 hash of a reader's content
-func hashContent(r io.Reader) (string, error) {
-	h := sha256.New()
-	if _, err := io.Copy(h, r); err != nil {
-		return "", errors.Errorf("copying content: %w", err)
-	}
-	return fmt.Sprintf("%x", h.Sum(nil)), nil
+	return remoteFile, nil
 }
 
 // 🔨 PutGeneratedFile adds or updates a generated file in the state
-func (s *State) PutGeneratedFile(ctx context.Context, file *GeneratedFile) (*GeneratedFile, error) {
+func (s *State) PutGeneratedFile(ctx context.Context, file GeneratedFile) (*GeneratedFile, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Check if file already exists
-	for i, existing := range s.file.GeneratedFiles {
-		if existing.LocalPath == file.LocalPath {
-			// Update existing file
-			s.file.GeneratedFiles[i].LastUpdated = time.Now()
-			s.file.GeneratedFiles[i].ReferenceFile = file.ReferenceFile
+	logger := zerolog.Ctx(ctx)
+	logger.Debug().Str("path", file.LocalPath).Msg("putting generated file")
 
-			s.logger.LogFileChange(FileChange{
-				Type:        FileUpdated,
-				Path:        file.LocalPath,
-				Description: "Updated generated file",
-			})
-			return &s.file.GeneratedFiles[i], nil
-		}
+	// Validate file exists
+	if _, err := os.Stat(file.LocalPath); os.IsNotExist(err) {
+		return nil, errors.Errorf("file does not exist: %s", file.LocalPath)
+	} else if err != nil {
+		return nil, errors.Errorf("checking file: %w", err)
 	}
 
-	// Add new file
-	newFile := GeneratedFile{
+	// Validate reference file exists
+	if _, err := os.Stat(file.ReferenceFile); os.IsNotExist(err) {
+		return nil, errors.Errorf("reference file does not exist: %s", file.ReferenceFile)
+	} else if err != nil {
+		return nil, errors.Errorf("checking reference file: %w", err)
+	}
+
+	// Create or update file entry
+	generatedFile := &GeneratedFile{
 		LocalPath:     file.LocalPath,
 		LastUpdated:   time.Now(),
 		ReferenceFile: file.ReferenceFile,
 	}
-	s.file.GeneratedFiles = append(s.file.GeneratedFiles, newFile)
 
-	s.logger.LogFileChange(FileChange{
-		Type:        FileAdded,
-		Path:        file.LocalPath,
-		Description: "Added generated file",
-	})
-	return &newFile, nil
-}
-
-// 📦 PutArchiveFile adds or updates an archive file in the state
-func (s *State) PutArchiveFile(ctx context.Context, release remote.Release, localPath string) (*Archive, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// Get archive content
-	content, err := release.GetTarball(ctx)
-	if err != nil {
-		return nil, errors.Errorf("getting tarball: %w", err)
-	}
-	defer content.Close()
-
-	// Hash the content
-	hash, err := hashContent(content)
-	if err != nil {
-		return nil, errors.Errorf("hashing archive: %w", err)
-	}
-
-	// Find repository in state
-	var repoState *Repository
-	for i := range s.file.Repositories {
-		if s.file.Repositories[i].Name == release.Repository().Name() {
-			repoState = &s.file.Repositories[i]
+	// Update state
+	found := false
+	for i, f := range s.file.GeneratedFiles {
+		if f.LocalPath == file.LocalPath {
+			s.file.GeneratedFiles[i] = *generatedFile
+			found = true
 			break
 		}
 	}
-
-	if repoState == nil {
-		// Add new repository
-		repoState = &Repository{
-			Provider:  "github", // TODO: Get from release
-			Name:      release.Repository().Name(),
-			LatestRef: release.Ref(),
-		}
-		s.file.Repositories = append(s.file.Repositories, *repoState)
+	if !found {
+		s.file.GeneratedFiles = append(s.file.GeneratedFiles, *generatedFile)
 	}
-
-	// Create or update release state
-	if repoState.Release == nil {
-		repoState.Release = &Release{
-			LastUpdated: time.Now(),
-			Ref:         release.Ref(),
-			RefHash:     hash,
-		}
-	}
-
-	// Create or update archive state
-	archive := &Archive{
-		Hash:        hash,
-		ContentType: "application/x-gzip", // GitHub always returns gzipped tarballs
-		DownloadURL: "",                   // TODO: Get from release
-		LocalPath:   localPath,
-	}
-	repoState.Release.Archive = archive
 
 	s.logger.LogFileChange(FileChange{
-		Type:        FileAdded,
-		Path:        localPath,
-		Description: "Added/updated release archive",
+		Type:        FileUpdated,
+		Path:        file.LocalPath,
+		Description: "Updated generated file",
 	})
 
-	return archive, nil
+	return generatedFile, nil
+}
+
+// 📦 PutArchiveFile adds or updates an archive file in the state
+func (s *State) PutArchiveFile(ctx context.Context, file ArchiveFile) (*ArchiveFile, error) {
+	s.logger.LogFileOperation(ctx, "putting archive file", file.LocalPath)
+
+	// Validate file exists
+	if _, err := os.Stat(file.LocalPath); err != nil {
+		if os.IsNotExist(err) {
+			return nil, errors.Errorf("file does not exist: %s", file.LocalPath)
+		}
+		return nil, errors.Errorf("checking file: %w", err)
+	}
+
+	// Compute hash of archive
+	hash, err := s.hashFile(file.LocalPath)
+	if err != nil {
+		return nil, errors.Errorf("computing hash: %w", err)
+	}
+
+	// Check if file already exists in state
+	for i, existing := range s.file.ArchiveFiles {
+		if existing.LocalPath == file.LocalPath {
+			// Update existing entry
+			s.file.ArchiveFiles[i] = file
+			s.file.ArchiveFiles[i].ContentHash = hash
+			s.logger.LogFileOperation(ctx, "Updated archive file", file.LocalPath)
+			return &s.file.ArchiveFiles[i], nil
+		}
+	}
+
+	// Add new entry
+	file.ContentHash = hash
+	s.file.ArchiveFiles = append(s.file.ArchiveFiles, file)
+	s.logger.LogFileOperation(ctx, "Added archive file", file.LocalPath)
+	return &s.file.ArchiveFiles[len(s.file.ArchiveFiles)-1], nil
 }
 
 // 📄 RawRemoteContent returns the raw content of a remote text file
@@ -624,22 +630,6 @@ func (s *State) validateFile(ctx context.Context, path string, expectedHash stri
 	}
 
 	return nil
-}
-
-// 🔏 hashFile computes the SHA-256 hash of a file
-func (s *State) hashFile(path string) (string, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return "", errors.Errorf("opening file: %w", err)
-	}
-	defer f.Close()
-
-	h := sha256.New()
-	if _, err := io.Copy(h, f); err != nil {
-		return "", errors.Errorf("reading file: %w", err)
-	}
-
-	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
 // 🧹 CleanupOrphanedFiles removes files that are no longer referenced in the state

@@ -130,3 +130,10 @@ func (u *UserLogger) LogLockOperation(acquired bool, path string, err error) {
 		}
 	}
 }
+
+// LogFileOperation logs a file operation with a custom message
+func (l *UserLogger) LogFileOperation(ctx context.Context, operation string, path string) {
+	zerolog.Ctx(ctx).Debug().
+		Str("path", path).
+		Msg(operation)
+}
