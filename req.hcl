@@ -10,12 +10,11 @@ packages {
 	remote {
 		nested_implementation_packages {
 			github {
-				# PROVIDE_MORE_CLARITY: What specific caching strategy should be used? In-memory, file-based, or something else?
 				implementation_notes = <<EOT
 					- All GitHub API calls should use context.Context for timeouts/cancellation
 					- Use github.com/google/go-github/v60 client library
-					- Cache responses when practical to avoid rate limiting
-					- Always handle pagination for list operations
+					- ONLY cache the tarballs for each release, not the api responses
+					- use the tarballs to get the files
 				EOT
 			}
 		}
