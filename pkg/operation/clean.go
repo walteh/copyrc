@@ -60,6 +60,11 @@ func (op *cleanOperation) Execute(ctx context.Context) error {
 		op.StatusMgr.UpdateProgress(ctx, i+1)
 	}
 
+	// Update lock file with empty state
+	if err := op.StatusMgr.UpdateLockFile(ctx, "", op.Config); err != nil {
+		return errors.Errorf("updating lock file: %w", err)
+	}
+
 	return nil
 }
 

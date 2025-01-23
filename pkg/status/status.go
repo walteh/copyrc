@@ -18,13 +18,16 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
+	"time"
 
+	"github.com/walteh/copyrc/pkg/config"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -120,6 +123,30 @@ type Manager struct {
 type FileEntry struct {
 	Status   FileStatus
 	Metadata map[string]string
+}
+
+// 📝 LockFile represents the status lock file
+type LockFile struct {
+	LastUpdated    time.Time                 `json:"last_updated"`
+	CommitHash     string                    `json:"commit_hash"`
+	Config         *config.Config            `json:"config"`
+	CopiedFiles    map[string]CopiedFileInfo `json:"copied_files"`
+	GeneratedFiles map[string]GeneratedFile  `json:"generated_files"`
+}
+
+// 📄 CopiedFileInfo represents a copied file's status
+type CopiedFileInfo struct {
+	Path      string    `json:"path"`
+	Hash      string    `json:"hash"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Source    string    `json:"source"`
+	Permalink string    `json:"permalink"`
+}
+
+// 📄 GeneratedFile represents a generated file's status
+type GeneratedFile struct {
+	Path      string    `json:"path"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // 🆕 NewManager creates a new Manager instance
@@ -427,4 +454,95 @@ func (m *Manager) CopyFile(src, dst string) error {
 	}
 
 	return nil
+}
+
+// 💾 loadLockFile loads the lock file from disk
+func (m *Manager) loadLockFile(ctx context.Context) (*LockFile, error) {
+	lockPath := filepath.Join(m.baseDir, ".copyrc.lock")
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &LockFile{
+				CopiedFiles:    make(map[string]CopiedFileInfo),
+				GeneratedFiles: make(map[string]GeneratedFile),
+			}, nil
+		}
+		return nil, errors.Errorf("reading lock file: %w", err)
+	}
+
+	var lock LockFile
+	if err := json.Unmarshal(data, &lock); err != nil {
+		return nil, errors.Errorf("parsing lock file: %w", err)
+	}
+
+	if lock.CopiedFiles == nil {
+		lock.CopiedFiles = make(map[string]CopiedFileInfo)
+	}
+	if lock.GeneratedFiles == nil {
+		lock.GeneratedFiles = make(map[string]GeneratedFile)
+	}
+
+	return &lock, nil
+}
+
+// 💾 saveLockFile saves the lock file to disk
+func (m *Manager) saveLockFile(ctx context.Context, lock *LockFile) error {
+	lockPath := filepath.Join(m.baseDir, ".copyrc.lock")
+
+	// Update timestamp
+	lock.LastUpdated = time.Now()
+
+	// Marshal with indentation for readability
+	data, err := json.MarshalIndent(lock, "", "  ")
+	if err != nil {
+		return errors.Errorf("marshaling lock file: %w", err)
+	}
+
+	// Write atomically using temp file
+	tempPath := lockPath + ".tmp"
+	if err := os.WriteFile(tempPath, data, 0644); err != nil {
+		return errors.Errorf("writing temp lock file: %w", err)
+	}
+
+	if err := os.Rename(tempPath, lockPath); err != nil {
+		os.Remove(tempPath) // Clean up temp file
+		return errors.Errorf("renaming temp lock file: %w", err)
+	}
+
+	return nil
+}
+
+// 🔄 UpdateLockFile updates the lock file with the latest status
+func (m *Manager) UpdateLockFile(ctx context.Context, commitHash string, cfg *config.Config) error {
+	lock, err := m.loadLockFile(ctx)
+	if err != nil {
+		return errors.Errorf("loading lock file: %w", err)
+	}
+
+	// Update metadata
+	lock.CommitHash = commitHash
+	lock.Config = cfg
+
+	// Update copied files
+	for path, entry := range m.files {
+		if entry.Status == StatusDeleted {
+			delete(lock.CopiedFiles, path)
+			continue
+		}
+
+		info, err := m.GetFileInfo(ctx, path)
+		if err != nil {
+			return errors.Errorf("getting file info: %w", err)
+		}
+
+		lock.CopiedFiles[path] = CopiedFileInfo{
+			Path:      info.Path,
+			Hash:      calculateChecksum([]byte(path)), // TODO: Use actual file content hash
+			UpdatedAt: time.Now(),
+			Source:    "github.com/org/repo", // TODO: Get from provider
+			Permalink: "https://...",         // TODO: Get from provider
+		}
+	}
+
+	return m.saveLockFile(ctx, lock)
 }

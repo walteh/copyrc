@@ -42,16 +42,16 @@ type copyOperation struct {
 
 // 🏃 Execute runs the copy operation
 func (op *copyOperation) Execute(ctx context.Context) error {
-	// List files from provider
-	files, err := op.Provider.ListFiles(ctx, op.Config.Provider)
-	if err != nil {
-		return errors.Errorf("listing files: %w", err)
-	}
-
-	// Get commit hash for tracking
+	// Get commit hash
 	commitHash, err := op.Provider.GetCommitHash(ctx, op.Config.Provider)
 	if err != nil {
 		return errors.Errorf("getting commit hash: %w", err)
+	}
+
+	// Get list of files
+	files, err := op.Provider.ListFiles(ctx, op.Config.Provider)
+	if err != nil {
+		return errors.Errorf("listing files: %w", err)
 	}
 
 	// Start tracking progress
@@ -60,24 +60,28 @@ func (op *copyOperation) Execute(ctx context.Context) error {
 
 	// Process each file
 	for i, file := range files {
-		if err := op.processFile(ctx, file, commitHash); err != nil {
-			// Track error status
-			op.StatusMgr.UpdateStatus(ctx, file, status.StatusUnknown, &status.FileEntry{
-				Status: status.StatusUnknown,
-				Metadata: map[string]string{
-					"error": err.Error(),
-				},
-			})
+		if err := op.processFile(ctx, file); err != nil {
 			return errors.Errorf("processing file %s: %w", file, err)
 		}
 		op.StatusMgr.UpdateProgress(ctx, i+1)
+	}
+
+	// Update lock file
+	if err := op.StatusMgr.UpdateLockFile(ctx, commitHash, op.Config); err != nil {
+		return errors.Errorf("updating lock file: %w", err)
 	}
 
 	return nil
 }
 
 // 📄 processFile processes a single file
-func (op *copyOperation) processFile(ctx context.Context, file, commitHash string) error {
+func (op *copyOperation) processFile(ctx context.Context, file string) error {
+	// Get commit hash for permalink
+	commitHash, err := op.Provider.GetCommitHash(ctx, op.Config.Provider)
+	if err != nil {
+		return errors.Errorf("getting commit hash: %w", err)
+	}
+
 	// Check if file should be ignored
 	if op.shouldIgnore(file) {
 		op.StatusMgr.UpdateStatus(ctx, file, status.StatusUnchanged, &status.FileEntry{
