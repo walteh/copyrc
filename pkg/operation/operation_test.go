@@ -220,15 +220,15 @@ func TestProcessFile(t *testing.T) {
 			statusMgr := status.NewManager(tt.cfg.Destination, status.NewDefaultFileFormatter())
 
 			// Create operation
-			op := operation.NewCopyOperation(operation.Options{
+			op := &operation.BaseOperation{
 				Config:    tt.cfg,
 				Provider:  p,
 				StatusMgr: statusMgr,
 				Logger:    &logger,
-			})
+			}
 
 			// Execute operation
-			err = op.Execute(context.Background())
+			err = op.Copy(context.Background())
 			if tt.wantErr {
 				assert.Error(t, err, "Execute should return error")
 				return
@@ -328,15 +328,15 @@ func TestProcessFiles(t *testing.T) {
 			statusMgr := status.NewManager(tt.cfg.Destination, status.NewDefaultFileFormatter())
 
 			// Create operation
-			op := operation.NewCopyOperation(operation.Options{
+			op := &operation.BaseOperation{
 				Config:    tt.cfg,
 				Provider:  p,
 				StatusMgr: statusMgr,
 				Logger:    &logger,
-			})
+			}
 
 			// Process files
-			err = op.Execute(context.Background())
+			err = op.Copy(context.Background())
 			if tt.wantErr {
 				assert.Error(t, err, "ProcessFiles should return error")
 				return

@@ -2,6 +2,8 @@ package status_test
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -260,4 +262,83 @@ func TestListFiles(t *testing.T) {
 	fileList, err := mgr.ListFiles(ctx)
 	require.NoError(t, err, "listing files should succeed")
 	assert.Len(t, fileList, len(files), "should list all tracked files")
+}
+
+// 🧪 TestMarkFileIgnored tests the MarkFileIgnored functionality
+func TestMarkFileIgnored(t *testing.T) {
+	tmpDir := t.TempDir()
+	mgr, formatter := setupTestManager(t, tmpDir)
+	ctx := context.Background()
+
+	// Set up expectations
+	formatter.EXPECT().FormatFileStatus("test.txt", status.StatusUnchanged, map[string]string{
+		"reason":  "test reason",
+		"ignored": "true",
+	}).Return("👍 Unchanged test.txt")
+
+	// Mark file as ignored
+	mgr.MarkFileIgnored(ctx, "test.txt", "test reason")
+
+	// Get tracked files
+	files, err := mgr.ListFiles(ctx)
+	require.NoError(t, err)
+	require.Len(t, files, 1)
+
+	// Verify status
+	assert.Equal(t, status.StatusUnchanged, files[0].Status)
+	assert.Equal(t, "test.txt", files[0].Path)
+}
+
+// 🧪 TestUpdateFileContent tests the UpdateFileContent functionality
+func TestUpdateFileContent(t *testing.T) {
+	tmpDir := t.TempDir()
+	mgr, formatter := setupTestManager(t, tmpDir)
+	ctx := context.Background()
+
+	// Test file in nested directory
+	nestedPath := filepath.Join("deep", "nested", "test.txt")
+	content := []byte("test content")
+	metadata := map[string]string{
+		"commit_hash": "abc123",
+		"permalink":   "https://test.com/file",
+		"source":      "test/repo",
+	}
+
+	// Calculate expected hash
+	hash := fmt.Sprintf("%x", sha256.Sum256(content))
+
+	// Set up expectations
+	formatter.EXPECT().FormatFileStatus(nestedPath, status.StatusModified, map[string]string{
+		"hash":        hash,
+		"size":        fmt.Sprintf("%d", len(content)),
+		"mode":        "0644",
+		"commit_hash": "abc123",
+		"permalink":   "https://test.com/file",
+		"source":      "test/repo",
+	}).Return("📝 Modified " + nestedPath)
+
+	// Update file content
+	err := mgr.UpdateFileContent(ctx, nestedPath, content, metadata)
+	require.NoError(t, err)
+
+	// Verify file content
+	readContent, err := mgr.ReadFile(ctx, nestedPath)
+	require.NoError(t, err)
+	assert.Equal(t, content, readContent)
+
+	// Verify directory was created
+	dirInfo, err := os.Stat(filepath.Join(tmpDir, "deep", "nested"))
+	require.NoError(t, err)
+	assert.True(t, dirInfo.IsDir())
+	assert.Equal(t, os.FileMode(0755), dirInfo.Mode()&os.ModePerm)
+
+	// Get tracked files
+	files, err := mgr.ListFiles(ctx)
+	require.NoError(t, err)
+	require.Len(t, files, 1)
+
+	// Verify status
+	assert.Equal(t, status.StatusModified, files[0].Status)
+	assert.Equal(t, nestedPath, files[0].Path)
+	assert.Equal(t, int64(len(content)), files[0].Size)
 }

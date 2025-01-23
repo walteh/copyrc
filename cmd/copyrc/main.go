@@ -74,30 +74,22 @@ func main() {
 	statusMgr := status.NewManager(cfg.Destination, status.NewDefaultFileFormatter())
 
 	// Create operation runner
-	runner := operation.NewRunner(&logger, *async)
 
 	// Create and run copy operation
-	op := operation.NewCopyOperation(operation.Options{
+	op := &operation.BaseOperation{
 		Config:    cfg,
 		Provider:  p,
 		StatusMgr: statusMgr,
 		Logger:    &logger,
-	})
+	}
 
-	if err := runner.Run(ctx, op); err != nil {
+	if err := op.Copy(ctx); err != nil {
 		logger.Fatal().Err(err).Msg("running copy operation")
 	}
 
 	// Run clean operation if needed
 	if cfg.Clean {
-		cleanOp := operation.NewCleanOperation(operation.Options{
-			Config:    cfg,
-			Provider:  p,
-			StatusMgr: statusMgr,
-			Logger:    &logger,
-		})
-
-		if err := runner.Run(ctx, cleanOp); err != nil {
+		if err := op.Clean(ctx); err != nil {
 			logger.Fatal().Err(err).Msg("running clean operation")
 		}
 	}

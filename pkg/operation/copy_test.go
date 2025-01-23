@@ -94,13 +94,13 @@ func TestCopyOperation(t *testing.T) {
 	}
 
 	// Create and run copy operation
-	op := operation.NewCopyOperation(operation.Options{
+	op := &operation.BaseOperation{
 		Config:    cfg,
 		Provider:  mockProvider,
 		StatusMgr: statusMgr,
 		Logger:    logger,
-	})
-	err := op.Execute(ctx)
+	}
+	err := op.Copy(ctx)
 	require.NoError(t, err)
 }
 
@@ -142,13 +142,13 @@ func TestCopyOperationErrors(t *testing.T) {
 			ctx, cfg, mockProvider, statusMgr, logger := createTestEnv(t)
 			tt.setupMocks(t, ctx, cfg, mockProvider)
 
-			op := operation.NewCopyOperation(operation.Options{
+			op := &operation.BaseOperation{
 				Config:    cfg,
 				Provider:  mockProvider,
 				StatusMgr: statusMgr,
 				Logger:    logger,
-			})
-			err := op.Execute(ctx)
+			}
+			err := op.Copy(ctx)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tt.expectedError)
 		})
@@ -177,13 +177,13 @@ func TestCopyOperationReplacements(t *testing.T) {
 		})
 
 	// Create and run copy operation
-	op := operation.NewCopyOperation(operation.Options{
+	op := &operation.BaseOperation{
 		Config:    cfg,
 		Provider:  mockProvider,
 		StatusMgr: statusMgr,
 		Logger:    logger,
-	})
-	err := op.Execute(ctx)
+	}
+	err := op.Copy(ctx)
 	require.NoError(t, err)
 
 	// Verify content was replaced

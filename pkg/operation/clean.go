@@ -21,20 +21,8 @@ import (
 	"gitlab.com/tozd/go/errors"
 )
 
-// 🧹 NewCleanOperation creates a new clean operation
-func NewCleanOperation(opts Options) Operation {
-	return &cleanOperation{
-		BaseOperation: NewBaseOperation(opts),
-	}
-}
-
-// 🧹 cleanOperation implements the clean operation
-type cleanOperation struct {
-	BaseOperation
-}
-
 // 🏃 Execute runs the clean operation
-func (op *cleanOperation) Execute(ctx context.Context) error {
+func (op *BaseOperation) Clean(ctx context.Context) error {
 	// Get list of tracked files
 	files, err := op.StatusMgr.ListFiles(ctx)
 	if err != nil {
@@ -69,7 +57,7 @@ func (op *cleanOperation) Execute(ctx context.Context) error {
 }
 
 // 🗑️ cleanFile removes a file and updates its status
-func (op *cleanOperation) cleanFile(ctx context.Context, file status.FileInfo) error {
+func (op *BaseOperation) cleanFile(ctx context.Context, file status.FileInfo) error {
 	// Delete file using status manager
 	if err := op.StatusMgr.DeleteFile(ctx, file.Path); err != nil {
 		return errors.Errorf("deleting file: %w", err)

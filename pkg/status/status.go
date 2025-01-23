@@ -196,17 +196,22 @@ func (m *Manager) WriteFile(ctx context.Context, path string, content []byte) er
 
 func (m *Manager) WriteFileAtomic(ctx context.Context, path string, content []byte) error {
 	absPath := m.getAbsPath(path)
-	tempPath := absPath + ".tmp"
 
-	// Write to temp file
-	if err := os.WriteFile(tempPath, content, 0644); err != nil {
-		return errors.Errorf("writing temp file: %w", err)
+	// Create parent directories
+	if err := os.MkdirAll(filepath.Dir(absPath), 0755); err != nil {
+		return errors.Errorf("creating parent directories: %w", err)
 	}
 
-	// Rename temp file to target (atomic operation)
-	if err := os.Rename(tempPath, absPath); err != nil {
-		os.Remove(tempPath) // Clean up temp file
-		return errors.Errorf("renaming temp file: %w", err)
+	// Create temporary file
+	tmpPath := absPath + ".tmp"
+	if err := os.WriteFile(tmpPath, content, 0644); err != nil {
+		return errors.Errorf("writing temporary file: %w", err)
+	}
+
+	// Rename temporary file to target
+	if err := os.Rename(tmpPath, absPath); err != nil {
+		os.Remove(tmpPath) // Clean up temp file
+		return errors.Errorf("renaming temporary file: %w", err)
 	}
 
 	return nil
@@ -545,4 +550,44 @@ func (m *Manager) UpdateLockFile(ctx context.Context, commitHash string, cfg *co
 	}
 
 	return m.saveLockFile(ctx, lock)
+}
+
+// 🏷️ MarkFileIgnored marks a file as ignored with metadata
+func (m *Manager) MarkFileIgnored(ctx context.Context, path string, reason string) {
+	m.UpdateStatus(ctx, path, StatusUnchanged, &FileEntry{
+		Status: StatusUnchanged,
+		Metadata: map[string]string{
+			"reason":  reason,
+			"ignored": "true",
+		},
+	})
+}
+
+// 🔄 UpdateFileContent updates file content and status atomically
+func (m *Manager) UpdateFileContent(ctx context.Context, path string, content []byte, metadata map[string]string) error {
+	// Calculate content hash
+	hash := calculateChecksum(content)
+
+	// Write file atomically
+	if err := m.WriteFileAtomic(ctx, path, content); err != nil {
+		return errors.Errorf("writing file content: %w", err)
+	}
+
+	// Merge metadata
+	allMetadata := map[string]string{
+		"hash": hash,
+		"size": fmt.Sprintf("%d", len(content)),
+		"mode": "0644",
+	}
+	for k, v := range metadata {
+		allMetadata[k] = v
+	}
+
+	// Update status
+	m.UpdateStatus(ctx, path, StatusModified, &FileEntry{
+		Status:   StatusModified,
+		Metadata: allMetadata,
+	})
+
+	return nil
 }
