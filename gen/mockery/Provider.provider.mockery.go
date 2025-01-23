@@ -199,9 +199,9 @@ func (_c *MockProvider_provider_GetFile_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
-// GetPermalink provides a mock function with given fields: ctx, args, commitHash, file
-func (_m *MockProvider_provider) GetPermalink(ctx context.Context, args config.ProviderArgs, commitHash string, file string) (string, error) {
-	ret := _m.Called(ctx, args, commitHash, file)
+// GetPermalink provides a mock function with given fields: ctx, args, commitHash, path
+func (_m *MockProvider_provider) GetPermalink(ctx context.Context, args config.ProviderArgs, commitHash string, path string) (string, error) {
+	ret := _m.Called(ctx, args, commitHash, path)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPermalink")
@@ -210,16 +210,16 @@ func (_m *MockProvider_provider) GetPermalink(ctx context.Context, args config.P
 	var r0 string
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, config.ProviderArgs, string, string) (string, error)); ok {
-		return rf(ctx, args, commitHash, file)
+		return rf(ctx, args, commitHash, path)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, config.ProviderArgs, string, string) string); ok {
-		r0 = rf(ctx, args, commitHash, file)
+		r0 = rf(ctx, args, commitHash, path)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, config.ProviderArgs, string, string) error); ok {
-		r1 = rf(ctx, args, commitHash, file)
+		r1 = rf(ctx, args, commitHash, path)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -236,12 +236,12 @@ type MockProvider_provider_GetPermalink_Call struct {
 //   - ctx context.Context
 //   - args config.ProviderArgs
 //   - commitHash string
-//   - file string
-func (_e *MockProvider_provider_Expecter) GetPermalink(ctx interface{}, args interface{}, commitHash interface{}, file interface{}) *MockProvider_provider_GetPermalink_Call {
-	return &MockProvider_provider_GetPermalink_Call{Call: _e.mock.On("GetPermalink", ctx, args, commitHash, file)}
+//   - path string
+func (_e *MockProvider_provider_Expecter) GetPermalink(ctx interface{}, args interface{}, commitHash interface{}, path interface{}) *MockProvider_provider_GetPermalink_Call {
+	return &MockProvider_provider_GetPermalink_Call{Call: _e.mock.On("GetPermalink", ctx, args, commitHash, path)}
 }
 
-func (_c *MockProvider_provider_GetPermalink_Call) Run(run func(ctx context.Context, args config.ProviderArgs, commitHash string, file string)) *MockProvider_provider_GetPermalink_Call {
+func (_c *MockProvider_provider_GetPermalink_Call) Run(run func(ctx context.Context, args config.ProviderArgs, commitHash string, path string)) *MockProvider_provider_GetPermalink_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(config.ProviderArgs), args[2].(string), args[3].(string))
 	})

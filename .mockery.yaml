@@ -16,3 +16,14 @@ packages:
     github.com/walteh/copyrc/refactor-attempt-1/status:
         interfaces:
             FileFormatter: {}
+
+    github.com/walteh/copyrc/pkg/remote:
+        interfaces:
+            Provider: {}
+            Repository: {}
+            Release: {}
+            RawTextFile: {}
+
+    github.com/walteh/copyrc/pkg/remote/github:
+        interfaces:
+            GitHubClient: {}
