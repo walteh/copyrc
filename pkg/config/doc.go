@@ -1,111 +1,204 @@
-/*
-Package config manages configuration parsing and validation for copyrc.
+// Copyright 2025 walteh LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-	            +-------------+
-	            |   Config    |
-	            | (Settings)  |
-	            +------+------+
-	                   |
-	      +-----------+-----------+
-	      |                       |
-	+-----+-----+           +----+----+
-	|   YAML    |           |   HCL   |
-	| Parser    |           | Parser  |
-	+-----------+           +---------+
+/*
+Package config provides configuration management for the copyrc tool.
 
 🎯 Purpose:
-- Manages configuration loading and parsing
-- Validates configuration values
-- Provides type-safe config access
-- Supports multiple config formats
+The config package is responsible for loading, parsing, and validating configuration
+files in multiple formats (YAML, JSON, HCL). It provides a unified configuration structure
+that other packages can use to control various operations.
 
-🔄 Flow:
-1. Reads configuration from file
-2. Parses format-specific syntax
-3. Validates configuration values
-4. Provides validated config to other packages
+🔄 Configuration Flow:
 
-⚡ Key Responsibilities:
-- Configuration parsing
-- Schema validation
-- Default value management
-- Type safety
-- Format abstraction
+	┌─────────────┐
+	│   Config    │
+	│    File     │
+	└─────────────┘
+	       │
+	       ▼
 
-🤝 Interfaces:
-- Parser: Format-specific parsing
-- Validator: Configuration validation
-- Config: Type-safe config access
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│    YAML     │   │    JSON     │   │    HCL      │
+│   Parser    │◄──│   Parser    │◄──│   Parser    │
+└─────────────┘   │  Selection  │   └─────────────┘
 
-📝 Design Philosophy:
-The config package is the source of truth for all configuration. It:
-- Provides a clean interface for config access
-- Ensures type safety and validation
-- Abstracts away format-specific details
-- Makes configuration errors clear and actionable
+	└─────────────┘
+	       │
+	       ▼
+	┌─────────────┐
+	│  Validated  │
+	│   Config    │
+	└─────────────┘
+	       │
+	       ▼
+	┌─────────────┐
+	│ Operations  │
+	│  Execution  │
+	└─────────────┘
 
-🚧 Current Issues & TODOs:
-1. Validation:
-  - Enhanced validation rules
-  - Custom validators
-  - Path normalization
-  - Environment variable support
+🔑 Key Components:
 
-2. Schema Management:
-  - Version control for schemas
-  - Migration support
-  - Backward compatibility
-  - Schema documentation
+1. Configuration Structure:
 
-3. Error Handling:
-  - Better validation errors
-  - Configuration suggestions
-  - Default value hints
-  - Format detection
+  - Provider: Repository source configuration
+    ├── Repo: Repository URL
+    ├── Ref: Branch/tag reference
+    └── Path: Source path within repo
 
-4. Testing:
-  - More edge cases
-  - Format compatibility
-  - Migration testing
-  - Error message clarity
+  - Destination: Target path for copied files
 
-💡 Ideal Validation:
+  - Copy Options:
+    ├── Replacements: Text substitutions
+    └── IgnorePatterns: Files to exclude
 
-	type Validator interface {
-		Validate(cfg *Config) error
-		SetDefaults(cfg *Config)
-		Normalize(cfg *Config) error
+    2. Operations (Planned):
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │    Copy     │ │    Clean    │ │   Status    │
+    └─────────────┘ └─────────────┘ └─────────────┘
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │   Remote    │ │    Async    │ │    Force    │
+    │   Status    │ │             │ │             │
+    └─────────────┘ └─────────────┘ └─────────────┘
+
+🔌 Interfaces:
+
+Parser Interface:
+
+	type Parser interface {
+	    Parse(ctx context.Context, data []byte) (*Config, error)
+	    CanParse(filename string) bool
 	}
 
-	// Example custom validator
-	type PathValidator struct {
-		RequiredPaths []string
-		AllowedExts  []string
-	}
+🎨 Design Principles:
+1. Format Agnostic: Support multiple config formats
+2. Extensible: Easy to add new parsers
+3. Validated: Strong validation at parse time
+4. Normalized: Consistent path handling
+5. Operation-Driven: Config drives operations
 
-	func (v *PathValidator) Validate(cfg *Config) error {
-		// Path existence
-		// Extension validation
-		// Permission checks
-		return nil
-	}
+📝 Example Usage:
 
-🔍 Example:
-
-	// Load with validation
 	cfg, err := config.Load(ctx, "config.yaml")
 	if err != nil {
-		var verr *ValidationError
-		if errors.As(err, &verr) {
-			// Show helpful message
-			fmt.Printf("Config error: %s\n", verr.Suggestion)
-		}
-		return err
+	    return err
 	}
 
-	// Access with type safety
-	if err := cfg.Validate(); err != nil {
-		return fmt.Errorf("invalid config: %w", err)
-	}
+	// Access configuration
+	fmt.Printf("Copying from %s to %s\n",
+	    cfg.Provider.Repo,
+	    cfg.Destination)
+
+🔍 Configuration Formats:
+
+ 1. YAML (Default):
+    ```yaml
+    provider:
+    repo: github.com/org/repo
+    ref: main
+    path: src/pkg
+    destination: /local/path
+    copy:
+    replacements:
+    - old: "foo"
+    new: "bar"
+    ignore_patterns:
+    - "*.tmp"
+    ```
+
+ 2. JSON:
+    ```json
+    {
+    "provider": {
+    "repo": "github.com/org/repo",
+    "ref": "main",
+    "path": "src/pkg"
+    },
+    "destination": "/local/path"
+    }
+    ```
+
+ 3. HCL:
+    ```hcl
+    copy {
+    source {
+    repo = "github.com/org/repo"
+    ref  = "main"
+    path = "src/pkg"
+    }
+    destination {
+    path = "/local/path"
+    }
+    }
+    ```
+
+🎯 Operation Flags:
+- go_embed: Generate Go embed directives
+- clean: Clean destination before copy
+- status: Show operation status
+- remote_status: Check remote source status
+- force: Force operation execution
+- async: Run operations asynchronously
+
+🔜 Planned Enhancements:
+1. [ ] Operation Registry System
+2. [ ] Progress Reporting
+3. [ ] Dependency Resolution
+4. [ ] Templating Support
+5. [ ] Remote Config Support
+
+🔍 Current Issues & TODOs:
+- [ ] Improve error messages with line numbers
+- [ ] Add schema validation for YAML/JSON
+- [ ] Support environment variable interpolation
+- [ ] Add config merge functionality
+- [ ] Add config versioning
+
+🤔 Deeper Reflection:
+1. Parser System:
+  - Current registration system is global
+  - Consider using dependency injection
+  - Add parser priority system
+
+2. Validation:
+  - Add custom validation hooks
+  - Support conditional validation
+  - Add path existence checks
+
+3. Testing:
+  - Add fuzz testing for parsers
+  - Test edge cases in path normalization
+  - Add benchmarks for large configs
+
+4. Security:
+  - Add sensitive field masking
+  - Validate file permissions
+  - Add config source verification
+
+ASCII Diagram:
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Config File │ -> │    Parser    │ -> │  Validated   │
+│(.yml/json/hcl)│    │  Selection   │    │   Config     │
+└──────────────┘    └──────────────┘    └──────────────┘
+
+	       │
+	┌──────┴───────┐
+	│   Parsers    │
+	├──────────────┤
+	│ YAML Parser  │
+	│ JSON Parser  │
+	│ HCL Parser   │
+	└──────────────┘
 */
 package config

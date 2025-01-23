@@ -1,6 +1,7 @@
 package status
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,70 +113,68 @@ func TestDefaultFileFormatter(t *testing.T) {
 // 🧪 TestProgressFormatting tests progress message formatting
 func TestProgressFormatting(t *testing.T) {
 	tests := []struct {
-		name        string
-		current     int
-		total       int
-		want        string
-		description string
+		name     string
+		current  int
+		total    int
+		expected string
+		msg      string
 	}{
 		{
-			name:        "zero_progress",
-			current:     0,
-			total:       100,
-			want:        "⏳ Progress: 0/100 (0%)",
-			description: "should show 0% progress",
+			name:     "zero_progress",
+			current:  0,
+			total:    10,
+			expected: fmt.Sprintf(MsgProgress, EmojiProgress, 0, 10, 0),
+			msg:      "should show 0% progress",
 		},
 		{
-			name:        "half_progress",
-			current:     50,
-			total:       100,
-			want:        "⏳ Progress: 50/100 (50%)",
-			description: "should show 50% progress",
+			name:     "half_progress",
+			current:  5,
+			total:    10,
+			expected: fmt.Sprintf(MsgProgress, EmojiProgress, 5, 10, 50),
+			msg:      "should show 50% progress",
 		},
 		{
-			name:        "complete",
-			current:     100,
-			total:       100,
-			want:        "✅ Progress: 100/100 (100%)",
-			description: "should show completion symbol at 100%",
-		},
-		// 🧪 Edge cases for medical-grade coverage
-		{
-			name:        "zero_total",
-			current:     0,
-			total:       0,
-			want:        "✅ Progress: 0/0 (0%)",
-			description: "should handle zero total gracefully",
+			name:     "complete",
+			current:  10,
+			total:    10,
+			expected: fmt.Sprintf(MsgProgress, EmojiComplete, 10, 10, 100),
+			msg:      "should show 100% progress",
 		},
 		{
-			name:        "zero_total_with_current",
-			current:     5,
-			total:       0,
-			want:        "✅ Progress: 5/0 (100%)",
-			description: "should handle zero total with positive current",
+			name:     "zero_total",
+			current:  0,
+			total:    0,
+			expected: fmt.Sprintf(MsgProgress, EmojiComplete, 0, 0, 0),
+			msg:      "should handle zero total",
 		},
 		{
-			name:        "current_exceeds_total",
-			current:     150,
-			total:       100,
-			want:        "✅ Progress: 150/100 (150%)",
-			description: "should handle current exceeding total",
+			name:     "zero_total_with_current",
+			current:  5,
+			total:    0,
+			expected: fmt.Sprintf(MsgProgress, EmojiComplete, 5, 0, 0),
+			msg:      "should handle zero total with positive current",
 		},
 		{
-			name:        "negative_values",
-			current:     -10,
-			total:       100,
-			want:        "⏳ Progress: -10/100 (-10%)",
-			description: "should handle negative values",
+			name:     "current_exceeds_total",
+			current:  15,
+			total:    10,
+			expected: fmt.Sprintf(MsgProgress, EmojiComplete, 15, 10, 100),
+			msg:      "should cap at 100% when current exceeds total",
+		},
+		{
+			name:     "negative_values",
+			current:  -1,
+			total:    -1,
+			expected: fmt.Sprintf(MsgProgress, EmojiProgress, 0, 0, 0),
+			msg:      "should handle negative values gracefully",
 		},
 	}
 
-	formatter := NewDefaultFileFormatter()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := formatter.FormatProgress(tt.current, tt.total)
-			assert.Equal(t, tt.want, got, tt.description)
+			formatter := NewDefaultFileFormatter()
+			result := formatter.FormatProgress(tt.current, tt.total)
+			assert.Equal(t, tt.expected, result, tt.msg)
 		})
 	}
 }

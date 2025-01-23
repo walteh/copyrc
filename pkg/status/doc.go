@@ -1,138 +1,211 @@
-/*
-Package status manages file storage and status tracking for copyrc.
+// Copyright 2025 walteh LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-	            +-------------+
-	            |   Status    |
-	            |  (Storage)  |
-	            +------+------+
-	                   |
-	      +-----------+-----------+
-	      |                       |
-	+-----+-----+           +----+----+
-	|   Files   |           |  Logs   |
-	| (Storage) |           | (UI/UX) |
-	+-----------+           +---------+
+/*
+Package status manages the state and tracking of file operations in copyrc.
 
 🎯 Purpose:
-- Manages file storage operations
-- Tracks file status (new, modified, removed)
-- Provides user-friendly status reporting
-- Handles file system operations safely
+The status package is responsible for tracking, persisting, and validating the state
+of file operations. It provides a centralized way to manage the status of copied
+files and ensure consistency between operations.
 
-🔄 Flow:
-1. Receives transformed content from operation
-2. Manages file system operations (create, update, delete)
-3. Tracks file status changes
-4. Reports changes in a user-friendly format
+🔄 Status Flow:
 
-⚡ Key Responsibilities:
-- File system operations
-- Status tracking
-- Progress reporting
-- Error handling for I/O
-- Backup management (if needed)
+	                        ┌─────────────┐
+	                        │  Operation  │
+	                        │   Package   │
+	                        └─────────────┘
+	                              │
+	        ┌───────────────┬─────┴─────┬───────────────┐
+	        ▼               ▼           ▼               ▼
+	┌─────────────┐  ┌─────────────┐   ┌─────────────┐
+	│    Load     │  │   Update    │   │    Save     │
+	│   Status    │  │   Status    │   │   Status    │
+	└─────────────┘  └─────────────┘   └─────────────┘
+	        │               │                   │
+	        └───────────────┴───────────────────┘
+	                       │
+	                ┌─────────────┐
+	                │  .copyrc    │
+	                │    .lock    │
+	                └─────────────┘
 
-🤝 Interfaces:
-- FileManager: Handles file operations
-- StatusReporter: Reports status changes
-- Logger: Provides user feedback
-- Formatter: Formats status messages (TODO)
+📦 Package Structure:
 
-📝 Design Philosophy:
-The status package is responsible for all file system operations and status
-tracking. It provides a clean abstraction over the file system and ensures:
-- Safe file operations
-- Consistent status tracking
-- Beautiful progress reporting
-- Clear error messages
-
-🚧 Current Issues & TODOs:
-1. File Management:
-  - Create FileManager interface ✅
-  - Implement safe atomic writes ✅
-  - Add backup/restore capability ✅
-  - Handle directory creation/cleanup ✅
-
-2. Status Tracking:
-  - Define clear file states ✅
-  - Track file metadata ✅
-  - Implement diff detection
-  - Support for dry-run mode
-
-3. Progress Reporting:
-  - Add progress bar for large operations
-  - Implement live updates ✅
-  - Better error formatting
-  - Support for different output formats
-
-4. Testing:
-  - Mock filesystem for testing
-  - Test error conditions
-  - Verify atomic operations
-  - Test concurrent access
-
-5. Missing Abstractions:
-  - FormatFileOperation should be moved from operation package
-  - Add FileFormatter interface for customizable output
-  - Support for different status display formats (text, json, etc)
-  - Better separation between storage and presentation logic
-
-🔍 Deeper Reflection:
-The current implementation has a few architectural issues:
-
- 1. Presentation Logic Leak:
-    Operation package is formatting status messages, which should be
-    handled here. We need a proper FileFormatter interface:
-
-    type FileFormatter interface {
-    FormatFileOperation(path, fileType, status string, isNew, isModified, isRemoved bool) string
-    FormatProgress(current, total int) string
-    FormatError(err error) string
+ 1. Core Types:
+    ```go
+    // Status represents the current state of copied files
+    type Status struct {
+    CommitHash     string                // Current commit hash
+    LastUpdated    time.Time             // Last update time
+    Config         *config.Config        // Current configuration
+    CopiedFiles    map[string]FileInfo   // Tracked files
+    GeneratedFiles map[string]FileInfo   // Generated files
     }
 
- 2. Status Management:
-    Currently mixing storage and status tracking. Should split into:
-    - StorageManager: Pure file operations
-    - StatusTracker: Status and metadata
-    - StatusFormatter: Presentation logic
+    // FileInfo represents a tracked file's status
+    type FileInfo struct {
+    Path       string    // File path
+    Hash       string    // Content hash
+    UpdatedAt  time.Time // Last update time
+    Source     string    // Source location
+    Permalink  string    // Source permalink
+    }
+    ```
 
- 3. Event System:
-    Should implement an event system for status changes:
-    - FileCreated
-    - FileModified
-    - FileDeleted
-    - OperationStarted
-    - OperationProgress
-    - OperationCompleted
+ 2. Core Interface:
+    ```go
+    // Manager handles status persistence and validation
+    type Manager interface {
+    Load(ctx context.Context) (*Status, error)
+    Save(ctx context.Context, status *Status) error
+    Update(ctx context.Context, file FileInfo) error
+    Validate(ctx context.Context) error
+    }
+    ```
 
- 4. Async Operations:
-    Need better support for:
-    - Progress streaming
-    - Cancellation
-    - Rate limiting
-    - Batch operations
+🔑 Key Responsibilities:
 
-Next Steps:
-1. Create FileFormatter interface
-2. Move formatting logic from operation package
-3. Split Manager into smaller focused types
-4. Add event system
-5. Implement comprehensive tests
+1. Status Management:
+  - Load and save status files
+  - Track file modifications
+  - Validate file consistency
+  - Handle status locking
 
-🔍 Example:
+2. File Tracking:
+  - Track copied files
+  - Track generated files
+  - Maintain file metadata
+  - Handle file hashing
 
-	status := status.New(cfg, logger)
+3. Status Validation:
+  - Check file existence
+  - Verify file hashes
+  - Compare timestamps
+  - Detect modifications
 
-	// File operations
-	err := status.WriteFile(ctx, path, content)
+4. Lock File Management:
+  - Create lock files
+  - Handle concurrent access
+  - Clean up stale locks
+  - Maintain lock integrity
 
-	// Status tracking
-	info := status.GetFileInfo(path)
+🤝 Integration with Operations:
 
-	// Progress reporting
-	status.ReportProgress(ctx, total, processed)
+1. Operation Package Relationship:
 
-	// Status formatting (TODO)
-	formatted := status.FormatFileOperation(path, fileType, status, isNew, isModified, isRemoved)
+  - Operations use status for state
+
+  - Status validates operations
+
+  - Status tracks operation results
+
+  - Status enforces consistency
+
+    2. Status Flow in Operations:
+    ```
+    Operation Start
+    │
+    ▼
+    Load Status ────────┐
+    │             │
+    ▼             │
+    Check Status       │
+    │            │
+    ▼            │
+    Execute Operation  │
+    │            │
+    ▼            │
+    Update Status ◄────┘
+    │
+    ▼
+    Operation End
+    ```
+
+🔒 Lock File Format:
+```json
+
+	{
+	    "commit_hash": "abc123",
+	    "last_updated": "2024-01-22T15:04:05Z",
+	    "config": {
+	        // Configuration snapshot
+	    },
+	    "copied_files": {
+	        "file.go": {
+	            "path": "pkg/file.go",
+	            "hash": "sha256:...",
+	            "updated_at": "2024-01-22T15:04:05Z",
+	            "source": "github.com/org/repo",
+	            "permalink": "https://..."
+	        }
+	    }
+	}
+
+```
+
+🎯 Implementation Guidelines:
+
+1. Status Operations:
+  - Always atomic file operations
+  - Use temporary files for updates
+  - Handle partial writes
+  - Maintain backup copies
+
+2. Error Handling:
+  - Recover from corrupted files
+  - Handle missing files gracefully
+  - Provide detailed error context
+  - Support status rollback
+
+3. Concurrency:
+  - Use file-based locking
+  - Handle concurrent updates
+  - Prevent race conditions
+  - Support distributed ops
+
+4. Performance:
+  - Cache status in memory
+  - Batch status updates
+  - Optimize file I/O
+  - Use efficient formats
+
+🔍 Testing Strategy:
+
+1. Unit Tests:
+  - Test file operations
+  - Test status validation
+  - Test error handling
+  - Test concurrency
+
+2. Integration Tests:
+  - Test with operations
+  - Test file consistency
+  - Test recovery scenarios
+  - Test performance
+
+3. Stress Tests:
+  - Test concurrent access
+  - Test large file counts
+  - Test frequent updates
+  - Test error recovery
+
+🔜 Future Enhancements:
+1. [ ] Distributed locking
+2. [ ] Status compression
+3. [ ] Status versioning
+4. [ ] Remote status sync
+5. [ ] Status backup/restore
 */
 package status

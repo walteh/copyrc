@@ -43,9 +43,6 @@ type Provider struct {
 // 🏭 New creates a new GitHub provider
 func New(ctx context.Context) (provider.Provider, error) {
 	token := os.Getenv("GITHUB_TOKEN")
-	if token == "" {
-		return nil, errors.Errorf("GITHUB_TOKEN environment variable not set")
-	}
 
 	return &Provider{
 		token: token,

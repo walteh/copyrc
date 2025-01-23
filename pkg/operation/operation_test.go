@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package operation
+package operation_test
 
 import (
 	"context"
@@ -29,6 +29,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/walteh/copyrc/gen/mockery"
 	"github.com/walteh/copyrc/pkg/config"
+	"github.com/walteh/copyrc/pkg/operation"
+	"github.com/walteh/copyrc/pkg/status"
 )
 
 // Helper function to check if a file should be ignored
@@ -45,8 +47,8 @@ func TestProcessFile(t *testing.T) {
 	tests := []struct {
 		name     string
 		cfg      *config.Config
-		files    map[string]string                 // 📄 Source files and their contents
-		setup    func(t *testing.T, tmpDir string) // 🛠️ Additional setup if needed
+		files    map[string]string
+		setup    func(t *testing.T, tmpDir string)
 		wantErr  bool
 		validate func(t *testing.T, tmpDir string)
 	}{
@@ -92,7 +94,7 @@ func TestProcessFile(t *testing.T) {
 			},
 			files: map[string]string{
 				"file.txt":  "test content here and test there",
-				"other.txt": "old content stays old",
+				"other.txt": "old content here and old there",
 			},
 			validate: func(t *testing.T, tmpDir string) {
 				// Check file.txt - should be replaced
@@ -100,10 +102,10 @@ func TestProcessFile(t *testing.T) {
 				require.NoError(t, err, "reading file.txt should succeed")
 				assert.Equal(t, "replaced content here and replaced there", string(content1), "replacements should only apply to specified file")
 
-				// Check other.txt - should not be replaced
+				// Check other.txt - should be replaced with its specific replacement
 				content2, err := os.ReadFile(filepath.Join(tmpDir, "dst", "other.txt"))
 				require.NoError(t, err, "reading other.txt should succeed")
-				assert.Equal(t, "old content stays old", string(content2), "replacements should not affect other files")
+				assert.Equal(t, "new content here and new there", string(content2), "replacements should only apply to specified file")
 			},
 		},
 		{
@@ -173,41 +175,65 @@ func TestProcessFile(t *testing.T) {
 			// Update config with temp dir
 			tt.cfg.Destination = filepath.Join(tmpDir, tt.cfg.Destination)
 
-			// Create destination dir if not created by setup
-			if tt.setup == nil {
-				err := os.MkdirAll(tt.cfg.Destination, 0755)
-				require.NoError(t, err, "creating destination directory")
-			}
+			// Create destination dir and any parent directories
+			err := os.MkdirAll(filepath.Dir(tt.cfg.Destination), 0755)
+			require.NoError(t, err, "creating destination directory")
 
-			// Set up mock provider with detailed expectations
+			// Set up mock provider
 			p := mockery.NewMockProvider_provider(t)
+
+			// Get list of non-ignored files
+			files := make([]string, 0, len(tt.files))
 			for path := range tt.files {
 				if tt.cfg.Copy == nil || len(tt.cfg.Copy.IgnorePatterns) == 0 || !shouldIgnore(path, tt.cfg.Copy.IgnorePatterns) {
-					p.EXPECT().GetFile(mock.Anything, tt.cfg.Provider, path).
-						RunAndReturn(func(ctx context.Context, args config.ProviderArgs, path string) (io.ReadCloser, error) {
-							if strings.Contains(path, "error") {
-								return nil, errors.New("simulated provider error")
-							}
-							return io.NopCloser(strings.NewReader(tt.files[path])), nil
-						}).Once()
+					files = append(files, path)
 				}
+			}
+
+			// Mock ListFiles
+			p.EXPECT().ListFiles(mock.Anything, tt.cfg.Provider).Return(files, nil).Once()
+
+			// Mock GetCommitHash
+			p.EXPECT().GetCommitHash(mock.Anything, tt.cfg.Provider).Return("test-hash", nil).Once()
+
+			// Mock GetPermalink for each file
+			for _, file := range files {
+				p.EXPECT().GetPermalink(mock.Anything, tt.cfg.Provider, "test-hash", file).
+					Return("https://test.com/"+file, nil).Once()
+			}
+
+			// Mock GetFile for each file
+			for _, file := range files {
+				p.EXPECT().GetFile(mock.Anything, tt.cfg.Provider, file).
+					RunAndReturn(func(ctx context.Context, args config.ProviderArgs, path string) (io.ReadCloser, error) {
+						if strings.Contains(path, "error") {
+							return nil, errors.New("simulated provider error")
+						}
+						return io.NopCloser(strings.NewReader(tt.files[path])), nil
+					}).Once()
 			}
 
 			// Create logger with test writer
 			logger := zerolog.New(zerolog.NewTestWriter(t))
 
-			// Create manager
-			mgr := New(tt.cfg, p, &logger)
+			// Create status manager
+			statusMgr := status.NewManager(tt.cfg.Destination, status.NewDefaultFileFormatter())
 
-			// Process each file
-			for path := range tt.files {
-				err := mgr.ProcessFile(context.Background(), path)
-				if tt.wantErr {
-					assert.Error(t, err, "ProcessFile should return error for %s", path)
-					return
-				}
-				assert.NoError(t, err, "ProcessFile should succeed for %s", path)
+			// Create operation
+			op := operation.NewCopyOperation(operation.Options{
+				Config:    tt.cfg,
+				Provider:  p,
+				StatusMgr: statusMgr,
+				Logger:    &logger,
+			})
+
+			// Execute operation
+			err = op.Execute(context.Background())
+			if tt.wantErr {
+				assert.Error(t, err, "Execute should return error")
+				return
 			}
+			assert.NoError(t, err, "Execute should succeed")
 
 			// Run validation
 			if tt.validate != nil {
@@ -273,21 +299,44 @@ func TestProcessFiles(t *testing.T) {
 			files := make([]string, 0, len(tt.files))
 			for path := range tt.files {
 				files = append(files, path)
-				p.EXPECT().GetFile(mock.Anything, tt.cfg.Provider, path).
+			}
+
+			// Mock ListFiles
+			p.EXPECT().ListFiles(mock.Anything, tt.cfg.Provider).Return(files, nil).Once()
+
+			// Mock GetCommitHash
+			p.EXPECT().GetCommitHash(mock.Anything, tt.cfg.Provider).Return("test-hash", nil).Once()
+
+			// Mock GetPermalink for each file
+			for _, file := range files {
+				p.EXPECT().GetPermalink(mock.Anything, tt.cfg.Provider, "test-hash", file).
+					Return("https://test.com/"+file, nil).Once()
+			}
+
+			// Mock GetFile for each file
+			for _, file := range files {
+				p.EXPECT().GetFile(mock.Anything, tt.cfg.Provider, file).
 					RunAndReturn(func(ctx context.Context, args config.ProviderArgs, path string) (io.ReadCloser, error) {
 						return io.NopCloser(strings.NewReader(tt.files[path])), nil
 					}).Once()
 			}
-			p.EXPECT().ListFiles(mock.Anything, tt.cfg.Provider).Return(files, nil).Once()
 
 			// Create logger with test writer
 			logger := zerolog.New(zerolog.NewTestWriter(t))
 
-			// Create manager
-			mgr := New(tt.cfg, p, &logger)
+			// Create status manager
+			statusMgr := status.NewManager(tt.cfg.Destination, status.NewDefaultFileFormatter())
+
+			// Create operation
+			op := operation.NewCopyOperation(operation.Options{
+				Config:    tt.cfg,
+				Provider:  p,
+				StatusMgr: statusMgr,
+				Logger:    &logger,
+			})
 
 			// Process files
-			err = mgr.ProcessFiles(context.Background(), files)
+			err = op.Execute(context.Background())
 			if tt.wantErr {
 				assert.Error(t, err, "ProcessFiles should return error")
 				return

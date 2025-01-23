@@ -18,12 +18,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -36,6 +37,8 @@ const (
 	StatusModified             // File exists but content differs
 	StatusUnchanged            // File exists and content matches
 	StatusDeleted              // File was deleted
+	StatusLocal                // File is local only
+	StatusManaged              // File is managed by copyrc
 )
 
 // String returns a string representation of FileStatus
@@ -49,6 +52,10 @@ func (s FileStatus) String() string {
 		return "unchanged"
 	case StatusDeleted:
 		return "deleted"
+	case StatusLocal:
+		return "local"
+	case StatusManaged:
+		return "managed"
 	default:
 		return "unknown"
 	}
@@ -98,29 +105,41 @@ type StatusReporter interface {
 	FinishOperation(ctx context.Context)
 }
 
-// 🔧 Manager implements both FileManager and StatusReporter
+// 📊 Manager handles file operations and status tracking
 type Manager struct {
-	baseDir   string          // Base directory for all operations
-	logger    *zerolog.Logger // Logger for status updates
-	formatter FileFormatter   // Formatter for status messages
-
-	// Status tracking
-	mu    sync.RWMutex
-	files map[string]FileInfo
-
-	// Progress tracking
+	baseDir   string
+	formatter FileFormatter
+	progress  ProgressIndicator
+	files     map[string]*FileEntry
+	mu        sync.RWMutex
 	total     int
 	processed int
 }
 
-// 🏭 New creates a new status manager
-func New(baseDir string, logger *zerolog.Logger) *Manager {
+// 📄 FileEntry tracks the status and metadata of a file
+type FileEntry struct {
+	Status   FileStatus
+	Metadata map[string]string
+}
+
+// 🆕 NewManager creates a new Manager instance
+func NewManager(baseDir string, formatter FileFormatter) *Manager {
 	return &Manager{
 		baseDir:   filepath.Clean(baseDir),
-		logger:    logger,
-		formatter: NewDefaultFileFormatter(),
-		files:     make(map[string]FileInfo),
+		formatter: formatter,
+		progress:  NewDefaultProgressIndicator(),
+		files:     make(map[string]*FileEntry),
 	}
+}
+
+// 🔄 UpdateStatus updates the status of a file
+func (m *Manager) UpdateStatus(ctx context.Context, path string, status FileStatus, entry *FileEntry) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.files[path] = entry
+	msg := m.formatter.FormatFileStatus(path, status, entry.Metadata)
+	fmt.Println(msg)
 }
 
 // 🔒 getAbsPath returns the absolute path for a given relative path
@@ -182,14 +201,14 @@ func (m *Manager) DeleteFile(ctx context.Context, path string) error {
 }
 
 func (m *Manager) FileExists(ctx context.Context, path string) (bool, error) {
-	_, err := os.Stat(m.getAbsPath(path))
-	if err == nil {
-		return true, nil
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, errors.Wrap(err, "checking file existence")
 	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, errors.Errorf("checking file existence: %w", err)
+	return true, nil
 }
 
 func (m *Manager) CreateDir(ctx context.Context, path string) error {
@@ -255,7 +274,18 @@ func (m *Manager) TrackFile(ctx context.Context, path string, info FileInfo) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.files[path] = info
+	entry := &FileEntry{
+		Status: info.Status,
+		Metadata: map[string]string{
+			"size": fmt.Sprintf("%d", info.Size),
+			"mode": info.Mode.String(),
+		},
+	}
+	if info.Error != nil {
+		entry.Metadata["error"] = info.Error.Error()
+	}
+	m.files[path] = entry
+
 	msg := m.formatter.FormatFileOperation(
 		path,
 		"file",
@@ -267,18 +297,42 @@ func (m *Manager) TrackFile(ctx context.Context, path string, info FileInfo) {
 	if info.Error != nil {
 		msg = m.formatter.FormatError(info.Error)
 	}
-	m.logger.Info().Str("path", path).Msg(msg)
+	fmt.Println(msg)
 }
 
 func (m *Manager) GetFileInfo(ctx context.Context, path string) (FileInfo, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	info, ok := m.files[path]
+	entry, ok := m.files[path]
 	if !ok {
 		return FileInfo{}, errors.Errorf("file not tracked: %s", path)
 	}
-	return info, nil
+
+	size := int64(0)
+	if s, ok := entry.Metadata["size"]; ok {
+		size, _ = strconv.ParseInt(s, 10, 64)
+	}
+
+	mode := os.FileMode(0644) // Default mode
+	if m, ok := entry.Metadata["mode"]; ok {
+		if parsed, err := strconv.ParseUint(m, 8, 32); err == nil {
+			mode = os.FileMode(parsed)
+		}
+	}
+
+	var err error
+	if e, ok := entry.Metadata["error"]; ok {
+		err = errors.New(e)
+	}
+
+	return FileInfo{
+		Path:   path,
+		Status: entry.Status,
+		Size:   size,
+		Mode:   mode,
+		Error:  err,
+	}, nil
 }
 
 func (m *Manager) ListFiles(ctx context.Context) ([]FileInfo, error) {
@@ -286,12 +340,15 @@ func (m *Manager) ListFiles(ctx context.Context) ([]FileInfo, error) {
 	defer m.mu.RUnlock()
 
 	files := make([]FileInfo, 0, len(m.files))
-	for _, info := range m.files {
-		files = append(files, info)
+	for path := range m.files {
+		if info, err := m.GetFileInfo(ctx, path); err == nil {
+			files = append(files, info)
+		}
 	}
 	return files, nil
 }
 
+// StartOperation starts tracking progress for an operation
 func (m *Manager) StartOperation(ctx context.Context, total int) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -299,30 +356,26 @@ func (m *Manager) StartOperation(ctx context.Context, total int) {
 	m.total = total
 	m.processed = 0
 	msg := m.formatter.FormatProgress(0, total)
-	m.logger.Info().Int("total", total).Msg(msg)
+	fmt.Println(msg)
 }
 
+// UpdateProgress updates the progress of the current operation
 func (m *Manager) UpdateProgress(ctx context.Context, processed int) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	m.processed = processed
 	msg := m.formatter.FormatProgress(processed, m.total)
-	m.logger.Info().
-		Int("processed", processed).
-		Int("total", m.total).
-		Msg(msg)
+	fmt.Println(msg)
 }
 
+// FinishOperation completes the current operation
 func (m *Manager) FinishOperation(ctx context.Context) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	msg := m.formatter.FormatProgress(m.total, m.total)
-	m.logger.Info().
-		Int("processed", m.total).
-		Int("total", m.total).
-		Msg(msg)
+	fmt.Println(msg)
 }
 
 // Helper functions

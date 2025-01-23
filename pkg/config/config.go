@@ -137,8 +137,8 @@ func (cfg *Config) Validate() error {
 	}
 
 	// Clean up paths
-	cfg.Provider.Path = filepath.Clean(cfg.Provider.Path)
-	cfg.Destination = filepath.Clean(cfg.Destination)
+	cfg.Provider.Path = filepath.ToSlash(filepath.Clean(cfg.Provider.Path))
+	cfg.Destination = filepath.ToSlash(filepath.Clean(cfg.Destination))
 
 	// Set defaults
 	if cfg.Provider.Ref == "" {
@@ -186,6 +186,24 @@ func (p *YAMLParser) Parse(ctx context.Context, data []byte) (*Config, error) {
 // 🔧 HCLParser implements the Parser interface for HCL files
 type HCLParser struct{}
 
+// 🔄 HCLConfig represents the HCL configuration structure
+type HCLConfig struct {
+	Copy []struct {
+		Source struct {
+			Repo string `hcl:"repo" cty:"repo"`
+			Ref  string `hcl:"ref,optional" cty:"ref"`
+			Path string `hcl:"path" cty:"path"`
+		} `hcl:"source,block" cty:"source"`
+		Destination struct {
+			Path string `hcl:"path" cty:"path"`
+		} `hcl:"destination,block" cty:"destination"`
+		Options struct {
+			Replacements cty.Value `hcl:"replacements,optional" cty:"replacements"`
+			IgnoreFiles  []string  `hcl:"ignore_files,optional" cty:"ignore_files"`
+		} `hcl:"options,block" cty:"options"`
+	} `hcl:"copy,block" cty:"copy"`
+}
+
 func init() {
 	Register(&HCLParser{})
 }
@@ -205,15 +223,57 @@ func (p *HCLParser) Parse(ctx context.Context, data []byte) (*Config, error) {
 		Variables: map[string]cty.Value{},
 	}
 
-	var cfg Config
-	diags = gohcl.DecodeBody(hclFile.Body, evalCtx, &cfg)
+	var hclCfg HCLConfig
+	diags = gohcl.DecodeBody(hclFile.Body, evalCtx, &hclCfg)
 	if diags.HasErrors() {
 		return nil, errors.Errorf("decoding HCL: %s", diags.Error())
+	}
+
+	if len(hclCfg.Copy) == 0 {
+		return nil, errors.Errorf("no copy block found")
+	}
+
+	// Convert to standard config
+	cfg := &Config{
+		Provider: ProviderArgs{
+			Repo: hclCfg.Copy[0].Source.Repo,
+			Ref:  hclCfg.Copy[0].Source.Ref,
+			Path: hclCfg.Copy[0].Source.Path,
+		},
+		Destination: hclCfg.Copy[0].Destination.Path,
+	}
+
+	// Convert replacements and ignore patterns
+	if !hclCfg.Copy[0].Options.Replacements.IsNull() || len(hclCfg.Copy[0].Options.IgnoreFiles) > 0 {
+		cfg.Copy = &CopyArgs{
+			IgnorePatterns: hclCfg.Copy[0].Options.IgnoreFiles,
+		}
+
+		if !hclCfg.Copy[0].Options.Replacements.IsNull() {
+			replacements := hclCfg.Copy[0].Options.Replacements.AsValueSlice()
+			cfg.Copy.Replacements = make([]Replacement, len(replacements))
+
+			for i, r := range replacements {
+				m := r.AsValueMap()
+				old := m["old"].AsString()
+				new := m["new"].AsString()
+				var file *string
+				if f, ok := m["file"]; ok && !f.IsNull() {
+					s := f.AsString()
+					file = &s
+				}
+				cfg.Copy.Replacements[i] = Replacement{
+					Old:  old,
+					New:  new,
+					File: file,
+				}
+			}
+		}
 	}
 
 	if err := cfg.Validate(); err != nil {
 		return nil, errors.Errorf("validating config: %w", err)
 	}
 
-	return &cfg, nil
+	return cfg, nil
 }
