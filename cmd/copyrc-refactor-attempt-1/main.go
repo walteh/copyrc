@@ -21,10 +21,10 @@ import (
 	"path/filepath"
 
 	"github.com/rs/zerolog"
-	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/operation"
-	"github.com/walteh/copyrc/pkg/provider"
-	"github.com/walteh/copyrc/pkg/status"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/operation"
+	"github.com/walteh/copyrc/refactor-attempt-1/provider"
+	"github.com/walteh/copyrc/refactor-attempt-1/status"
 )
 
 var (

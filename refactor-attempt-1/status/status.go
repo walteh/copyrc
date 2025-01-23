@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/walteh/copyrc/pkg/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
 	"gitlab.com/tozd/go/errors"
 )
 

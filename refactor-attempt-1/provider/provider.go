@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v60/github"
-	"github.com/walteh/copyrc/pkg/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
 	"gitlab.com/tozd/go/errors"
 )
 

@@ -23,7 +23,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/walteh/copyrc/pkg/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
 )
 
 func TestParseRepo(t *testing.T) {

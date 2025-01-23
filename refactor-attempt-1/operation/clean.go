@@ -17,7 +17,7 @@ package operation
 import (
 	"context"
 
-	"github.com/walteh/copyrc/pkg/status"
+	"github.com/walteh/copyrc/refactor-attempt-1/status"
 	"gitlab.com/tozd/go/errors"
 )
 

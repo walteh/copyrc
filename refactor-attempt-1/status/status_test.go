@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/walteh/copyrc/gen/mockery"
-	"github.com/walteh/copyrc/pkg/status"
+	"github.com/walteh/copyrc/refactor-attempt-1/status"
 )
 
 // 🛠️ setupTestManager creates a new Manager with a mock formatter

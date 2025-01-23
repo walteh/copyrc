@@ -26,8 +26,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/provider"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/provider"
 	"gitlab.com/tozd/go/errors"
 )
 

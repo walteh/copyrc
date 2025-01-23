@@ -28,9 +28,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/walteh/copyrc/gen/mockery"
-	"github.com/walteh/copyrc/pkg/config"
-	"github.com/walteh/copyrc/pkg/operation"
-	"github.com/walteh/copyrc/pkg/status"
+	"github.com/walteh/copyrc/refactor-attempt-1/config"
+	"github.com/walteh/copyrc/refactor-attempt-1/operation"
+	"github.com/walteh/copyrc/refactor-attempt-1/status"
 )
 
 // Helper function to check if a file should be ignored

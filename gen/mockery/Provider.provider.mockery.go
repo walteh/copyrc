@@ -5,7 +5,7 @@ package mockery
 import (
 	context "context"
 
-	config "github.com/walteh/copyrc/pkg/config"
+	config "github.com/walteh/copyrc/refactor-attempt-1/config"
 
 	io "io"
 
