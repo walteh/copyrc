@@ -697,6 +697,11 @@ func (s *State) CleanupOrphanedFiles(ctx context.Context) error {
 	return nil
 }
 
+// 🏠 Dir returns the directory where the state file is located
+func (s *State) Dir() string {
+	return filepath.Dir(s.path)
+}
+
 // TODO(dr.methodical): 🧪 Add tests for state loading/saving
 // TODO(dr.methodical): 🧪 Add tests for file operations
 // TODO(dr.methodical): 🧪 Add tests for text modifications

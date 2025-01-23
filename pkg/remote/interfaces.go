@@ -55,6 +55,12 @@ type RawTextFile interface {
 	WebViewPermalink() string
 }
 
+// ModifiableRawTextFile extends RawTextFile with the ability to modify its content
+type ModifiableRawTextFile interface {
+	RawTextFile
+	SetContent(content string)
+}
+
 // TODO(dr.methodical): 🔬 Add mockery configuration for these interfaces
 // TODO(dr.methodical): 🧪 Add tests for interface method signatures
 // TODO(dr.methodical): 🎯 Add GitHub implementation
