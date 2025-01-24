@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rs/zerolog"
+	"github.com/walteh/copyrc/pkg/remote"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -36,61 +37,57 @@ func (o *operator) Sync(ctx context.Context) error {
 			Msg("config has changed")
 	}
 
-	// Get repository from provider
-	repo, err := o.provider.GetRepository(ctx, "test/repo")
-	if err != nil {
-		return errors.Errorf("getting repository: %w", err)
-	}
-
-	// Get repository name for validation
-	repoName := repo.Name()
-	if repoName != "test/repo" {
-		return errors.Errorf("unexpected repository name: %s", repoName)
-	}
-
-	// Get latest release
-	release, err := repo.GetLatestRelease(ctx)
-	if err != nil {
-		return errors.Errorf("getting latest release: %w", err)
-	}
-
-	// Validate release
-	if release.Ref() != "main" {
-		return errors.Errorf("unexpected release ref: %s", release.Ref())
-	}
-	if release.Repository() != repo {
-		return errors.Errorf("release repository mismatch")
-	}
-
-	// List files at path
-	files, err := release.ListFilesAtPath(ctx, "remote/path")
-	if err != nil {
-		return errors.Errorf("listing files: %w", err)
-	}
-
-	// Process each file
-	for _, file := range files {
-		// Validate file
-		if file.Path() != "test.txt" {
-			return errors.Errorf("unexpected file path: %s", file.Path())
-		}
-		if file.WebViewPermalink() != "https://example.com/test.txt" {
-			return errors.Errorf("unexpected permalink: %s", file.WebViewPermalink())
-		}
-		if file.Release() != release {
-			return errors.Errorf("file release mismatch")
-		}
-
-		// Get file content
-		content, err := file.GetContent(ctx)
+	// Process each repository
+	for _, repo := range o.config.GetRepositories() {
+		// Get repository from provider
+		remoteRepo, err := o.provider.GetRepository(ctx, repo.Name)
 		if err != nil {
-			return errors.Errorf("getting file content: %w", err)
+			return errors.Errorf("getting repository %s: %w", repo.Name, err)
 		}
-		defer content.Close()
 
-		// Put file in state
-		if _, err := o.state.PutRemoteTextFile(ctx, file, "test.copy.txt"); err != nil {
-			return errors.Errorf("putting file in state: %w", err)
+		// Get repository name for validation
+		repoName := remoteRepo.Name()
+		if repoName != repo.Name {
+			return errors.Errorf("unexpected repository name: got %s, want %s", repoName, repo.Name)
+		}
+
+		// Get release based on ref
+		var release remote.Release
+		if repo.Ref == "latest" {
+			release, err = remoteRepo.GetLatestRelease(ctx)
+		} else {
+			release, err = remoteRepo.GetReleaseFromRef(ctx, repo.Ref)
+		}
+		if err != nil {
+			return errors.Errorf("getting release %s: %w", repo.Ref, err)
+		}
+
+		// Find copies for this repository
+		for _, copy := range o.config.GetCopies() {
+			if copy.Repository.Name != repo.Name {
+				continue
+			}
+
+			// List files at path
+			files, err := release.ListFilesAtPath(ctx, copy.Paths.Remote)
+			if err != nil {
+				return errors.Errorf("listing files at %s: %w", copy.Paths.Remote, err)
+			}
+
+			// Process each file
+			for _, file := range files {
+				// Get file content
+				content, err := file.GetContent(ctx)
+				if err != nil {
+					return errors.Errorf("getting content for %s: %w", file.Path(), err)
+				}
+				defer content.Close()
+
+				// Put file in state
+				if _, err := o.state.PutRemoteTextFile(ctx, file, copy.Paths.Local); err != nil {
+					return errors.Errorf("putting file %s in state: %w", file.Path(), err)
+				}
+			}
 		}
 	}
 

@@ -11,92 +11,114 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/walteh/copyrc/gen/mockery"
+	"github.com/walteh/copyrc/pkg/config"
 	"github.com/walteh/copyrc/pkg/remote"
-	"github.com/walteh/copyrc/pkg/state"
+	statepkg "github.com/walteh/copyrc/pkg/state"
 )
 
 func TestSync(t *testing.T) {
 	tests := []struct {
 		name          string
-		setupMocks    func(*testing.T) (*mockConfig, remote.Provider, *mockery.MockStateManager_state)
+		setupMocks    func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state)
 		expectedError string
 	}{
 		{
 			name: "successful_sync_single_file",
-			setupMocks: func(t *testing.T) (*mockConfig, remote.Provider, *mockery.MockStateManager_state) {
+			setupMocks: func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state) {
 				mockFile := mockery.NewMockRawTextFile_remote(t)
 				mockRelease := mockery.NewMockRelease_remote(t)
 				mockRepo := mockery.NewMockRepository_remote(t)
-				mockProvider := mockery.NewMockProvider_remote(t)
-				mockState := mockery.NewMockStateManager_state(t)
-				cfg := &mockConfig{}
 
-				// Config expectations
-				cfg.On("Hash").Return("abc123")
+				// Create test config
+				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
+					{
+						Provider: "github",
+						Name:     "test/repo",
+						Ref:      "main",
+					},
+				},
+				)
+
+				cfg.EXPECT().GetCopies().Return([]config.Copy{
+					{
+						Repository: config.RepositoryDefinition{
+							Provider: "github",
+							Name:     "test/repo",
+							Ref:      "main",
+						},
+						Paths: config.CopyPaths{
+							Remote: "remote/path",
+							Local:  "test.copy.txt",
+						},
+					},
+				},
+				)
 
 				// File expectations
 				mockFile.EXPECT().GetContent(mock.Anything).Return(io.NopCloser(strings.NewReader("test content")), nil)
 				mockFile.EXPECT().Path().Return("test.txt")
-				mockFile.EXPECT().WebViewPermalink().Return("https://example.com/test.txt")
-				mockFile.EXPECT().Release().Return(mockRelease)
 
 				// Release expectations
-				mockRelease.EXPECT().Ref().Return("main")
-				mockRelease.EXPECT().Repository().Return(mockRepo)
 				mockRelease.EXPECT().ListFilesAtPath(mock.Anything, "remote/path").Return([]remote.RawTextFile{mockFile}, nil)
 
 				// Repository expectations
 				mockRepo.EXPECT().Name().Return("test/repo")
-				mockRepo.EXPECT().GetLatestRelease(mock.Anything).Return(mockRelease, nil)
+				mockRepo.EXPECT().GetReleaseFromRef(mock.Anything, "main").Return(mockRelease, nil)
 
 				// Provider expectations
-				mockProvider.EXPECT().GetRepository(mock.Anything, "test/repo").Return(mockRepo, nil)
+				provider.EXPECT().GetRepository(mock.Anything, "test/repo").Return(mockRepo, nil)
 
 				// State expectations
-				mockState.EXPECT().Load(mock.Anything).Return(nil)
-				mockState.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
-				mockState.EXPECT().ConfigHash().Return("def456")
-				mockState.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "test.copy.txt").Return(&state.RemoteTextFile{
+				state.EXPECT().Load(mock.Anything).Return(nil)
+				state.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
+				state.EXPECT().ConfigHash().Return("def456")
+				state.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "test.copy.txt").Return(&statepkg.RemoteTextFile{
 					LocalPath: "test.copy.txt",
 					RepoName:  "test/repo",
 				}, nil)
-				mockState.EXPECT().Save(mock.Anything).Return(nil)
-
-				return cfg, mockProvider, mockState
+				state.EXPECT().Save(mock.Anything).Return(nil)
 			},
 		},
 		{
 			name: "load_state_error",
-			setupMocks: func(t *testing.T) (*mockConfig, remote.Provider, *mockery.MockStateManager_state) {
-				mockProvider := mockery.NewMockProvider_remote(t)
-				mockState := mockery.NewMockStateManager_state(t)
-				cfg := &mockConfig{}
+			setupMocks: func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state) {
 
-				mockState.EXPECT().Load(mock.Anything).Return(assert.AnError)
+				// Create test config
+				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
+					{
+						Provider: "github",
+						Name:     "test/repo",
+						Ref:      "main",
+					},
+				})
 
-				return cfg, mockProvider, mockState
+				state.EXPECT().Load(mock.Anything).Return(assert.AnError)
+
 			},
 			expectedError: "loading state",
 		},
 		{
 			name: "get_repository_error",
-			setupMocks: func(t *testing.T) (*mockConfig, remote.Provider, *mockery.MockStateManager_state) {
-				mockProvider := mockery.NewMockProvider_remote(t)
-				mockState := mockery.NewMockStateManager_state(t)
-				cfg := &mockConfig{}
+			setupMocks: func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state) {
 
-				// Config expectations
-				cfg.On("Hash").Return("abc123")
+				// Create test config
+
+				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
+					{
+						Provider: "github",
+						Name:     "test/repo",
+						Ref:      "main",
+					},
+				})
 
 				// State expectations
-				mockState.EXPECT().Load(mock.Anything).Return(nil)
-				mockState.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
-				mockState.EXPECT().ConfigHash().Return("def456")
+				state.EXPECT().Load(mock.Anything).Return(nil)
+				state.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
+				state.EXPECT().ConfigHash().Return("def456")
 
 				// Provider expectations
-				mockProvider.EXPECT().GetRepository(mock.Anything, mock.Anything).Return(nil, assert.AnError)
+				provider.EXPECT().GetRepository(mock.Anything, "test/repo").Return(nil, assert.AnError)
 
-				return cfg, mockProvider, mockState
 			},
 			expectedError: "getting repository",
 		},
@@ -106,11 +128,14 @@ func TestSync(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup
 			ctx := zerolog.New(zerolog.NewTestWriter(t)).WithContext(context.Background())
-			cfg, provider, mockState := tt.setupMocks(t)
+			cfg := mockery.NewMockConfig_config(t)
+			provider := mockery.NewMockProvider_remote(t)
+			state := mockery.NewMockStateManager_state(t)
+			tt.setupMocks(t, cfg, provider, state)
 
 			op, err := New(Options{
 				Config:       cfg,
-				StateManager: mockState,
+				StateManager: state,
 				Provider:     provider,
 			})
 			require.NoError(t, err)
@@ -126,6 +151,10 @@ func TestSync(t *testing.T) {
 			}
 
 			require.NoError(t, err)
+
+			state.AssertExpectations(t)
+			provider.AssertExpectations(t)
+			cfg.AssertExpectations(t)
 		})
 	}
 }

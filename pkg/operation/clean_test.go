@@ -14,12 +14,12 @@ import (
 func TestClean(t *testing.T) {
 	tests := []struct {
 		name          string
-		setupMocks    func(*mockery.MockStateManager_state, *mockConfig)
+		setupMocks    func(*mockery.MockStateManager_state, *mockery.MockConfig_config)
 		expectedError string
 	}{
 		{
 			name: "successful_clean",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().CleanupOrphanedFiles(mock.Anything).Return(nil)
 				sm.EXPECT().Reset(mock.Anything).Return(nil)
@@ -27,7 +27,7 @@ func TestClean(t *testing.T) {
 		},
 		{
 			name: "inconsistent_state_still_cleans",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(false, nil)
 				sm.EXPECT().CleanupOrphanedFiles(mock.Anything).Return(nil)
 				sm.EXPECT().Reset(mock.Anything).Return(nil)
@@ -35,14 +35,14 @@ func TestClean(t *testing.T) {
 		},
 		{
 			name: "consistency_check_error",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(false, assert.AnError)
 			},
 			expectedError: "checking state consistency",
 		},
 		{
 			name: "cleanup_error",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().CleanupOrphanedFiles(mock.Anything).Return(assert.AnError)
 			},
@@ -50,7 +50,7 @@ func TestClean(t *testing.T) {
 		},
 		{
 			name: "reset_error",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().CleanupOrphanedFiles(mock.Anything).Return(nil)
 				sm.EXPECT().Reset(mock.Anything).Return(assert.AnError)
@@ -64,7 +64,7 @@ func TestClean(t *testing.T) {
 			// Setup
 			ctx := zerolog.New(zerolog.NewTestWriter(t)).WithContext(context.Background())
 			sm := mockery.NewMockStateManager_state(t)
-			cfg := &mockConfig{}
+			cfg := mockery.NewMockConfig_config(t)
 			tt.setupMocks(sm, cfg)
 
 			op, err := New(Options{
@@ -85,6 +85,9 @@ func TestClean(t *testing.T) {
 			}
 
 			require.NoError(t, err)
+
+			sm.AssertExpectations(t)
+			cfg.AssertExpectations(t)
 		})
 	}
 }

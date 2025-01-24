@@ -12,42 +12,33 @@ import (
 )
 
 // mockConfig implements a mock CopyrcConfig for testing
-type mockConfig struct {
-	mock.Mock
-}
-
-func (m *mockConfig) Hash() string {
-	args := m.Called()
-	return args.String(0)
-}
-
 func TestStatus(t *testing.T) {
 	tests := []struct {
 		name              string
-		setupMocks        func(*mockery.MockStateManager_state, *mockConfig)
+		setupMocks        func(*mockery.MockStateManager_state, *mockery.MockConfig_config)
 		expectedNeedsSync bool
 		expectedError     string
 	}{
 		{
 			name: "no_changes_needed",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().ValidateLocalState(mock.Anything).Return(nil)
 				sm.EXPECT().ConfigHash().Return("abc123")
-				cfg.On("Hash").Return("abc123")
+				cfg.EXPECT().Hash().Return("abc123")
 			},
 			expectedNeedsSync: false,
 		},
 		{
 			name: "inconsistent_state",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(false, nil)
 			},
 			expectedNeedsSync: true,
 		},
 		{
 			name: "invalid_local_state",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().ValidateLocalState(mock.Anything).Return(assert.AnError)
 			},
@@ -55,17 +46,17 @@ func TestStatus(t *testing.T) {
 		},
 		{
 			name: "config_changed",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				sm.EXPECT().ValidateLocalState(mock.Anything).Return(nil)
 				sm.EXPECT().ConfigHash().Return("abc123")
-				cfg.On("Hash").Return("def456")
+				cfg.EXPECT().Hash().Return("def456")
 			},
 			expectedNeedsSync: true,
 		},
 		{
 			name: "consistency_check_error",
-			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockConfig) {
+			setupMocks: func(sm *mockery.MockStateManager_state, cfg *mockery.MockConfig_config) {
 				sm.EXPECT().IsConsistent(mock.Anything).Return(false, assert.AnError)
 			},
 			expectedError: "checking state consistency",
@@ -77,7 +68,7 @@ func TestStatus(t *testing.T) {
 			// Setup
 			ctx := zerolog.New(zerolog.NewTestWriter(t)).WithContext(context.Background())
 			sm := mockery.NewMockStateManager_state(t)
-			cfg := &mockConfig{}
+			cfg := mockery.NewMockConfig_config(t)
 			tt.setupMocks(sm, cfg)
 
 			op, err := New(Options{

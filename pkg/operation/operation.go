@@ -25,6 +25,10 @@ type Operator interface {
 type Config interface {
 	// Hash returns a hash of the configuration
 	Hash() string
+	// GetRepositories returns the list of repositories to sync
+	GetRepositories() []config.RepositoryDefinition
+	// GetCopies returns the list of copy operations
+	GetCopies() []config.Copy
 }
 
 // 🔧 Options contains configuration for the operator

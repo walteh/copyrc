@@ -8,6 +8,13 @@ import (
 	"gitlab.com/tozd/go/errors"
 )
 
+type Config interface {
+	Hash() string
+	GetRepositories() []RepositoryDefinition
+	GetCopies() []Copy
+	Validate() error
+}
+
 // CopyrcConfig is the top-level configuration structure defining what to copy from where
 type CopyrcConfig struct {
 	// Repositories defines the list of remote repositories to copy from
@@ -46,6 +53,16 @@ func (c *CopyrcConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// GetRepositories returns the list of repositories to sync
+func (c *CopyrcConfig) GetRepositories() []RepositoryDefinition {
+	return c.Repositories
+}
+
+// GetCopies returns the list of copy operations
+func (c *CopyrcConfig) GetCopies() []Copy {
+	return c.Copies
 }
 
 // Copy defines a single copy operation from a remote source to local destination
