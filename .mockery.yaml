@@ -9,11 +9,11 @@ issue-845-fix: true
 filename: "{{.InterfaceName}}.{{.PackageName}}.mockery.go"
 mockname: Mock{{.InterfaceName}}_{{.PackageName}}
 packages:
-    github.com/walteh/copyrc/refactor-attempt-1/provider:
+    github.com/walteh/copyrc/cmd/copyrc-refactor-1/pkg/provider:
         interfaces:
             Provider: {}
 
-    github.com/walteh/copyrc/refactor-attempt-1/status:
+    github.com/walteh/copyrc/cmd/copyrc-refactor-1/pkg/status:
         interfaces:
             FileFormatter: {}
 
