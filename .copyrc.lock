@@ -1,166 +1,227 @@
 {
-  "schema_version": "1.0.0",
-  "last_updated": "2025-01-24T06:43:42.289213-05:00",
-  "repositories": null,
-  "remote_text_files": [
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/.copy.gitignore",
-      "last_updated": "2025-01-24T06:43:40.523645-05:00",
-      "is_patched": false,
-      "content_hash": "1740a8e751f5bb5f4a4559425e861b9f2e3ef1a27363e9c3258f44fc0d270628",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/.gitignore",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/.golangci.copy.yaml",
-      "last_updated": "2025-01-24T06:43:40.66525-05:00",
-      "is_patched": false,
-      "content_hash": "9686db769e17b02f2c8f75f29b85ae4335f67765f34781c5e2d5dd0592eaea7f",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/.golangci.yaml",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/.goreleaser.copy.yaml",
-      "last_updated": "2025-01-24T06:43:40.782387-05:00",
-      "is_patched": false,
-      "content_hash": "5636e396b85806d5378921d8336fdfa6c45d1fe1eb1a1136f74875d945128363",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/.goreleaser.yaml",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/CONTRIBUTING.copy.md",
-      "last_updated": "2025-01-24T06:43:40.928324-05:00",
-      "is_patched": false,
-      "content_hash": "4d896b6ac14716d09e5c4431dcef36ac22513755db16b6c5b4bd892039dd7384",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/CONTRIBUTING.md",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/Dockerfile.copy",
-      "last_updated": "2025-01-24T06:43:41.074747-05:00",
-      "is_patched": false,
-      "content_hash": "93ccfca14377d7947d2ee64a2ddaba8a777ab1a915652a3ae9f24d715dd1aca0",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/Dockerfile",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/LICENSE.copy",
-      "last_updated": "2025-01-24T06:43:41.205761-05:00",
-      "is_patched": false,
-      "content_hash": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/LICENSE",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/README.copy.md",
-      "last_updated": "2025-01-24T06:43:41.329644-05:00",
-      "is_patched": false,
-      "content_hash": "263ab24dd0c20dbb0765d57f686fb6bba74a7e9ae56d41d622aa43b97f33d6b2",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/README.md",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/go.copy.mod",
-      "last_updated": "2025-01-24T06:43:41.458781-05:00",
-      "is_patched": false,
-      "content_hash": "a82864c09088a91df8c47c3f177cd9232c757470b8fe08be32d9956732e9e689",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/go.mod",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/go.copy.sum",
-      "last_updated": "2025-01-24T06:43:41.56876-05:00",
-      "is_patched": false,
-      "content_hash": "ba521a11f462fcbf06f5b7d5eff42360a4153451f48105ef830b97249990b9a4",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/go.sum",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/main.copy.go",
-      "last_updated": "2025-01-24T06:43:41.788013-05:00",
-      "is_patched": false,
-      "content_hash": "0858a40b0d861bb0263dd3eac28730be577148f56df37f9e882e989e056f912f",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/main.go",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/main_test.copy.go",
-      "last_updated": "2025-01-24T06:43:41.996086-05:00",
-      "is_patched": false,
-      "content_hash": "231cf7f1ab4503e088bdf3d3574a8afcaa61b06664911ecedec713c30dcfbd5e",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/main_test.go",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/tmpl.copy.go",
-      "last_updated": "2025-01-24T06:43:42.158714-05:00",
-      "is_patched": false,
-      "content_hash": "3265637fc6ec2714f0f19a200d4c585951a42d3fdb144e727b7f60aa805fb37e",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/tmpl.go",
-      "license": null
-    },
-    {
-      "metadata": {},
-      "repository_name": "google/addlicense",
-      "release_ref": "master",
-      "local_path": "pkg/addlicense/tmpl_test.copy.go",
-      "last_updated": "2025-01-24T06:43:42.289003-05:00",
-      "is_patched": false,
-      "content_hash": "6ea35f224fa7a6c97be22d2f1a450d2e1712c1fd3c74a790c7be4ea45a2a8feb",
-      "patch": null,
-      "permalink": "https://github.com/google/addlicense/blob/master/tmpl_test.go",
-      "license": null
-    }
-  ],
-  "generated_files": null,
-  "config": null,
-  "archive_files": null
+	"schema_version": "1.0.0",
+	"last_updated": "2025-01-24T08:56:07.742781-05:00",
+	"repositories": null,
+	"remote_text_files": [
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/.copy.gitignore",
+			"last_updated": "2025-01-24T08:56:02.827212-05:00",
+			"is_patched": false,
+			"content_hash": "1740a8e751f5bb5f4a4559425e861b9f2e3ef1a27363e9c3258f44fc0d270628",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/.gitignore",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/.golangci.copy.yaml",
+			"last_updated": "2025-01-24T08:56:03.279157-05:00",
+			"is_patched": false,
+			"content_hash": "9686db769e17b02f2c8f75f29b85ae4335f67765f34781c5e2d5dd0592eaea7f",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/.golangci.yaml",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/.goreleaser.copy.yaml",
+			"last_updated": "2025-01-24T08:56:03.696116-05:00",
+			"is_patched": false,
+			"content_hash": "5636e396b85806d5378921d8336fdfa6c45d1fe1eb1a1136f74875d945128363",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/.goreleaser.yaml",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/CONTRIBUTING.copy.md",
+			"last_updated": "2025-01-24T08:56:04.195967-05:00",
+			"is_patched": false,
+			"content_hash": "4d896b6ac14716d09e5c4431dcef36ac22513755db16b6c5b4bd892039dd7384",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/CONTRIBUTING.md",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/Dockerfile.copy",
+			"last_updated": "2025-01-24T08:56:04.555286-05:00",
+			"is_patched": false,
+			"content_hash": "93ccfca14377d7947d2ee64a2ddaba8a777ab1a915652a3ae9f24d715dd1aca0",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/Dockerfile",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/LICENSE.copy",
+			"last_updated": "2025-01-24T08:56:04.896494-05:00",
+			"is_patched": false,
+			"content_hash": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/LICENSE",
+			"license": null,
+			"is_ignored": false
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/README.copy.md",
+			"last_updated": "2025-01-24T08:56:05.286092-05:00",
+			"is_patched": false,
+			"content_hash": "263ab24dd0c20dbb0765d57f686fb6bba74a7e9ae56d41d622aa43b97f33d6b2",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/README.md",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/go.copy.mod",
+			"last_updated": "2025-01-24T08:56:05.74526-05:00",
+			"is_patched": false,
+			"content_hash": "a82864c09088a91df8c47c3f177cd9232c757470b8fe08be32d9956732e9e689",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/go.mod",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/go.copy.sum",
+			"last_updated": "2025-01-24T08:56:06.102214-05:00",
+			"is_patched": false,
+			"content_hash": "ba521a11f462fcbf06f5b7d5eff42360a4153451f48105ef830b97249990b9a4",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/go.sum",
+			"license": null,
+			"is_ignored": true
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/main.copy.go",
+			"last_updated": "2025-01-24T08:56:06.483294-05:00",
+			"is_patched": true,
+			"content_hash": "0858a40b0d861bb0263dd3eac28730be577148f56df37f9e882e989e056f912f",
+			"patch": {
+				"patch_diff": "=1366\t-1\t+z\t=817\t-1\t+z\t=1341\t-1\t+z\t=23\t-1\t+z\t=65\t-1\t+z\t=43\t-1\t+z\t=2032\t-1\t+z\t=5210",
+				"patch_hash": "dda63fee6a2c730daedf89e837a3c325db1b00c5532f1680ee861a147ff4fa8f",
+				"remote_content": "",
+				"patch_path": "pkg/addlicense/main.patch.go"
+			},
+			"permalink": "https://github.com/google/addlicense/blob/master/main.go",
+			"license": null,
+			"is_ignored": false
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/main_test.copy.go",
+			"last_updated": "2025-01-24T08:56:06.816363-05:00",
+			"is_patched": false,
+			"content_hash": "231cf7f1ab4503e088bdf3d3574a8afcaa61b06664911ecedec713c30dcfbd5e",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/main_test.go",
+			"license": null,
+			"is_ignored": false
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/tmpl.copy.go",
+			"last_updated": "2025-01-24T08:56:07.237906-05:00",
+			"is_patched": false,
+			"content_hash": "3265637fc6ec2714f0f19a200d4c585951a42d3fdb144e727b7f60aa805fb37e",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/tmpl.go",
+			"license": null,
+			"is_ignored": false
+		},
+		{
+			"metadata": {},
+			"repository_name": "google/addlicense",
+			"release_ref": "master",
+			"local_path": "pkg/addlicense/tmpl_test.copy.go",
+			"last_updated": "2025-01-24T08:56:07.686765-05:00",
+			"is_patched": false,
+			"content_hash": "6ea35f224fa7a6c97be22d2f1a450d2e1712c1fd3c74a790c7be4ea45a2a8feb",
+			"patch": null,
+			"permalink": "https://github.com/google/addlicense/blob/master/tmpl_test.go",
+			"license": null,
+			"is_ignored": false
+		}
+	],
+	"generated_files": [],
+	"config": {
+		"location": ".copyrc.hcl",
+		"repositories": [
+			{
+				"provider": "github",
+				"name": "google/addlicense",
+				"ref": "master"
+			}
+		],
+		"copies": [
+			{
+				"repository": {
+					"provider": "github",
+					"name": "google/addlicense",
+					"ref": "master"
+				},
+				"paths": {
+					"remote": ".",
+					"local": "pkg/addlicense"
+				},
+				"options": {
+					"text_replacements": [
+						{
+							"from_text": "package main",
+							"to_text": "package addlicense",
+							"file_filter_glob": "*.go"
+						}
+					],
+					"save_archive_to_path": "",
+					"create_go_embed_for_archive": false,
+					"ignore_files_globs": [
+						"*.md",
+						"go.mod",
+						"go.sum",
+						"Dockerfile",
+						"*.yaml",
+						".gitignore"
+					]
+				}
+			}
+		],
+		"hash": "c5e0631e34a01e0bc58ed6068411edfe13cc6797fbe5629f1d2d6fdc42a006fe"
+	},
+	"archive_files": null,
+	"raw_gzip_data": "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"
 }

@@ -1,22 +1,59 @@
 package config
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"gitlab.com/tozd/go/errors"
 )
 
 type Config interface {
-	Hash() string
+	GetLocation() string
+	GetHash() string
 	GetRepositories() []RepositoryDefinition
 	GetCopies() []Copy
-	Validate() error
+}
+
+var _ Config = &StaticConfig{}
+
+type StaticConfig struct {
+	Location     string                 `json:"location" yaml:"location" hcl:"location,attr" cty:"location"`
+	Repositories []RepositoryDefinition `json:"repositories" yaml:"repositories" hcl:"repositories,block" cty:"repositories"`
+	Copies       []Copy                 `json:"copies"       yaml:"copies"       hcl:"copy,block"         cty:"copies"`
+	Hash         string                 `json:"hash"         yaml:"hash"         hcl:"hash,attr"          cty:"hash"`
+}
+
+func NewStaticConfig(ctx context.Context, cfg Config) *StaticConfig {
+	return &StaticConfig{
+		Location:     cfg.GetLocation(),
+		Repositories: cfg.GetRepositories(),
+		Copies:       cfg.GetCopies(),
+		Hash:         cfg.GetHash(),
+	}
+}
+
+func (c *StaticConfig) GetLocation() string {
+	return c.Location
+}
+
+func (c *StaticConfig) GetHash() string {
+	return c.Hash
+}
+
+func (c *StaticConfig) GetRepositories() []RepositoryDefinition {
+	return c.Repositories
+}
+
+func (c *StaticConfig) GetCopies() []Copy {
+	return c.Copies
 }
 
 // CopyrcConfig is the top-level configuration structure defining what to copy from where
 type CopyrcConfig struct {
+	location string
 	// Repositories defines the list of remote repositories to copy from
 	Repositories []RepositoryDefinition `json:"repositories" yaml:"repositories" hcl:"repositories,block" cty:"repositories"`
 
@@ -24,29 +61,39 @@ type CopyrcConfig struct {
 	Copies []Copy `json:"copies" yaml:"copies" hcl:"copy,block" cty:"copies"`
 }
 
+var _ Config = &CopyrcConfig{}
+
 // Hash returns a hash of the config used to detect changes
 func (c *CopyrcConfig) Hash() string {
 	data, _ := json.Marshal(c)
 	return fmt.Sprintf("%x", sha256.Sum256(data))
 }
 
+func (c *CopyrcConfig) GetLocation() string {
+	return c.location
+}
+
+func (c *CopyrcConfig) GetHash() string {
+	return c.Hash()
+}
+
 // Validate checks that all required fields are set
-func (c *CopyrcConfig) Validate() error {
-	if len(c.Repositories) == 0 {
+func Validate(ctx context.Context, cfg Config) error {
+	if len(cfg.GetRepositories()) == 0 {
 		return errors.Errorf("at least one repository must be defined")
 	}
 
-	for i, repo := range c.Repositories {
+	for i, repo := range cfg.GetRepositories() {
 		if err := repo.Validate(); err != nil {
 			return errors.Errorf("repository %d: %w", i, err)
 		}
 	}
 
-	if len(c.Copies) == 0 {
+	if len(cfg.GetCopies()) == 0 {
 		return errors.Errorf("at least one copy operation must be defined")
 	}
 
-	for i, copy := range c.Copies {
+	for i, copy := range cfg.GetCopies() {
 		if err := copy.Validate(); err != nil {
 			return errors.Errorf("copy %d: %w", i, err)
 		}
@@ -150,6 +197,9 @@ type CopyOptions struct {
 
 	// CreateGoEmbedForArchive indicates whether to create a go:embed file for the archive
 	CreateGoEmbedForArchive bool `json:"create_go_embed_for_archive" yaml:"create_go_embed_for_archive" hcl:"create_go_embed_for_archive,optional" cty:"create_go_embed_for_archive"`
+
+	// IgnoreFilesGlobs is a list of glob patterns to ignore files in the copy operation
+	IgnoreFilesGlobs []string `json:"ignore_files_globs" yaml:"ignore_files_globs" hcl:"ignore_files_globs,optional" cty:"ignore_files_globs"`
 }
 
 // Validate checks that all required fields are set
@@ -191,3 +241,11 @@ func (t *TextReplacement) Validate() error {
 // TODO(dr.methodical): 🧪 Add tests for config loading/validation
 // TODO(dr.methodical): 🧪 Add tests for Hash() method
 // TODO(dr.methodical): 📝 Add examples of config usage
+
+func FilterCopiesByRepository(copies []Copy, repository RepositoryDefinition) []Copy {
+	return slices.DeleteFunc(copies, func(copy Copy) bool {
+		return copy.Repository.Name != repository.Name ||
+			copy.Repository.Provider != repository.Provider ||
+			copy.Repository.Ref != repository.Ref
+	})
+}

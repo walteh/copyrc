@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -21,7 +22,7 @@ import (
 // - .yaml or .yml for YAML
 // - .hcl for HCL
 // - .copyrc will try both YAML and HCL formats
-func LoadConfig(path string) (*CopyrcConfig, error) {
+func LoadConfig(ctx context.Context, path string) (*CopyrcConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Errorf("reading config file: %w", err)
@@ -62,8 +63,8 @@ func LoadConfig(path string) (*CopyrcConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if err := cfg.Validate(); err != nil {
+	cfg.location = path
+	if err := Validate(ctx, cfg); err != nil {
 		return nil, errors.Errorf("validating config: %w", err)
 	}
 

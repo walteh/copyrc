@@ -194,14 +194,11 @@ func TestRelease(t *testing.T) {
 			refName: "v1.0.0",
 		}
 
-		licenseRC, spdxID, err := release.GetLicense(context.Background())
+		license, err := release.GetLicense(context.Background())
 		require.NoError(t, err, "getting license should not error")
-		defer licenseRC.Close()
 
-		data, err := io.ReadAll(licenseRC)
-		require.NoError(t, err, "reading license should not error")
-		assert.Equal(t, "mock license content", string(data), "license content should match")
-		assert.Equal(t, "MIT", spdxID, "SPDX ID should match")
+		assert.Equal(t, "MIT", license.SPDXID, "SPDX ID should match")
+		assert.Equal(t, "https://github.com/walteh/copyrc/blob/v1.0.0/LICENSE", license.WebPermalink, "Web permalink should match")
 		mockClient.AssertExpectations(t)
 	})
 

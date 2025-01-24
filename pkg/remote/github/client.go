@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/google/go-github/v60/github"
@@ -26,10 +27,18 @@ type Provider struct {
 	client GitHubClient
 }
 
+func init() {
+	remote.RegisterProvider("github", NewProvider())
+}
+
 // NewProvider creates a new GitHub provider
 func NewProvider() *Provider {
+	client := github.NewClient(nil)
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		client = client.WithAuthToken(token)
+	}
 	return &Provider{
-		client: &githubClientWrapper{client: github.NewClient(nil)},
+		client: &githubClientWrapper{client: client},
 	}
 }
 

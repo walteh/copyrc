@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -331,6 +332,7 @@ it should fail to parse
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			// Create temp file with appropriate extension
 			tmpDir := t.TempDir()
 			var configPath string
@@ -348,7 +350,7 @@ it should fail to parse
 			require.NoError(t, err)
 
 			// Load config
-			cfg, err := LoadConfig(configPath)
+			cfg, err := LoadConfig(ctx, configPath)
 			if tt.expectError {
 				require.Error(t, err)
 				return
@@ -654,7 +656,8 @@ func TestValidate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.config.Validate()
+			ctx := context.Background()
+			err := Validate(ctx, tt.config)
 			if tt.expectError {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), tt.errorMsg)

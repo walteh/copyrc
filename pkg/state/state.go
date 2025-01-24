@@ -12,10 +12,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/rs/zerolog"
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/walteh/copyrc/pkg/config"
 	"github.com/walteh/copyrc/pkg/remote"
 	"github.com/walteh/copyrc/pkg/text"
@@ -25,182 +25,137 @@ import (
 // CurrentSchemaVersion is the current version of the state file schema
 const CurrentSchemaVersion = "1.0.0"
 
-// StateManager defines the interface for managing state
-type StateManager interface {
-	// Load loads the state from disk
-	Load(ctx context.Context) error
-	// Save saves the state to disk
-	Save(ctx context.Context) error
-	// Dir returns the directory containing the state
-	Dir() string
-	// PutRemoteTextFile adds or updates a remote text file in the state
-	PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (*RemoteTextFile, error)
-	// ValidateLocalState validates that all files match their recorded state
-	ValidateLocalState(ctx context.Context) error
-	// IsConsistent checks if the current memory state matches the filesystem
-	IsConsistent(ctx context.Context) (bool, error)
-	// ConfigHash returns a hash of the current configuration
-	ConfigHash() string
-	// CleanupOrphanedFiles removes files that are no longer referenced in the state
-	CleanupOrphanedFiles(ctx context.Context) error
-	// Reset resets the state to empty
-	Reset(ctx context.Context) error
-}
-
-// 🔒 State represents the in-memory state manager with locking capabilities
-type State struct {
-	mu     sync.RWMutex // protects concurrent access to state
-	file   *StateFile   // current state data
-	path   string       // path to .copyrc.lock file
-	logger *UserLogger  // user-friendly logging
-}
-
-// 📄 StateFile represents the on-disk state format
-type StateFile struct {
-	SchemaVersion   string                 `json:"schema_version"`
-	LastUpdated     time.Time              `json:"last_updated"`
-	Repositories    []Repository           `json:"repositories"`
-	RemoteTextFiles []RemoteTextFile       `json:"remote_text_files"`
-	GeneratedFiles  []GeneratedFile        `json:"generated_files"`
-	Config          map[string]interface{} `json:"config"`
-	ArchiveFiles    []ArchiveFile          `json:"archive_files"`
-}
-
-// 📦 Repository tracks state for a single repository
-type Repository struct {
-	Provider  string   `json:"provider"`   // e.g. "github"
-	Name      string   `json:"name"`       // repository name
-	LatestRef string   `json:"latest_ref"` // latest known ref
-	Release   *Release `json:"release"`    // state of specific release
-}
-
-// 🏷️ Release tracks state for a specific release/ref
-type Release struct {
-	LastUpdated  time.Time `json:"last_updated"`
-	Ref          string    `json:"ref"`           // release ref/tag
-	RefHash      string    `json:"ref_hash"`      // hash of the ref
-	Archive      *Archive  `json:"archive"`       // state of release archive
-	WebPermalink string    `json:"web_permalink"` // link to view release
-	License      *License  `json:"license"`       // license information
-}
-
-// 📚 Archive tracks state of a release archive
-type Archive struct {
-	Hash        string `json:"hash"`         // content hash
-	ContentType string `json:"content_type"` // MIME type
-	DownloadURL string `json:"download_url"` // URL to download
-	LocalPath   string `json:"local_path"`   // where archive is stored
-}
-
-// ⚖️ License tracks state of repository license
-type License struct {
-	SPDX            string `json:"spdx"`             // SPDX identifier
-	RemotePermalink string `json:"remote_permalink"` // link to license
-	LocalPath       string `json:"local_path"`       // where license is stored
-}
-
-// 📝 RemoteTextFile tracks state of a copied text file
-type RemoteTextFile struct {
-	Metadata    map[string]string `json:"metadata"`        // file metadata
-	RepoName    string            `json:"repository_name"` // source repository
-	ReleaseRef  string            `json:"release_ref"`     // source release ref
-	LocalPath   string            `json:"local_path"`      // where file is stored
-	LastUpdated time.Time         `json:"last_updated"`    // when file was updated
-	IsPatched   bool              `json:"is_patched"`      // whether file is patched
-	ContentHash string            `json:"content_hash"`    // hash of content
-	Patch       *Patch            `json:"patch"`           // patch information if patched
-	Permalink   string            `json:"permalink"`       // link to source
-	License     *License          `json:"license"`         // license information
-}
-
-// 🔄 Patch tracks state of a file patch
-type Patch struct {
-	PatchDiff     string `json:"patch_diff"`     // patch in gopatch format
-	RemoteContent string `json:"remote_content"` // original content (gzipped)
-	PatchPath     string `json:"patch_path"`     // where patch is stored
-}
-
-// ⚙️ GeneratedFile tracks state of a generated file
-type GeneratedFile struct {
-	LocalPath     string    `json:"local_path"`     // where file is stored
-	LastUpdated   time.Time `json:"last_updated"`   // when file was generated
-	ReferenceFile string    `json:"reference_file"` // source file reference
-}
-
-// ArchiveFile represents a downloaded archive file
-type ArchiveFile struct {
-	LocalPath   string // Path to the local file
-	ContentHash string // SHA-256 hash of the file content
-}
-
 // 🆕 New creates a new state manager for the given directory
-func New(dir string) (*State, error) {
-	path := filepath.Join(dir, ".copyrc.lock")
-	return &State{
+func New(ctx context.Context, cfg config.Config) (*State, error) {
+	zerolog.Ctx(ctx).Debug().Str("path", cfg.GetLocation()).Msg("creating state manager")
+	path := filepath.Join(filepath.Dir(cfg.GetLocation()), ".copyrc.lock")
+	st := &State{
 		path: path,
 		file: &StateFile{
-			SchemaVersion: CurrentSchemaVersion,
-			LastUpdated:   time.Now(),
+			SchemaVersion:           CurrentSchemaVersion,
+			LastUpdated:             time.Now(),
+			Config:                  config.NewStaticConfig(ctx, cfg),
+			RemoteTextFiles:         make([]RemoteTextFile, 0),
+			GeneratedFiles:          make([]GeneratedFile, 0),
+			Repositories:            make([]Repository, 0),
+			ArchiveFiles:            make([]ArchiveFile, 0),
+			RawGzipData:             make([]byte, 0),
+			decompressedRawGzipData: make(map[string][]byte),
 		},
 		logger: NewUserLogger(context.Background()),
-	}, nil
+	}
+
+	return st, nil
 }
 
 // 💾 Load reads the state from disk, creating a new one if it doesn't exist
-func (s *State) Load(ctx context.Context) error {
-	s.logger = NewUserLogger(ctx)
+func LoadExisting(ctx context.Context, cfg config.Config) (*State, error) {
+	s, err := New(ctx, cfg)
+	if err != nil {
+		return nil, errors.Errorf("creating state manager: %w", err)
+	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	// Check if file exists
-	_, err := os.Stat(s.path)
-	if os.IsNotExist(err) {
-		s.logger.LogStateChange("Starting with clean state")
-		return nil // Clean state already initialized in New()
-	}
+	_, err = os.Stat(s.path)
 	if err != nil {
-		return errors.Errorf("checking state file: %w", err)
+		return nil, errors.Errorf("checking state file: %w", err)
 	}
 
 	// Read and parse state file
 	data, err := os.ReadFile(s.path)
 	if err != nil {
-		return errors.Errorf("reading state file: %w", err)
+		return nil, errors.Errorf("reading state file: %w", err)
 	}
 
 	if err := json.Unmarshal(data, s.file); err != nil {
-		return errors.Errorf("parsing state file: %w", err)
+		return nil, errors.Errorf("parsing state file: %w", err)
 	}
 
-	// Load configuration from parent directory
-	configPath := filepath.Join(filepath.Dir(s.path), ".copyrc")
-	cfg, err := config.LoadConfig(configPath)
-	if err == nil {
-		// Convert config to map for storage
-		data, err := json.Marshal(cfg)
-		if err != nil {
-			return errors.Errorf("marshaling config: %w", err)
-		}
-		var configMap map[string]interface{}
-		if err := json.Unmarshal(data, &configMap); err != nil {
-			return errors.Errorf("unmarshaling config to map: %w", err)
-		}
-
-		// Store config in state
-		s.file.Config = configMap
-		s.logger.LogStateChange("Loaded configuration from " + filepath.Base(configPath))
+	if err := s.DecompressRawGzipData(ctx); err != nil {
+		return nil, errors.Errorf("decompressing raw gzip data: %w", err)
 	}
+
+	// Load configuration from parent director
 
 	s.logger.LogStateChange("Loaded existing state")
+	return s, nil
+}
+
+func (s *State) CompressRawGzipData(ctx context.Context) error {
+
+	// if already compressed, return
+
+	if s.file.decompressedRawGzipData == nil {
+		return nil
+	}
+
+	// json marshal the data
+	data, err := json.Marshal(s.file.decompressedRawGzipData)
+	if err != nil {
+		return errors.Errorf("marshaling raw gzip data: %w", err)
+	}
+
+	// gzip the data
+	buf := bytes.NewBuffer(nil)
+	gz := gzip.NewWriter(buf)
+	gz.Write(data)
+	gz.Close()
+
+	s.file.RawGzipData = buf.Bytes()
+
+	return nil
+}
+
+func (s *State) DecompressRawGzipData(ctx context.Context) error {
+
+	// ungzip the data
+	buf := bytes.NewBuffer(s.file.RawGzipData)
+	gz, err := gzip.NewReader(buf)
+	if err != nil {
+		return errors.Errorf("creating gzip reader: %w", err)
+	}
+	defer gz.Close()
+
+	dec := json.NewDecoder(gz)
+	var rawGzipData map[string][]byte
+	if err := dec.Decode(&rawGzipData); err != nil {
+		return errors.Errorf("unmarshaling raw gzip data: %w", err)
+	}
+
+	s.file.decompressedRawGzipData = rawGzipData
+
 	return nil
 }
 
 // 💾 Save writes the current state to disk with file locking
 func (s *State) Save(ctx context.Context) error {
+
+	// Validate local state
+
+	// write all files to disk
+	if err := s.WriteAllFiles(ctx); err != nil {
+		return errors.Errorf("writing all files: %w", err)
+	}
+
+	// cleanup old files
+	if err := s.CleanupOrphanedFiles(ctx); err != nil {
+		return errors.Errorf("cleaning up old files: %w", err)
+	}
+
+	if err := s.CompressRawGzipData(ctx); err != nil {
+		return errors.Errorf("compressing raw gzip data: %w", err)
+	}
+
+	// validate local state
+	if err := s.ValidateLocalState(ctx); err != nil {
+		return errors.Errorf("validating local state: %w", err)
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
 	// Create lock file
 	lockPath := s.path + ".lock"
 
@@ -228,8 +183,10 @@ func (s *State) Save(ctx context.Context) error {
 	// Update timestamp
 	s.file.LastUpdated = time.Now()
 
+	zerolog.Ctx(ctx).Debug().Interface("state", s.file).Msg("state")
+
 	// Marshal state
-	data, err := json.MarshalIndent(s.file, "", "  ")
+	data, err := json.MarshalIndent(s.file, "", "\t")
 	if err != nil {
 		return errors.Errorf("marshaling state: %w", err)
 	}
@@ -255,12 +212,27 @@ func (s *State) Save(ctx context.Context) error {
 // TODO: Add methods for checking consistency
 
 // LoadState loads state from a .copyrc.lock file
-func LoadState(ctx context.Context, path string) (*State, error) {
+func LoadState(ctx context.Context, cfg config.Config) (*State, error) {
 	logger := zerolog.Ctx(ctx)
-	logger.Debug().Str("path", path).Msg("loading state")
+	logger.Debug().Str("path", cfg.GetLocation()).Msg("loading state")
 
-	// TODO(dr.methodical): 🔨 Implement state loading from JSON file
-	return nil, errors.Errorf("not implemented")
+	state, err := New(ctx, cfg)
+	if err != nil {
+		return nil, errors.Errorf("creating state manager: %w", err)
+	}
+
+	// existing, err := LoadExisting(ctx, cfg)
+	// if err != nil {
+	// 	return nil, errors.Errorf("loading existing state: %w", err)
+	// }
+
+	// if err := state.Load(ctx); err != nil {
+	// 	return nil, errors.Errorf("loading state: %w", err)
+	// }
+
+	zerolog.Ctx(ctx).Debug().Interface("state", state.file).Msg("state")
+
+	return state, nil
 }
 
 // WriteState writes state to a .copyrc.lock file
@@ -297,35 +269,17 @@ func (s *State) hashContent(r io.Reader) (string, error) {
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
+type PutRemoteTextFileOptions struct {
+	IsIgnored bool
+}
+
 // 🔄 PutRemoteTextFile adds or updates a remote text file in the state
-func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (*RemoteTextFile, error) {
+func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string, opts PutRemoteTextFileOptions) (*RemoteTextFile, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	logger := zerolog.Ctx(ctx)
 	logger.Debug().Str("path", localPath).Msg("putting remote text file")
-
-	// Check if file should be ignored based on globs
-	if s.file.Config != nil {
-		if globs, ok := s.file.Config["ignored_globs"].([]interface{}); ok {
-			for _, glob := range globs {
-				if globStr, ok := glob.(string); ok {
-					matched, err := filepath.Match(globStr, file.Path())
-					if err != nil {
-						return nil, errors.Errorf("matching glob pattern %s: %w", globStr, err)
-					}
-					if matched {
-						s.logger.LogFileChange(FileChange{
-							Type:        FileSkipped,
-							Path:        file.Path(),
-							Description: "File matches ignored glob pattern: " + globStr,
-						})
-						return nil, nil
-					}
-				}
-			}
-		}
-	}
 
 	// Validate localPath is a directory
 	info, err := os.Stat(localPath)
@@ -348,6 +302,12 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 	destFileName := baseName + ".copy" + ext
 	destPath := filepath.Join(localPath, destFileName)
 
+	patchPath := strings.Replace(destPath, ".copy.", ".patch.", 1)
+
+	if !strings.Contains(patchPath, ".patch.") && strings.HasSuffix(patchPath, ".copy") {
+		patchPath = strings.Replace(patchPath, ".copy", ".patch", 1)
+	}
+
 	// Get content hash and data
 	content, err := file.GetContent(ctx)
 	if err != nil {
@@ -361,9 +321,38 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 		return nil, errors.Errorf("reading file content: %w", err)
 	}
 
+	// if !opts.IsIgnored {
 	// Write content to file
-	if err := os.WriteFile(destPath, data, 0644); err != nil {
-		return nil, errors.Errorf("writing file content: %w", err)
+	// if err := os.WriteFile(destPath, data, 0644); err != nil {
+	// 	return nil, errors.Errorf("writing file content: %w", err)
+	// }
+	// }
+	var patch *Patch
+	// check if patch file exists
+	if _, err := os.Stat(patchPath); err == nil {
+		zerolog.Ctx(ctx).Debug().Str("path", patchPath).Msg("patch file exists")
+		patch = &Patch{
+			PatchPath: patchPath,
+		}
+
+		patchContent, err := os.ReadFile(patchPath)
+		if err != nil {
+			return nil, errors.Errorf("reading patch file: %w", err)
+		}
+
+		dmp := diffmatchpatch.New()
+
+		diffs := dmp.DiffMain(string(data), string(patchContent), false)
+
+		patch.PatchDiff = string(dmp.DiffToDelta(diffs))
+
+		patchHash, err := s.hashFile(patchPath)
+		if err != nil {
+			return nil, errors.Errorf("hashing patch file: %w", err)
+		}
+		patch.PatchHash = patchHash
+
+		// delete patch file
 	}
 
 	// Compute hash of content
@@ -379,29 +368,16 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 		ReleaseRef:  file.Release().Ref(),
 		LocalPath:   destPath,
 		LastUpdated: time.Now(),
-		IsPatched:   false,
+		IsPatched:   patch != nil, // we check this on write
+		Patch:       patch,
 		ContentHash: hash,
 		Permalink:   file.WebViewPermalink(),
+		IsIgnored:   opts.IsIgnored,
+		content:     data,
 	}
 
 	// Update state
-	found := false
-	for i, f := range s.file.RemoteTextFiles {
-		if f.LocalPath == destPath {
-			s.file.RemoteTextFiles[i] = *remoteFile
-			found = true
-			break
-		}
-	}
-	if !found {
-		s.file.RemoteTextFiles = append(s.file.RemoteTextFiles, *remoteFile)
-	}
-
-	s.logger.LogFileChange(FileChange{
-		Type:        FileUpdated,
-		Path:        destPath,
-		Description: "Updated from remote",
-	})
+	s.file.RemoteTextFiles = append(s.file.RemoteTextFiles, *remoteFile)
 
 	return remoteFile, nil
 }
@@ -617,29 +593,41 @@ func (s *State) ValidateLocalState(ctx context.Context) error {
 	for _, f := range s.file.RemoteTextFiles {
 		// Validate file suffix
 		if !strings.Contains(f.LocalPath, ".copy.") && !strings.Contains(f.LocalPath, ".patch.") {
-			return errors.Errorf("invalid file suffix: %s (must contain .copy. or .patch.)", f.LocalPath)
+			if !strings.HasSuffix(f.LocalPath, ".copy") && !strings.HasSuffix(f.LocalPath, ".patch") {
+				return errors.Errorf("invalid file suffix: %s (must contain .copy. or .patch.)", f.LocalPath)
+			}
 		}
 
-		// Check file exists
-		if _, err := os.Stat(f.LocalPath); os.IsNotExist(err) {
-			return errors.Errorf("file does not exist: %s", f.LocalPath)
+		if f.IsIgnored || f.IsPatched {
+			// Check file exists
+			if _, err := os.Stat(f.LocalPath); !os.IsNotExist(err) {
+				return errors.Errorf("file exists: %s", f.LocalPath)
+			}
+		} else {
+			// Check file exists
+			if _, err := os.Stat(f.LocalPath); os.IsNotExist(err) {
+				return errors.Errorf("file does not exist: %s", f.LocalPath)
+			}
+
+			hash, err := s.hashFile(f.LocalPath)
+			if err != nil {
+				return errors.Errorf("computing hash for %s: %w", f.LocalPath, err)
+			}
+			if hash != f.ContentHash {
+				return errors.Errorf("content hash mismatch for %s: expected %s, got %s", f.LocalPath, f.ContentHash, hash)
+			}
 		}
 
-		// Check content hash
-		hash, err := s.hashFile(f.LocalPath)
-		if err != nil {
-			return errors.Errorf("computing hash for %s: %w", f.LocalPath, err)
-		}
-		if hash != f.ContentHash {
-			return errors.Errorf("content hash mismatch for %s: expected %s, got %s", f.LocalPath, f.ContentHash, hash)
-		}
-
-		// Check patch file if patched
-		if f.IsPatched && f.Patch != nil {
+		if f.IsPatched {
 			if _, err := os.Stat(f.Patch.PatchPath); os.IsNotExist(err) {
 				return errors.Errorf("patch file does not exist: %s", f.Patch.PatchPath)
 			}
 		}
+
+		// Check content hash
+
+		// Check patch file if patched
+
 	}
 
 	// Validate repositories
@@ -672,9 +660,20 @@ func (s *State) IsConsistent(ctx context.Context) (bool, error) {
 
 	// Quick check - verify all files exist and have correct hashes
 	for _, file := range s.file.RemoteTextFiles {
-		if err := s.validateFile(ctx, file.LocalPath, file.ContentHash); err != nil {
-			s.logger.LogValidation(false, "State inconsistency detected", err)
-			return false, nil
+		if file.IsIgnored {
+			continue
+		}
+		if file.IsPatched {
+			err := s.validateFile(ctx, file.Patch.PatchPath, file.Patch.PatchHash)
+			if err != nil {
+				s.logger.LogValidation(false, "State inconsistency detected", err)
+				return false, nil
+			}
+		} else {
+			if err := s.validateFile(ctx, file.LocalPath, file.ContentHash); err != nil {
+				s.logger.LogValidation(false, "State inconsistency detected", err)
+				return false, nil
+			}
 		}
 	}
 
@@ -684,6 +683,7 @@ func (s *State) IsConsistent(ctx context.Context) (bool, error) {
 
 // 🔐 validateFile checks if a file exists and optionally verifies its hash
 func (s *State) validateFile(ctx context.Context, path string, expectedHash string) error {
+
 	// Check file exists
 	info, err := os.Stat(path)
 	if err != nil {
@@ -740,6 +740,17 @@ func (s *State) CleanupOrphanedFiles(ctx context.Context) error {
 		}
 	}
 
+	// delete all ignored files if they exist or not
+	for _, file := range s.file.RemoteTextFiles {
+		if file.IsIgnored {
+			if _, err := os.Stat(file.LocalPath); err == nil {
+				if err := os.Remove(file.LocalPath); err != nil {
+					return errors.Errorf("removing ignored file: %s: %w", file.LocalPath, err)
+				}
+			}
+		}
+	}
+
 	// Walk directory to find unknown files
 	baseDir := filepath.Dir(s.path)
 	err := filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
@@ -777,6 +788,23 @@ func (s *State) CleanupOrphanedFiles(ctx context.Context) error {
 	return nil
 }
 
+// 🔄 WriteAllFiles writes all files to disk
+func (s *State) WriteAllFiles(ctx context.Context) error {
+	for _, file := range s.file.RemoteTextFiles {
+		if file.IsIgnored || file.IsPatched {
+			if s.file.decompressedRawGzipData == nil {
+				s.file.decompressedRawGzipData = make(map[string][]byte)
+			}
+			s.file.decompressedRawGzipData[file.LocalPath] = file.content
+			continue
+		}
+		if err := os.WriteFile(file.LocalPath, file.content, 0644); err != nil {
+			return errors.Errorf("writing file: %w", err)
+		}
+	}
+	return nil
+}
+
 // 🏠 Dir returns the directory where the state file is located
 func (s *State) Dir() string {
 	return filepath.Dir(s.path)
@@ -797,18 +825,20 @@ func (s *State) ConfigHash() string {
 		return ""
 	}
 
-	// Marshal config to JSON for consistent hashing
-	data, err := json.Marshal(s.file.Config)
-	if err != nil {
-		// Log error but return empty hash
-		zerolog.Ctx(context.Background()).Error().Err(err).Msg("failed to marshal config for hashing")
-		return ""
-	}
+	return s.file.Config.GetHash()
 
-	// Compute SHA-256 hash
-	h := sha256.New()
-	h.Write(data)
-	return fmt.Sprintf("%x", h.Sum(nil))
+	// // Marshal config to JSON for consistent hashing
+	// data, err := json.Marshal(s.file.Config)
+	// if err != nil {
+	// 	// Log error but return empty hash
+	// 	zerolog.Ctx(context.Background()).Error().Err(err).Msg("failed to marshal config for hashing")
+	// 	return ""
+	// }
+
+	// // Compute SHA-256 hash
+	// h := sha256.New()
+	// h.Write(data)
+	// return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // Reset resets the state to empty

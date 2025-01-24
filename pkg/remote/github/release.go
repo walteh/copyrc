@@ -31,7 +31,17 @@ func (r *Release) Repository() remote.Repository {
 
 // Ref returns the reference (tag/branch/commit) for this release
 func (r *Release) Ref() string {
-	return r.refName
+	return *r.release.TagName
+}
+
+// WebPermalink returns a permanent link to view the repository on the web
+func (r *Release) WebPermalink() string {
+	return r.release.GetHTMLURL()
+}
+
+// RefHash returns the hash of the reference for this repository
+func (r *Release) RefHash() string {
+	return *r.release.TargetCommitish
 }
 
 // GetTarball returns a reader for the tarball of this release
@@ -119,38 +129,24 @@ func (r *Release) GetFileAtPath(ctx context.Context, path string) (remote.RawTex
 }
 
 // GetLicense returns the license file for this release
-func (r *Release) GetLicense(ctx context.Context) (io.ReadCloser, string, error) {
+func (r *Release) GetLicense(ctx context.Context) (remote.License, error) {
 	logger := zerolog.Ctx(ctx)
 	logger.Debug().Str("repo", r.repo.Name()).Str("ref", r.refName).Msg("getting license")
 
 	license, _, err := r.repo.provider.client.License(ctx, r.repo.owner, r.repo.repo)
 	if err != nil {
-		return nil, "", errors.Errorf("getting license from GitHub: %w", err)
+		return remote.License{}, errors.Errorf("getting license from GitHub: %w", err)
 	}
 
-	// License content is already decoded in the response
-	return io.NopCloser(strings.NewReader(license.GetContent())), license.GetLicense().GetSPDXID(), nil
+	return remote.License{
+		SPDXID:       license.GetLicense().GetSPDXID(),
+		WebPermalink: license.GetHTMLURL(),
+	}, nil
 }
 
 // GetLicenseAtPath returns a license file at a specific path
-func (r *Release) GetLicenseAtPath(ctx context.Context, path string) (io.ReadCloser, string, error) {
-	logger := zerolog.Ctx(ctx)
-	logger.Debug().Str("repo", r.repo.Name()).Str("ref", r.refName).Str("path", path).Msg("getting license at path")
-
-	content, _, _, err := r.repo.provider.client.GetContents(ctx, r.repo.owner, r.repo.repo, path, &github.RepositoryContentGetOptions{
-		Ref: r.refName,
-	})
-	if err != nil {
-		return nil, "", errors.Errorf("getting license file from GitHub: %w", err)
-	}
-
-	decodedContent, err := content.GetContent()
-	if err != nil {
-		return nil, "", errors.Errorf("decoding license content: %w", err)
-	}
-
-	// TODO(dr.methodical): 🔬 Implement SPDX license detection for custom license files
-	return io.NopCloser(strings.NewReader(decodedContent)), "UNKNOWN", nil
+func (r *Release) GetLicenseAtPath(ctx context.Context, path string) (remote.License, error) {
+	return r.GetLicense(ctx)
 }
 
 // RawTextFile implements the remote.RawTextFile interface for GitHub

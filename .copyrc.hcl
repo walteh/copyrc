@@ -24,11 +24,14 @@ copy {
 				file_filter_glob = "*.go"
 			}
 		]
-		# ignored_globs = [
-		# 	"README.md",
-		# 	"go.mod",
-		# 	"go.sum",
-		# ]
+		ignore_files_globs = [
+			"*.md",
+			"go.mod",
+			"go.sum",
+			"Dockerfile",
+			"*.yaml",
+			".gitignore",
+		]
 	}
 }
 

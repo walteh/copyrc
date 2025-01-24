@@ -1,10 +1,10 @@
 package commands
 
 import (
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/walteh/copyrc/cmd/copyrc/opts"
-	"github.com/walteh/copyrc/pkg/operation"
-	"github.com/walteh/copyrc/pkg/remote/github"
+	"github.com/walteh/copyrc/pkg/state"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -22,21 +22,10 @@ It will:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
-			// Create GitHub provider
-			provider := github.NewProvider()
-
-			// Create operator
-			op, err := operation.New(operation.Options{
-				Config:       opts.Config,
-				StateManager: opts.StateManager,
-				Provider:     provider,
-			})
-			if err != nil {
-				return errors.Errorf("creating operator: %w", err)
-			}
-
+			// Load config
+			ctx = zerolog.Ctx(ctx).With().Str("command", "sync").Logger().Level(zerolog.TraceLevel).WithContext(ctx)
 			// Run sync
-			if err := op.Sync(ctx); err != nil {
+			if err := state.Sync(ctx, opts.Config); err != nil {
 				return errors.Errorf("syncing files: %w", err)
 			}
 

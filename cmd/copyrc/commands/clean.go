@@ -3,8 +3,6 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"github.com/walteh/copyrc/cmd/copyrc/opts"
-	"github.com/walteh/copyrc/pkg/operation"
-	"github.com/walteh/copyrc/pkg/remote/github"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -19,27 +17,7 @@ It will:
 2. Reset the state file
 3. Clean up any temporary files`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
-
-			// Create GitHub provider
-			provider := github.NewProvider()
-
-			// Create operator
-			op, err := operation.New(operation.Options{
-				Config:       opts.Config,
-				StateManager: opts.StateManager,
-				Provider:     provider,
-			})
-			if err != nil {
-				return errors.Errorf("creating operator: %w", err)
-			}
-
-			// Run clean
-			if err := op.Clean(ctx); err != nil {
-				return errors.Errorf("cleaning state: %w", err)
-			}
-
-			return nil
+			return errors.New("not implemented")
 		},
 	}
 

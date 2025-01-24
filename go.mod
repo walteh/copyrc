@@ -4,8 +4,10 @@ go 1.23.5
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.8.0
+	github.com/fatih/color v1.18.0
 	github.com/google/go-github/v60 v60.0.0
 	github.com/hashicorp/hcl/v2 v2.23.0
+	github.com/pterm/pterm v0.12.80
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
@@ -34,8 +36,8 @@ require (
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/pterm/pterm v0.12.80 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect

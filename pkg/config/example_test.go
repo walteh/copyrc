@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 )
 
 func ExampleLoadConfig_json() {
+	ctx := context.Background()
 	// Create a temporary JSON config file
 	configJSON := `{
 		"repositories": [
@@ -50,7 +52,7 @@ func ExampleLoadConfig_json() {
 	}
 
 	// Load and validate the config
-	cfg, err := config.LoadConfig(configPath)
+	cfg, err := config.LoadConfig(ctx, configPath)
 	if err != nil {
 		fmt.Printf("Error loading config: %v\n", err)
 		return
@@ -68,6 +70,7 @@ func ExampleLoadConfig_json() {
 }
 
 func ExampleLoadConfig_yaml() {
+	ctx := context.Background()
 	// Create a temporary YAML config file
 	configYAML := `
 repositories:
@@ -98,7 +101,7 @@ copies:
 	}
 
 	// Load and validate the config
-	cfg, err := config.LoadConfig(configPath)
+	cfg, err := config.LoadConfig(ctx, configPath)
 	if err != nil {
 		fmt.Printf("Error loading config: %v\n", err)
 		return
@@ -116,6 +119,7 @@ copies:
 }
 
 func ExampleLoadConfig_hcl() {
+	ctx := context.Background()
 	// Create a temporary HCL config file
 	configHCL := `
 repositories {
@@ -154,7 +158,7 @@ copy {
 	}
 
 	// Load and validate the config
-	cfg, err := config.LoadConfig(configPath)
+	cfg, err := config.LoadConfig(ctx, configPath)
 	if err != nil {
 		fmt.Printf("Error loading config: %v\n", err)
 		return
@@ -206,6 +210,7 @@ func ExampleCopyrcConfig_Hash() {
 }
 
 func ExampleCopyrcConfig_Validate() {
+	ctx := context.Background()
 	// Create an invalid config
 	cfg := &config.CopyrcConfig{
 		Repositories: []config.RepositoryDefinition{
@@ -216,7 +221,7 @@ func ExampleCopyrcConfig_Validate() {
 	}
 
 	// Try to validate
-	err := cfg.Validate()
+	err := config.Validate(ctx, cfg)
 	fmt.Printf("Validation error: %v\n", err)
 
 	// Fix the config
@@ -236,7 +241,7 @@ func ExampleCopyrcConfig_Validate() {
 	}
 
 	// Validate again
-	err = cfg.Validate()
+	err = config.Validate(ctx, cfg)
 	fmt.Printf("Config is valid: %v\n", err == nil)
 
 	// Output:

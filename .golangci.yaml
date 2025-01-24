@@ -1,4 +1,13 @@
 # yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+linters:
+    enable:
+        - tagalign
+linters-settings:
+    tagalign:
+        align: true
+        order: [json, yaml, hcl, cty]
+        sort: true
+        strict: true
 
 issues:
     exclude-dirs:
@@ -6,3 +15,7 @@ issues:
         - "gen"
         - "cmd/copyrc-refactor-attempt-1"
         - "refactor-attempt-1"
+    exclude-files:
+        - "\\s*.copy.\\s*"
+
+    fix: true

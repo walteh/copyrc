@@ -3,7 +3,6 @@ package text
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"gitlab.com/tozd/go/errors"
@@ -20,7 +19,7 @@ func NewSimpleTextReplacer() *SimpleTextReplacer {
 // ReplaceText implements TextReplacer.ReplaceText
 func (r *SimpleTextReplacer) ReplaceText(ctx context.Context, content io.Reader, rules []ReplacementRule) (*ReplacementResult, error) {
 	// Read all content
-	originalContent, err := ioutil.ReadAll(content)
+	originalContent, err := io.ReadAll(content)
 	if err != nil {
 		return nil, errors.Errorf("reading content: %w", err)
 	}

@@ -29,6 +29,10 @@ tasks:
     desc: run golangci-lint - built from github.com/golangci/golangci-lint/cmd/golangci-lint
     cmds:
       - ./scripts/run-tool.sh golangci-lint {{.CLI_ARGS}}
+  addlicense:
+    desc: run addlicense - built from github.com/google/addlicense
+    cmds:
+      - ./scripts/run-tool.sh addlicense {{.CLI_ARGS}}
   crane:
     desc: run crane - built from github.com/google/go-containerregistry/cmd/crane
     cmds:
@@ -37,6 +41,10 @@ tasks:
     desc: run goreleaser - built from github.com/goreleaser/goreleaser/v2
     cmds:
       - ./scripts/run-tool.sh goreleaser {{.CLI_ARGS}}
+  todos:
+    desc: run todos - built from github.com/ianlewis/todos/internal/cmd/todos
+    cmds:
+      - ./scripts/run-tool.sh todos {{.CLI_ARGS}}
   go-mod-upgrade:
     desc: run go-mod-upgrade - built from github.com/oligot/go-mod-upgrade
     cmds:
@@ -57,11 +65,3 @@ tasks:
     desc: run gotestsum - built from gotest.tools/gotestsum
     cmds:
       - ./scripts/run-tool.sh gotestsum {{.CLI_ARGS}}
-  railroad:
-    desc: run railroad - built from github.com/alecthomas/participle/v2/cmd/railroad
-    cmds:
-      - ./scripts/run-tool.sh railroad {{.CLI_ARGS}}
-  todos:
-    desc: run todos - built from github.com/ianlewis/todos/internal/cmd/todos
-    cmds:
-      - ./scripts/run-tool.sh todos {{.CLI_ARGS}}

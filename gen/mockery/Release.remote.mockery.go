@@ -84,40 +84,31 @@ func (_c *MockRelease_remote_GetFileAtPath_Call) RunAndReturn(run func(context.C
 }
 
 // GetLicense provides a mock function with given fields: ctx
-func (_m *MockRelease_remote) GetLicense(ctx context.Context) (io.ReadCloser, string, error) {
+func (_m *MockRelease_remote) GetLicense(ctx context.Context) (remote.License, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetLicense")
 	}
 
-	var r0 io.ReadCloser
-	var r1 string
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context) (io.ReadCloser, string, error)); ok {
+	var r0 remote.License
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (remote.License, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) io.ReadCloser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) remote.License); ok {
 		r0 = rf(ctx)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(io.ReadCloser)
-		}
+		r0 = ret.Get(0).(remote.License)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context) string); ok {
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
 		r1 = rf(ctx)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context) error); ok {
-		r2 = rf(ctx)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // MockRelease_remote_GetLicense_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLicense'
@@ -138,51 +129,42 @@ func (_c *MockRelease_remote_GetLicense_Call) Run(run func(ctx context.Context))
 	return _c
 }
 
-func (_c *MockRelease_remote_GetLicense_Call) Return(_a0 io.ReadCloser, _a1 string, _a2 error) *MockRelease_remote_GetLicense_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *MockRelease_remote_GetLicense_Call) Return(_a0 remote.License, _a1 error) *MockRelease_remote_GetLicense_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockRelease_remote_GetLicense_Call) RunAndReturn(run func(context.Context) (io.ReadCloser, string, error)) *MockRelease_remote_GetLicense_Call {
+func (_c *MockRelease_remote_GetLicense_Call) RunAndReturn(run func(context.Context) (remote.License, error)) *MockRelease_remote_GetLicense_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetLicenseAtPath provides a mock function with given fields: ctx, path
-func (_m *MockRelease_remote) GetLicenseAtPath(ctx context.Context, path string) (io.ReadCloser, string, error) {
+func (_m *MockRelease_remote) GetLicenseAtPath(ctx context.Context, path string) (remote.License, error) {
 	ret := _m.Called(ctx, path)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetLicenseAtPath")
 	}
 
-	var r0 io.ReadCloser
-	var r1 string
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (io.ReadCloser, string, error)); ok {
+	var r0 remote.License
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (remote.License, error)); ok {
 		return rf(ctx, path)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) io.ReadCloser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) remote.License); ok {
 		r0 = rf(ctx, path)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(io.ReadCloser)
-		}
+		r0 = ret.Get(0).(remote.License)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) string); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, path)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
-		r2 = rf(ctx, path)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // MockRelease_remote_GetLicenseAtPath_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLicenseAtPath'
@@ -204,12 +186,12 @@ func (_c *MockRelease_remote_GetLicenseAtPath_Call) Run(run func(ctx context.Con
 	return _c
 }
 
-func (_c *MockRelease_remote_GetLicenseAtPath_Call) Return(_a0 io.ReadCloser, _a1 string, _a2 error) *MockRelease_remote_GetLicenseAtPath_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *MockRelease_remote_GetLicenseAtPath_Call) Return(_a0 remote.License, _a1 error) *MockRelease_remote_GetLicenseAtPath_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockRelease_remote_GetLicenseAtPath_Call) RunAndReturn(run func(context.Context, string) (io.ReadCloser, string, error)) *MockRelease_remote_GetLicenseAtPath_Call {
+func (_c *MockRelease_remote_GetLicenseAtPath_Call) RunAndReturn(run func(context.Context, string) (remote.License, error)) *MockRelease_remote_GetLicenseAtPath_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -376,6 +358,51 @@ func (_c *MockRelease_remote_Ref_Call) RunAndReturn(run func() string) *MockRele
 	return _c
 }
 
+// RefHash provides a mock function with no fields
+func (_m *MockRelease_remote) RefHash() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for RefHash")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// MockRelease_remote_RefHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RefHash'
+type MockRelease_remote_RefHash_Call struct {
+	*mock.Call
+}
+
+// RefHash is a helper method to define mock.On call
+func (_e *MockRelease_remote_Expecter) RefHash() *MockRelease_remote_RefHash_Call {
+	return &MockRelease_remote_RefHash_Call{Call: _e.mock.On("RefHash")}
+}
+
+func (_c *MockRelease_remote_RefHash_Call) Run(run func()) *MockRelease_remote_RefHash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockRelease_remote_RefHash_Call) Return(_a0 string) *MockRelease_remote_RefHash_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockRelease_remote_RefHash_Call) RunAndReturn(run func() string) *MockRelease_remote_RefHash_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Repository provides a mock function with no fields
 func (_m *MockRelease_remote) Repository() remote.Repository {
 	ret := _m.Called()
@@ -419,6 +446,51 @@ func (_c *MockRelease_remote_Repository_Call) Return(_a0 remote.Repository) *Moc
 }
 
 func (_c *MockRelease_remote_Repository_Call) RunAndReturn(run func() remote.Repository) *MockRelease_remote_Repository_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WebPermalink provides a mock function with no fields
+func (_m *MockRelease_remote) WebPermalink() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for WebPermalink")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// MockRelease_remote_WebPermalink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WebPermalink'
+type MockRelease_remote_WebPermalink_Call struct {
+	*mock.Call
+}
+
+// WebPermalink is a helper method to define mock.On call
+func (_e *MockRelease_remote_Expecter) WebPermalink() *MockRelease_remote_WebPermalink_Call {
+	return &MockRelease_remote_WebPermalink_Call{Call: _e.mock.On("WebPermalink")}
+}
+
+func (_c *MockRelease_remote_WebPermalink_Call) Run(run func()) *MockRelease_remote_WebPermalink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockRelease_remote_WebPermalink_Call) Return(_a0 string) *MockRelease_remote_WebPermalink_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockRelease_remote_WebPermalink_Call) RunAndReturn(run func() string) *MockRelease_remote_WebPermalink_Call {
 	_c.Call.Return(run)
 	return _c
 }

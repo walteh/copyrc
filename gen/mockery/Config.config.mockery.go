@@ -67,6 +67,96 @@ func (_c *MockConfig_config_GetCopies_Call) RunAndReturn(run func() []config.Cop
 	return _c
 }
 
+// GetHash provides a mock function with no fields
+func (_m *MockConfig_config) GetHash() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetHash")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// MockConfig_config_GetHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetHash'
+type MockConfig_config_GetHash_Call struct {
+	*mock.Call
+}
+
+// GetHash is a helper method to define mock.On call
+func (_e *MockConfig_config_Expecter) GetHash() *MockConfig_config_GetHash_Call {
+	return &MockConfig_config_GetHash_Call{Call: _e.mock.On("GetHash")}
+}
+
+func (_c *MockConfig_config_GetHash_Call) Run(run func()) *MockConfig_config_GetHash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockConfig_config_GetHash_Call) Return(_a0 string) *MockConfig_config_GetHash_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockConfig_config_GetHash_Call) RunAndReturn(run func() string) *MockConfig_config_GetHash_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetLocation provides a mock function with no fields
+func (_m *MockConfig_config) GetLocation() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLocation")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// MockConfig_config_GetLocation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLocation'
+type MockConfig_config_GetLocation_Call struct {
+	*mock.Call
+}
+
+// GetLocation is a helper method to define mock.On call
+func (_e *MockConfig_config_Expecter) GetLocation() *MockConfig_config_GetLocation_Call {
+	return &MockConfig_config_GetLocation_Call{Call: _e.mock.On("GetLocation")}
+}
+
+func (_c *MockConfig_config_GetLocation_Call) Run(run func()) *MockConfig_config_GetLocation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockConfig_config_GetLocation_Call) Return(_a0 string) *MockConfig_config_GetLocation_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockConfig_config_GetLocation_Call) RunAndReturn(run func() string) *MockConfig_config_GetLocation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRepositories provides a mock function with no fields
 func (_m *MockConfig_config) GetRepositories() []config.RepositoryDefinition {
 	ret := _m.Called()
@@ -110,96 +200,6 @@ func (_c *MockConfig_config_GetRepositories_Call) Return(_a0 []config.Repository
 }
 
 func (_c *MockConfig_config_GetRepositories_Call) RunAndReturn(run func() []config.RepositoryDefinition) *MockConfig_config_GetRepositories_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Hash provides a mock function with no fields
-func (_m *MockConfig_config) Hash() string {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Hash")
-	}
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
-// MockConfig_config_Hash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Hash'
-type MockConfig_config_Hash_Call struct {
-	*mock.Call
-}
-
-// Hash is a helper method to define mock.On call
-func (_e *MockConfig_config_Expecter) Hash() *MockConfig_config_Hash_Call {
-	return &MockConfig_config_Hash_Call{Call: _e.mock.On("Hash")}
-}
-
-func (_c *MockConfig_config_Hash_Call) Run(run func()) *MockConfig_config_Hash_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *MockConfig_config_Hash_Call) Return(_a0 string) *MockConfig_config_Hash_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *MockConfig_config_Hash_Call) RunAndReturn(run func() string) *MockConfig_config_Hash_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Validate provides a mock function with no fields
-func (_m *MockConfig_config) Validate() error {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Validate")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// MockConfig_config_Validate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Validate'
-type MockConfig_config_Validate_Call struct {
-	*mock.Call
-}
-
-// Validate is a helper method to define mock.On call
-func (_e *MockConfig_config_Expecter) Validate() *MockConfig_config_Validate_Call {
-	return &MockConfig_config_Validate_Call{Call: _e.mock.On("Validate")}
-}
-
-func (_c *MockConfig_config_Validate_Call) Run(run func()) *MockConfig_config_Validate_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *MockConfig_config_Validate_Call) Return(_a0 error) *MockConfig_config_Validate_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *MockConfig_config_Validate_Call) RunAndReturn(run func() error) *MockConfig_config_Validate_Call {
 	_c.Call.Return(run)
 	return _c
 }
