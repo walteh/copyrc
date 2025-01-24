@@ -11,6 +11,59 @@ import (
 	"gitlab.com/tozd/go/errors"
 )
 
+// 🎯 Operator defines the main interface for copyrc operations
+type Operator interface {
+	// Sync updates the state file with the latest remote file content
+	Sync(ctx context.Context) error
+	// Clean clears the state
+	Clean(ctx context.Context) error
+	// Status is a local operation indicating if files need to be fetched from remote
+	Status(ctx context.Context) (bool, error)
+}
+
+// 🔧 Config defines the interface for configuration
+type Config interface {
+	// Hash returns a hash of the configuration
+	Hash() string
+}
+
+// 🔧 Options contains configuration for the operator
+type Options struct {
+	// Config is the copyrc configuration
+	Config Config
+	// StateManager manages the local state
+	StateManager state.StateManager
+	// Provider is the remote repository provider
+	Provider remote.Provider
+}
+
+// 🏭 New creates a new operator with the given options
+func New(opts Options) (Operator, error) {
+	if opts.Config == nil {
+		return nil, errors.Errorf("config is required")
+	}
+	if opts.StateManager == nil {
+		return nil, errors.Errorf("state manager is required")
+	}
+	if opts.Provider == nil {
+		return nil, errors.Errorf("provider is required")
+	}
+	return &operator{
+		config:   opts.Config,
+		state:    opts.StateManager,
+		provider: opts.Provider,
+	}, nil
+}
+
+// 🎮 operator implements the Operator interface
+type operator struct {
+	config   Config
+	state    state.StateManager
+	provider remote.Provider
+}
+
+// Sync method is implemented in sync.go
+
 // 📋 CopyFiles copies files from remote repositories according to the provided config
 func CopyFiles(ctx context.Context, cfg *config.CopyrcConfig, provider remote.Provider, st state.StateManager) error {
 	logger := zerolog.Ctx(ctx)
@@ -105,3 +158,7 @@ func CheckStatus(ctx context.Context, cfg *config.CopyrcConfig, st state.StateMa
 	logger.Debug().Msg("local state is consistent")
 	return false, nil
 }
+
+// TODO(dr.methodical): 🧪 Add tests for operator creation
+// TODO(dr.methodical): 🧪 Add tests for validation
+// TODO(dr.methodical): 📝 Add examples of operator usage

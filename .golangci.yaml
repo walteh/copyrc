@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+
+issues:
+    exclude-dirs:
+        - "cmd/copyrc-legacy"
+        - "gen"
+        - "cmd/copyrc-refactor-attempt-1"
+        - "refactor-attempt-1"

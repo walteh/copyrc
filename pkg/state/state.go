@@ -18,6 +18,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/walteh/copyrc/pkg/config"
 	"github.com/walteh/copyrc/pkg/remote"
+	"github.com/walteh/copyrc/pkg/text"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -33,11 +34,17 @@ type StateManager interface {
 	// Dir returns the directory containing the state
 	Dir() string
 	// PutRemoteTextFile adds or updates a remote text file in the state
-	PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (bool, error)
+	PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, localPath string) (*RemoteTextFile, error)
 	// ValidateLocalState validates that all files match their recorded state
 	ValidateLocalState(ctx context.Context) error
 	// IsConsistent checks if the current memory state matches the filesystem
 	IsConsistent(ctx context.Context) (bool, error)
+	// ConfigHash returns a hash of the current configuration
+	ConfigHash() string
+	// CleanupOrphanedFiles removes files that are no longer referenced in the state
+	CleanupOrphanedFiles(ctx context.Context) error
+	// Reset resets the state to empty
+	Reset(ctx context.Context) error
 }
 
 // 🔒 State represents the in-memory state manager with locking capabilities
@@ -477,6 +484,16 @@ func (f *RemoteTextFile) RawPatchContent() (io.ReadCloser, error) {
 
 // 🔄 ApplyModificationToRawRemoteContent applies a text modification to the file's content
 func (f *RemoteTextFile) ApplyModificationToRawRemoteContent(ctx context.Context, mod config.TextReplacement) error {
+	// Create replacer
+	replacer := text.NewSimpleTextReplacer()
+
+	// Convert config rule to text rule
+	rule := text.ReplacementRule{
+		FromText:       mod.FromText,
+		ToText:         mod.ToText,
+		FileFilterGlob: mod.FileFilterGlob,
+	}
+
 	// Get raw content
 	content, err := f.RawRemoteContent()
 	if err != nil {
@@ -484,21 +501,18 @@ func (f *RemoteTextFile) ApplyModificationToRawRemoteContent(ctx context.Context
 	}
 	defer content.Close()
 
-	// Read all content
-	data, err := io.ReadAll(content)
+	// Apply replacement
+	result, err := replacer.ReplaceText(ctx, content, []text.ReplacementRule{rule})
 	if err != nil {
-		return errors.Errorf("reading content: %w", err)
+		return errors.Errorf("applying text replacement: %w", err)
 	}
 
-	// Apply text replacement
-	modified := strings.ReplaceAll(string(data), mod.FromText, mod.ToText)
-
 	// Create patch if needed
-	if !f.IsPatched {
+	if result.WasModified && !f.IsPatched {
 		// Compress original content
 		var gzipBuf bytes.Buffer
 		gzipWriter := gzip.NewWriter(&gzipBuf)
-		if _, err := gzipWriter.Write(data); err != nil {
+		if _, err := gzipWriter.Write(result.OriginalContent); err != nil {
 			return errors.Errorf("compressing content: %w", err)
 		}
 		if err := gzipWriter.Close(); err != nil {
@@ -511,30 +525,23 @@ func (f *RemoteTextFile) ApplyModificationToRawRemoteContent(ctx context.Context
 			return errors.Errorf("file path must contain .copy.: %s", f.LocalPath)
 		}
 
-		// Store compressed content
-		f.Patch = &Patch{
-			RemoteContent: base64.StdEncoding.EncodeToString(gzipBuf.Bytes()),
-			PatchPath:     patchPath,
-		}
-		f.IsPatched = true
-
-		// Write patch file
-		if err := os.WriteFile(patchPath, []byte(f.Patch.PatchDiff), 0644); err != nil {
+		// Create patch file
+		if err := os.WriteFile(patchPath, result.OriginalContent, 0644); err != nil {
 			return errors.Errorf("writing patch file: %w", err)
+		}
+
+		// Update file state
+		f.IsPatched = true
+		f.Patch = &Patch{
+			PatchPath:     patchPath,
+			RemoteContent: base64.StdEncoding.EncodeToString(gzipBuf.Bytes()),
 		}
 	}
 
 	// Write modified content
-	if err := os.WriteFile(f.LocalPath, []byte(modified), 0644); err != nil {
+	if err := os.WriteFile(f.LocalPath, result.ModifiedContent, 0644); err != nil {
 		return errors.Errorf("writing modified content: %w", err)
 	}
-
-	// Update content hash
-	f.ContentHash = fmt.Sprintf("%x", sha256.Sum256([]byte(modified)))
-
-	// Generate patch diff
-	f.Patch.PatchDiff = fmt.Sprintf("--- %s\n+++ %s\n@@ -1,1 +1,1 @@\n-%s\n+%s\n",
-		f.LocalPath, f.LocalPath, string(data), modified)
 
 	return nil
 }
@@ -722,3 +729,41 @@ func (s *State) Dir() string {
 // TODO(dr.methodical): 🧪 Add tests for file operations
 // TODO(dr.methodical): 🧪 Add tests for text modifications
 // TODO(dr.methodical): 📝 Add examples of state usage
+
+// ConfigHash returns a hash of the current configuration
+func (s *State) ConfigHash() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	// If no config is stored, return empty hash
+	if s.file.Config == nil {
+		return ""
+	}
+
+	// Marshal config to JSON for consistent hashing
+	data, err := json.Marshal(s.file.Config)
+	if err != nil {
+		// Log error but return empty hash
+		zerolog.Ctx(context.Background()).Error().Err(err).Msg("failed to marshal config for hashing")
+		return ""
+	}
+
+	// Compute SHA-256 hash
+	h := sha256.New()
+	h.Write(data)
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+// Reset resets the state to empty
+func (s *State) Reset(ctx context.Context) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.file = &StateFile{
+		SchemaVersion: CurrentSchemaVersion,
+		LastUpdated:   time.Now(),
+	}
+
+	s.logger.LogStateChange("Reset state")
+	return nil
+}

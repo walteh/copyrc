@@ -14,6 +14,7 @@ import (
 	"github.com/walteh/copyrc/gen/mockery"
 	"github.com/walteh/copyrc/pkg/config"
 	"github.com/walteh/copyrc/pkg/remote"
+	"github.com/walteh/copyrc/pkg/state"
 )
 
 func setupTestLogger(t *testing.T) context.Context {
@@ -51,7 +52,10 @@ func TestCopyFiles(t *testing.T) {
 
 				// Setup state expectations
 				mockState.EXPECT().Load(mock.Anything).Return(nil).Maybe()
-				mockState.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "test.copy.txt").Return(true, nil).Maybe()
+				mockState.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "test.copy.txt").Return(&state.RemoteTextFile{
+					LocalPath: "test.copy.txt",
+					RepoName:  "repo",
+				}, nil).Maybe()
 				mockState.EXPECT().ValidateLocalState(mock.Anything).Return(nil).Maybe()
 				mockState.EXPECT().IsConsistent(mock.Anything).Return(true, nil).Maybe()
 

@@ -1,33 +1,28 @@
+# 📦 copyrc configuration file
 
+repositories {
+	provider = "github"
+	name     = "google/addlicense"
+	ref      = "master"
+}
 
 copy {
-	source {
-		repo = "github.com/google/addlicense"
-		ref  = "master"
-		path = "."
+	repository {
+		provider = "github"
+		name     = "google/addlicense"
+		ref      = "master"
 	}
-
-	destination {
-		path = "pkg/addlicense"
+	paths {
+		remote = "."
+		local  = "pkg/addlicense"
 	}
-
 	options {
-		replacements = [
+		text_replacements = [
 			{
-				old = "package main"
-				new = "package addlicense"
+				from_text        = "package main"
+				to_text          = "package addlicense"
+				file_filter_glob = "*.go"
 			}
-		]
-		ignore_files = [
-			"README.md",
-			"go.mod",
-			"go.sum",
-			"go.work",
-			"go.work.sum",
-			"*.yaml",
-			"*.md",
-			"Dockerfile",
-			".gitignore",
 		]
 	}
 }

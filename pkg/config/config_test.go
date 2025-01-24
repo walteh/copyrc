@@ -12,7 +12,7 @@ import (
 func TestLoadConfig(t *testing.T) {
 	tests := []struct {
 		name        string
-		format      string // "json", "yaml", or "hcl"
+		format      string // "json", "yaml", "hcl", or "copyrc"
 		config      string
 		expectError bool
 		validate    func(t *testing.T, cfg *CopyrcConfig)
@@ -248,22 +248,102 @@ repositories {
 `,
 			expectError: true,
 		},
+		{
+			name:   "copyrc_yaml_format",
+			format: "copyrc",
+			config: `
+repositories:
+  - provider: github
+    name: org/repo
+    ref: main
+
+copies:
+  - repository:
+      provider: github
+      name: org/repo
+      ref: main
+    paths:
+      remote: /src
+      local: /dest
+    options:
+      text_replacements:
+        - from_text: foo
+          to_text: bar
+          file_filter_glob: "*.go"
+`,
+			validate: func(t *testing.T, cfg *CopyrcConfig) {
+				require.NotNil(t, cfg)
+				require.Len(t, cfg.Repositories, 1)
+				require.Equal(t, "github", cfg.Repositories[0].Provider)
+				require.Equal(t, "org/repo", cfg.Repositories[0].Name)
+				require.Equal(t, "main", cfg.Repositories[0].Ref)
+			},
+		},
+		{
+			name:   "copyrc_hcl_format",
+			format: "copyrc",
+			config: `
+repositories {
+  provider = "github"
+  name = "org/repo"
+  ref = "main"
+}
+
+copy {
+  repository {
+    provider = "github"
+    name = "org/repo"
+    ref = "main"
+  }
+  paths {
+    remote = "/src"
+    local = "/dest"
+  }
+  options {
+    text_replacements = [
+      {
+        from_text = "foo"
+        to_text = "bar"
+        file_filter_glob = "*.go"
+      }
+    ]
+  }
+}
+`,
+			validate: func(t *testing.T, cfg *CopyrcConfig) {
+				require.NotNil(t, cfg)
+				require.Len(t, cfg.Repositories, 1)
+				require.Equal(t, "github", cfg.Repositories[0].Provider)
+				require.Equal(t, "org/repo", cfg.Repositories[0].Name)
+				require.Equal(t, "main", cfg.Repositories[0].Ref)
+			},
+		},
+		{
+			name:   "copyrc_invalid_format",
+			format: "copyrc",
+			config: `
+this is not valid YAML or HCL
+it should fail to parse
+`,
+			expectError: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create temp file with appropriate extension
 			tmpDir := t.TempDir()
-			var ext string
+			var configPath string
 			switch tt.format {
 			case "json":
-				ext = ".json"
+				configPath = filepath.Join(tmpDir, "config.json")
 			case "yaml":
-				ext = ".yaml"
+				configPath = filepath.Join(tmpDir, "config.yaml")
 			case "hcl":
-				ext = ".hcl"
+				configPath = filepath.Join(tmpDir, "config.hcl")
+			case "copyrc":
+				configPath = filepath.Join(tmpDir, ".copyrc")
 			}
-			configPath := filepath.Join(tmpDir, "config"+ext)
 			err := os.WriteFile(configPath, []byte(tt.config), 0644)
 			require.NoError(t, err)
 

@@ -20,6 +20,7 @@ import (
 // - .json for JSON
 // - .yaml or .yml for YAML
 // - .hcl for HCL
+// - .copyrc will try both YAML and HCL formats
 func LoadConfig(path string) (*CopyrcConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -28,6 +29,25 @@ func LoadConfig(path string) (*CopyrcConfig, error) {
 
 	ext := strings.ToLower(filepath.Ext(path))
 	var cfg *CopyrcConfig
+
+	// For .copyrc files, try both YAML and HCL
+	if ext == ".copyrc" || path == ".copyrc" {
+		// Try YAML first
+		cfg, err = loadYAML(data)
+		if err == nil {
+			return cfg, nil
+		}
+
+		// Try HCL next
+		cfg, err = loadHCL(data, path)
+		if err == nil {
+			return cfg, nil
+		}
+
+		return nil, errors.Errorf("failed to parse .copyrc as YAML or HCL: %w", err)
+	}
+
+	// Otherwise use extension to determine format
 	switch ext {
 	case ".json":
 		cfg, err = loadJSON(data)
