@@ -79,12 +79,7 @@ tasks:
 
     copywrite:
         cmds:
-            - ./scripts/run-tool.sh copywrite license --year=$(date +%Y)
-            - ./scripts/run-tool.sh copywrite headers
-        generates:
-            - LICENSE
-        sources:
-            - .copywrite.hcl
+            - ./scripts/run-tool.sh addlicense -c="walteh LLC" -l="apache"  "./cmd" "./pkg" "./scripts"
 
     go-mod-tidy:
         env:
