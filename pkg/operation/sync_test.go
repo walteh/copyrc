@@ -30,14 +30,14 @@ func TestSync(t *testing.T) {
 				mockRepo := mockery.NewMockRepository_remote(t)
 
 				// Create test config
+				cfg.EXPECT().Hash().Return("abc123")
 				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
 					{
 						Provider: "github",
 						Name:     "test/repo",
 						Ref:      "main",
 					},
-				},
-				)
+				})
 
 				cfg.EXPECT().GetCopies().Return([]config.Copy{
 					{
@@ -51,12 +51,11 @@ func TestSync(t *testing.T) {
 							Local:  "test.copy.txt",
 						},
 					},
-				},
-				)
+				})
 
 				// File expectations
-				mockFile.EXPECT().GetContent(mock.Anything).Return(io.NopCloser(strings.NewReader("test content")), nil)
-				mockFile.EXPECT().Path().Return("test.txt")
+				mockFile.EXPECT().GetContent(mock.Anything).Return(io.NopCloser(strings.NewReader("test content")), nil).Maybe()
+				mockFile.EXPECT().Path().Return("test.txt").Maybe()
 
 				// Release expectations
 				mockRelease.EXPECT().ListFilesAtPath(mock.Anything, "remote/path").Return([]remote.RawTextFile{mockFile}, nil)
@@ -82,27 +81,21 @@ func TestSync(t *testing.T) {
 		{
 			name: "load_state_error",
 			setupMocks: func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state) {
-
-				// Create test config
-				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
-					{
-						Provider: "github",
-						Name:     "test/repo",
-						Ref:      "main",
-					},
-				})
-
+				// State expectations
 				state.EXPECT().Load(mock.Anything).Return(assert.AnError)
-
 			},
 			expectedError: "loading state",
 		},
 		{
 			name: "get_repository_error",
 			setupMocks: func(t *testing.T, cfg *mockery.MockConfig_config, provider *mockery.MockProvider_remote, state *mockery.MockStateManager_state) {
+				// State expectations
+				state.EXPECT().Load(mock.Anything).Return(nil)
+				state.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
+				state.EXPECT().ConfigHash().Return("def456")
 
-				// Create test config
-
+				// Config expectations
+				cfg.EXPECT().Hash().Return("abc123")
 				cfg.EXPECT().GetRepositories().Return([]config.RepositoryDefinition{
 					{
 						Provider: "github",
@@ -111,14 +104,8 @@ func TestSync(t *testing.T) {
 					},
 				})
 
-				// State expectations
-				state.EXPECT().Load(mock.Anything).Return(nil)
-				state.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
-				state.EXPECT().ConfigHash().Return("def456")
-
 				// Provider expectations
 				provider.EXPECT().GetRepository(mock.Anything, "test/repo").Return(nil, assert.AnError)
-
 			},
 			expectedError: "getting repository",
 		},
