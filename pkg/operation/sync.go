@@ -83,7 +83,7 @@ func (o *operator) Sync(ctx context.Context) error {
 				}
 				defer content.Close()
 
-				// Put file in state
+				// Put file in state - let state package handle file paths and suffixes
 				if _, err := o.state.PutRemoteTextFile(ctx, file, copy.Paths.Local); err != nil {
 					return errors.Errorf("putting file %s in state: %w", file.Path(), err)
 				}

@@ -24,6 +24,11 @@ copy {
 				file_filter_glob = "*.go"
 			}
 		]
+		# ignored_globs = [
+		# 	"README.md",
+		# 	"go.mod",
+		# 	"go.sum",
+		# ]
 	}
 }
 

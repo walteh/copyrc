@@ -185,19 +185,21 @@ func TestPutRemoteTextFile(t *testing.T) {
 		}
 
 		// Add file to state
-		localPath := filepath.Join(dir, "test.copy.txt")
-		file, err := state.PutRemoteTextFile(ctx, mockFile, localPath)
+		file, err := state.PutRemoteTextFile(ctx, mockFile, dir)
 		require.NoError(t, err, "putting remote text file")
 		assert.NotNil(t, file, "file should not be nil")
 
+		// Expected path
+		expectedPath := filepath.Join(dir, "test.copy.txt")
+
 		// Verify file was written
-		content, err := os.ReadFile(localPath)
+		content, err := os.ReadFile(expectedPath)
 		require.NoError(t, err, "reading file")
 		assert.Equal(t, "test content", string(content), "file content should match")
 
 		// Verify state was updated
 		assert.Len(t, state.file.RemoteTextFiles, 1, "should have one file")
-		assert.Equal(t, localPath, state.file.RemoteTextFiles[0].LocalPath, "file path should match")
+		assert.Equal(t, expectedPath, state.file.RemoteTextFiles[0].LocalPath, "file path should match")
 		assert.Equal(t, "test/repo", state.file.RemoteTextFiles[0].RepoName, "repo name should match")
 		assert.Equal(t, "v1.0.0", state.file.RemoteTextFiles[0].ReleaseRef, "release ref should match")
 	})
@@ -221,18 +223,20 @@ func TestPutRemoteTextFile(t *testing.T) {
 		}
 
 		// Add file to state twice
-		localPath := filepath.Join(dir, "test.copy.txt")
-		_, err = state.PutRemoteTextFile(ctx, mockFile, localPath)
+		_, err = state.PutRemoteTextFile(ctx, mockFile, dir)
 		require.NoError(t, err, "putting remote text file first time")
+
+		// Expected path
+		expectedPath := filepath.Join(dir, "test.copy.txt")
 
 		// Update content
 		mockFile.content = "updated content"
-		file, err := state.PutRemoteTextFile(ctx, mockFile, localPath)
+		file, err := state.PutRemoteTextFile(ctx, mockFile, dir)
 		require.NoError(t, err, "putting remote text file second time")
 		assert.NotNil(t, file, "file should not be nil")
 
 		// Verify file was updated
-		content, err := os.ReadFile(localPath)
+		content, err := os.ReadFile(expectedPath)
 		require.NoError(t, err, "reading file")
 		assert.Equal(t, "updated content", string(content), "file content should be updated")
 
@@ -240,7 +244,7 @@ func TestPutRemoteTextFile(t *testing.T) {
 		assert.Len(t, state.file.RemoteTextFiles, 1, "should still have one file")
 	})
 
-	t.Run("validates_file_suffix", func(t *testing.T) {
+	t.Run("validates_directory_exists", func(t *testing.T) {
 		dir := setupTestDir(t)
 		state, err := New(dir)
 		require.NoError(t, err, "creating state")
@@ -258,11 +262,73 @@ func TestPutRemoteTextFile(t *testing.T) {
 			},
 		}
 
-		// Try to add file with invalid suffix
-		localPath := filepath.Join(dir, "test.txt")
-		_, err = state.PutRemoteTextFile(ctx, mockFile, localPath)
-		require.Error(t, err, "putting file with invalid suffix should error")
-		assert.Contains(t, err.Error(), "invalid file suffix", "error should mention invalid suffix")
+		// Try to add file with non-existent directory
+		nonExistentDir := filepath.Join(dir, "does-not-exist")
+		file, err := state.PutRemoteTextFile(ctx, mockFile, nonExistentDir)
+		require.NoError(t, err, "putting file in non-existent directory should create it")
+		assert.NotNil(t, file, "file should not be nil")
+
+		// Try to add file with a file path instead of directory
+		filePath := filepath.Join(dir, "not-a-directory.txt")
+		err = os.WriteFile(filePath, []byte("test"), 0644)
+		require.NoError(t, err, "creating test file")
+
+		_, err = state.PutRemoteTextFile(ctx, mockFile, filePath)
+		require.Error(t, err, "putting file with file path should error")
+		assert.Contains(t, err.Error(), "path is not a directory", "error should mention invalid path")
+	})
+
+	t.Run("respects_ignored_globs", func(t *testing.T) {
+		dir := setupTestDir(t)
+		state, err := New(dir)
+		require.NoError(t, err, "creating state")
+
+		// Set ignored globs in config
+		state.file.Config = map[string]interface{}{
+			"ignored_globs": []interface{}{
+				"*.md",
+				"go.*",
+				"test/*.txt",
+			},
+		}
+
+		// Create mock files
+		files := []struct {
+			path    string
+			ignored bool
+		}{
+			{"README.md", true},
+			{"go.mod", true},
+			{"test/example.txt", true},
+			{"src/main.go", false},
+			{"docs/guide.txt", false},
+		}
+
+		for _, f := range files {
+			mockFile := &mockRawTextFile{
+				content:   "test content",
+				path:      f.path,
+				permalink: "https://github.com/test/repo/blob/main/" + f.path,
+				repository: &mockRepository{
+					name: "test/repo",
+					release: &mockRelease{
+						ref: "v1.0.0",
+					},
+				},
+			}
+
+			file, err := state.PutRemoteTextFile(ctx, mockFile, dir)
+			if f.ignored {
+				assert.Nil(t, file, "file %s should be ignored", f.path)
+				assert.NoError(t, err, "ignoring file should not return error")
+			} else {
+				assert.NotNil(t, file, "file %s should not be ignored", f.path)
+				assert.NoError(t, err, "putting file should not return error")
+			}
+		}
+
+		// Verify only non-ignored files were added
+		assert.Len(t, state.file.RemoteTextFiles, 2, "should have only non-ignored files")
 	})
 }
 

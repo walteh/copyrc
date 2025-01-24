@@ -85,6 +85,7 @@ packages {
 						text_replacements           = "[]Replace"
 						save_archive_to_path        = "string"
 						create_go_embed_for_archive = "bool"
+						ignored_globs                 = "[]string"
 					}
 				}
 			}

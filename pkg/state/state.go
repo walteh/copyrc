@@ -173,6 +173,25 @@ func (s *State) Load(ctx context.Context) error {
 		return errors.Errorf("parsing state file: %w", err)
 	}
 
+	// Load configuration from parent directory
+	configPath := filepath.Join(filepath.Dir(s.path), ".copyrc")
+	cfg, err := config.LoadConfig(configPath)
+	if err == nil {
+		// Convert config to map for storage
+		data, err := json.Marshal(cfg)
+		if err != nil {
+			return errors.Errorf("marshaling config: %w", err)
+		}
+		var configMap map[string]interface{}
+		if err := json.Unmarshal(data, &configMap); err != nil {
+			return errors.Errorf("unmarshaling config to map: %w", err)
+		}
+
+		// Store config in state
+		s.file.Config = configMap
+		s.logger.LogStateChange("Loaded configuration from " + filepath.Base(configPath))
+	}
+
 	s.logger.LogStateChange("Loaded existing state")
 	return nil
 }
@@ -286,10 +305,48 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 	logger := zerolog.Ctx(ctx)
 	logger.Debug().Str("path", localPath).Msg("putting remote text file")
 
-	// Validate file suffix
-	if !strings.Contains(localPath, ".copy.") && !strings.Contains(localPath, ".patch.") {
-		return nil, errors.Errorf("invalid file suffix: %s (must contain .copy. or .patch.)", localPath)
+	// Check if file should be ignored based on globs
+	if s.file.Config != nil {
+		if globs, ok := s.file.Config["ignored_globs"].([]interface{}); ok {
+			for _, glob := range globs {
+				if globStr, ok := glob.(string); ok {
+					matched, err := filepath.Match(globStr, file.Path())
+					if err != nil {
+						return nil, errors.Errorf("matching glob pattern %s: %w", globStr, err)
+					}
+					if matched {
+						s.logger.LogFileChange(FileChange{
+							Type:        FileSkipped,
+							Path:        file.Path(),
+							Description: "File matches ignored glob pattern: " + globStr,
+						})
+						return nil, nil
+					}
+				}
+			}
+		}
 	}
+
+	// Validate localPath is a directory
+	info, err := os.Stat(localPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return nil, errors.Errorf("checking directory: %w", err)
+		}
+		// Create directory if it doesn't exist
+		if err := os.MkdirAll(localPath, 0755); err != nil {
+			return nil, errors.Errorf("creating directory %s: %w", localPath, err)
+		}
+	} else if !info.IsDir() {
+		return nil, errors.Errorf("path is not a directory: %s", localPath)
+	}
+
+	// Construct file path with .copy. suffix
+	fileName := filepath.Base(file.Path())
+	ext := filepath.Ext(fileName)
+	baseName := strings.TrimSuffix(fileName, ext)
+	destFileName := baseName + ".copy" + ext
+	destPath := filepath.Join(localPath, destFileName)
 
 	// Get content hash and data
 	content, err := file.GetContent(ctx)
@@ -305,7 +362,7 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 	}
 
 	// Write content to file
-	if err := os.WriteFile(localPath, data, 0644); err != nil {
+	if err := os.WriteFile(destPath, data, 0644); err != nil {
 		return nil, errors.Errorf("writing file content: %w", err)
 	}
 
@@ -320,9 +377,9 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 		Metadata:    make(map[string]string),
 		RepoName:    file.Release().Repository().Name(),
 		ReleaseRef:  file.Release().Ref(),
-		LocalPath:   localPath,
+		LocalPath:   destPath,
 		LastUpdated: time.Now(),
-		IsPatched:   false, // Will be set to true if/when patches are applied
+		IsPatched:   false,
 		ContentHash: hash,
 		Permalink:   file.WebViewPermalink(),
 	}
@@ -330,7 +387,7 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 	// Update state
 	found := false
 	for i, f := range s.file.RemoteTextFiles {
-		if f.LocalPath == localPath {
+		if f.LocalPath == destPath {
 			s.file.RemoteTextFiles[i] = *remoteFile
 			found = true
 			break
@@ -342,7 +399,7 @@ func (s *State) PutRemoteTextFile(ctx context.Context, file remote.RawTextFile, 
 
 	s.logger.LogFileChange(FileChange{
 		Type:        FileUpdated,
-		Path:        localPath,
+		Path:        destPath,
 		Description: "Updated from remote",
 	})
 

@@ -48,7 +48,7 @@ func TestSync(t *testing.T) {
 						},
 						Paths: config.CopyPaths{
 							Remote: "remote/path",
-							Local:  "test.copy.txt",
+							Local:  "local/path",
 						},
 					},
 				})
@@ -71,8 +71,8 @@ func TestSync(t *testing.T) {
 				state.EXPECT().Load(mock.Anything).Return(nil)
 				state.EXPECT().IsConsistent(mock.Anything).Return(true, nil)
 				state.EXPECT().ConfigHash().Return("def456")
-				state.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "test.copy.txt").Return(&statepkg.RemoteTextFile{
-					LocalPath: "test.copy.txt",
+				state.EXPECT().PutRemoteTextFile(mock.Anything, mockFile, "local/path").Return(&statepkg.RemoteTextFile{
+					LocalPath: "local/path/test.copy.txt",
 					RepoName:  "test/repo",
 				}, nil)
 				state.EXPECT().Save(mock.Anything).Return(nil)
