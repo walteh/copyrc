@@ -71,7 +71,7 @@ func getArchiveData(ctx context.Context, provider RepoProvider, args ProviderArg
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusNotFound {
-			return nil, errors.Errorf("invalid tag or reference '%s': %w", args.Ref, err)
+			return nil, errors.Errorf("invalid tag or reference '%s': %w", url, err)
 		}
 
 		data, err = io.ReadAll(resp.Body)

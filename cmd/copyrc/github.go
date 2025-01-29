@@ -209,7 +209,11 @@ func (g *GithubProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (
 	case "branch":
 		refPath = "heads/" + args.Ref
 	default:
-		refPath = "refs/" + args.Ref
+		if strings.HasPrefix(args.Ref, "tags/") {
+			refPath = "refs/" + args.Ref
+		} else {
+			refPath = "refs/tags/" + args.Ref
+		}
 	}
 
 	return fmt.Sprintf("https://github.com/%s/%s/archive/%s.tar.gz", org, repo, refPath), nil
