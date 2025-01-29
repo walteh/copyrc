@@ -178,17 +178,13 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file s
 	// Check file patterns first before doing anything else
 	if len(cfg.CopyArgs.FilePatterns) > 0 {
 		matched := false
-		logger := loggerFromContext(ctx)
-		logger.Infof("checking file patterns for file %s against patterns %v", file, cfg.CopyArgs.FilePatterns)
 		for _, pattern := range cfg.CopyArgs.FilePatterns {
 			if match, err := doublestar.Match(pattern, file); err == nil && match {
 				matched = true
-				logger.Infof("file %s matched pattern %s", file, pattern)
 				break
 			}
 		}
 		if !matched {
-			logger.Infof("file %s did not match any patterns", file)
 			return nil
 		}
 	}
