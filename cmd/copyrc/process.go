@@ -76,6 +76,10 @@ func cleanDestination(ctx context.Context, status *StatusFile, destPath string) 
 	return nil
 }
 
+type FileGetter interface {
+	GetFile(ctx context.Context, args ProviderArgs, file string) ([]byte, error)
+}
+
 func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
 
 	// Check if file should be ignored
@@ -191,7 +195,7 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 	}
 
 	var contentz []byte
-	if mockProvider, ok := provider.(*MockProvider); ok {
+	if mockProvider, ok := provider.(FileGetter); ok {
 		// For mock provider, use GetFile directly
 		contentz, err = mockProvider.GetFile(ctx, cfg.ProviderArgs, file)
 		if err != nil {

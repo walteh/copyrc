@@ -70,6 +70,10 @@ func getArchiveData(ctx context.Context, provider RepoProvider, args ProviderArg
 		}
 		defer resp.Body.Close()
 
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, errors.Errorf("invalid tag or reference '%s': %w", args.Ref, err)
+		}
+
 		data, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, errors.Errorf("reading response: %w", err)
@@ -78,5 +82,22 @@ func getArchiveData(ctx context.Context, provider RepoProvider, args ProviderArg
 		return nil, errors.Errorf("unsupported URL scheme: %s", url)
 	}
 
+	// Check if the response is a 404 text message
+	if len(data) < 1024 && strings.Contains(string(data), "404: Not Found") {
+		return nil, errors.Errorf("invalid tag or reference '%s'", args.Ref)
+	}
+
+	// Verify it's actually a gzip file by checking magic number
+	if len(data) < 2 || data[0] != 0x1f || data[1] != 0x8b {
+		return nil, errors.Errorf("invalid archive format - expected gzip file, got: %s", string(data[:min(len(data), 1024)]))
+	}
+
 	return data, nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

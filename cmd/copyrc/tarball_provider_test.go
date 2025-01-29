@@ -16,10 +16,12 @@ package main
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gitlab.com/tozd/go/errors"
 )
 
 func TestTarballFunctions(t *testing.T) {
@@ -75,4 +77,49 @@ func TestTarballFunctions(t *testing.T) {
 		require.Error(t, err, "getting file with invalid cache dir should fail")
 		assert.Contains(t, err.Error(), "invalid path")
 	})
+
+	t.Run("test_invalid_tag_404", func(t *testing.T) {
+		mock := NewMockErrorProvider(t)
+		mock.shouldReturn404 = true
+
+		args := ProviderArgs{
+			Repo: "github.com/org/repo",
+			Ref:  "v999.999.999", // Non-existent tag
+			Path: "path/to/files",
+		}
+
+		_, err := GetFileFromTarball(context.Background(), mock, args)
+		require.Error(t, err, "getting file with invalid tag should fail")
+		assert.Contains(t, err.Error(), "invalid tag or reference", "error should indicate invalid tag")
+	})
+}
+
+type MockErrorProvider struct {
+	*MockProvider
+	shouldReturn404 bool
+}
+
+func NewMockErrorProvider(t *testing.T) *MockErrorProvider {
+	return &MockErrorProvider{
+		MockProvider: NewMockProvider(t),
+	}
+}
+
+func (m *MockErrorProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error) {
+	if m.shouldReturn404 {
+		// Create a temporary file with 404 content
+		f, err := os.CreateTemp("", "mock-404-*.tar.gz")
+		if err != nil {
+			return "", errors.Errorf("creating temp file: %s", err)
+		}
+		defer f.Close()
+
+		// Write 404 content
+		if _, err := f.WriteString("404: Not Found"); err != nil {
+			return "", errors.Errorf("writing 404 content: %s", err)
+		}
+
+		return "file://" + f.Name(), nil
+	}
+	return m.MockProvider.GetArchiveUrl(ctx, args)
 }
