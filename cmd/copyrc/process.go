@@ -80,39 +80,11 @@ type FileGetter interface {
 	GetFile(ctx context.Context, args ProviderArgs, file string) ([]byte, error)
 }
 
-func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
+func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file string, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
 
-	// Check if file should be included based on patterns
-	if cfg.CopyArgs != nil && len(cfg.CopyArgs.FilePatterns) > 0 {
-		matched := false
-		for _, pattern := range cfg.CopyArgs.FilePatterns {
-			isMatch, err := doublestar.Match(pattern, file)
-			if err != nil {
-				return errors.Errorf("matching file pattern %q: %w", pattern, err)
-			}
-			if isMatch {
-				matched = true
-				break
-			}
-		}
-		if !matched {
-			// File doesn't match any include pattern, skip it
-			return nil
-		}
-	}
-
-	// Check if file should be ignored
-	if cfg.CopyArgs != nil && len(cfg.CopyArgs.IgnoreFiles) > 0 {
-		for _, pattern := range cfg.CopyArgs.IgnoreFiles {
-			matched, err := doublestar.Match(pattern, file)
-			if err != nil {
-				return errors.Errorf("matching ignore pattern %q: %w", pattern, err)
-			}
-			if matched {
-				// File matches ignore pattern, skip it
-				return nil
-			}
-		}
+	// Ensure destination directory exists first
+	if err := os.MkdirAll(destPath, 0755); err != nil {
+		return errors.Errorf("creating destination directory: %w", err)
 	}
 
 	if cfg.ArchiveArgs != nil {
@@ -203,6 +175,32 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 		return errors.New("copy args are required")
 	}
 
+	// Check file patterns first before doing anything else
+	if len(cfg.CopyArgs.FilePatterns) > 0 {
+		matched := false
+		logger := loggerFromContext(ctx)
+		logger.Infof("checking file patterns for file %s against patterns %v", file, cfg.CopyArgs.FilePatterns)
+		for _, pattern := range cfg.CopyArgs.FilePatterns {
+			if match, err := doublestar.Match(pattern, file); err == nil && match {
+				matched = true
+				logger.Infof("file %s matched pattern %s", file, pattern)
+				break
+			}
+		}
+		if !matched {
+			logger.Infof("file %s did not match any patterns", file)
+			return nil
+		}
+	}
+
+	// Check ignore patterns
+	for _, pattern := range cfg.CopyArgs.IgnoreFiles {
+		if match, err := doublestar.Match(pattern, file); err == nil && match {
+			// Skip this file
+			return nil
+		}
+	}
+
 	sourceInfo, err := provider.GetSourceInfo(ctx, cfg.ProviderArgs, commitHash)
 	if err != nil {
 		return errors.Errorf("getting source info: %w", err)
@@ -250,6 +248,12 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 	// Get base name and extension
 	ext := filepath.Ext(file)
 	base := strings.TrimSuffix(filepath.Base(file), ext)
+
+	// Create output path and ensure its directory exists
+	outPath := filepath.Join(cfg.DestPath, base+".copy"+ext)
+	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
+		return errors.Errorf("creating output directory: %w", err)
+	}
 
 	// Process content
 	var buf bytes.Buffer
@@ -308,9 +312,6 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 		}
 	}
 
-	// Check if file exists and has .patch suffix
-	outPath := filepath.Join(cfg.DestPath, base+".copy"+ext)
-
 	// Let writeFile handle all status management and logging
 	if _, err := writeFile(ctx, WriteFileOpts{
 		Path:             outPath,
@@ -330,6 +331,10 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, 
 }
 
 func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
+	// Ensure destination directory exists
+	if err := os.MkdirAll(destPath, 0755); err != nil {
+		return errors.Errorf("creating destination directory: %w", err)
+	}
 
 	var files []string
 	var err error

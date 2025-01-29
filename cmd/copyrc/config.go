@@ -130,7 +130,6 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 
 	// Process copies
 	for _, copy := range cfg.Copies {
-
 		config := &Config{
 			ProviderArgs: ProviderArgs{
 				Repo:    copy.Source.Repo,
@@ -142,6 +141,7 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 			CopyArgs: &ConfigCopyArgs{
 				Replacements: copy.Options.Replacements,
 				IgnoreFiles:  copy.Options.IgnoreFiles,
+				FilePatterns: copy.Options.FilePatterns,
 			},
 			Clean:        clean,
 			Status:       status,

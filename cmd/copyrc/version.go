@@ -20,50 +20,38 @@ import (
 	"runtime/debug"
 )
 
-var (
-	// Version is the version of the binary, set during build
-	Version = "dev"
-	// CommitSHA is the git commit SHA, set during build
-	CommitSHA = "unknown"
-	// BuildTime is the time the binary was built, set during build
-	BuildTime = "unknown"
-)
-
 // VersionInfo represents the version information of the binary
 type VersionInfo struct {
-	Version      string `json:"version"`
-	CommitSHA    string `json:"commit_sha"`
-	BuildTime    string `json:"build_time"`
-	GoVersion    string `json:"go_version"`
-	Platform     string `json:"platform"`
-	BuildInfo    string `json:"build_info"`
-	Dependencies []struct {
-		Path    string `json:"path"`
-		Version string `json:"version"`
-	} `json:"dependencies,omitempty"`
+	Version   string `json:"version"`
+	GoVersion string `json:"go_version"`
+	Platform  string `json:"platform"`
+	VCS       string `json:"vcs"`
+	Revision  string `json:"revision"`
+	Time      string `json:"time"`
+	Modified  bool   `json:"modified"`
 }
 
-// GetVersionInfo returns the version information of the binary
+// GetVersionInfo returns the version information from build info
 func GetVersionInfo() *VersionInfo {
 	info := &VersionInfo{
-		Version:   Version,
-		CommitSHA: CommitSHA,
-		BuildTime: BuildTime,
+		Version:   "dev",
 		GoVersion: runtime.Version(),
 		Platform:  fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 	}
 
-	// Get build info from debug package
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		info.BuildInfo = buildInfo.Main.Path
-		for _, dep := range buildInfo.Deps {
-			info.Dependencies = append(info.Dependencies, struct {
-				Path    string `json:"path"`
-				Version string `json:"version"`
-			}{
-				Path:    dep.Path,
-				Version: dep.Version,
-			})
+		info.Version = buildInfo.Main.Version
+		for _, setting := range buildInfo.Settings {
+			switch setting.Key {
+			case "vcs":
+				info.VCS = setting.Value
+			case "vcs.revision":
+				info.Revision = setting.Value
+			case "vcs.time":
+				info.Time = setting.Value
+			case "vcs.modified":
+				info.Modified = setting.Value == "true"
+			}
 		}
 	}
 
@@ -73,11 +61,15 @@ func GetVersionInfo() *VersionInfo {
 // FormatVersion returns a formatted string of version information
 func FormatVersion() string {
 	info := GetVersionInfo()
+	modified := ""
+	if info.Modified {
+		modified = " (modified)"
+	}
 	return fmt.Sprintf(`🚀 copyrc version info:
 Version:   %s
-Commit:    %s
+Revision:  %s%s
 Built:     %s
 Go:        %s
 Platform:  %s
-`, info.Version, info.CommitSHA, info.BuildTime, info.GoVersion, info.Platform)
+`, info.Version, info.Revision, modified, info.Time, info.GoVersion, info.Platform)
 }

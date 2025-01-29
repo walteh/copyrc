@@ -327,6 +327,39 @@ copy {
 `,
 			expectError: true,
 		},
+		{
+			name: "valid_hcl_config_with_patterns",
+			config: `
+# Copy configuration
+copy {
+  source {
+    repo = "github.com/SchemaStore/schemastore"
+    ref = "022c82bdf96a5844c867ddcfc45ce1fbc41c3ecc"
+    ref_type = "commit"
+    path = "src/schemas/json"
+  }
+  destination {
+    path = "./gen/schemastore"
+  }
+  options {
+    file_patterns = [
+      "tmlanguage.json"
+    ]
+  }
+}
+`,
+			validate: func(t *testing.T, cfg *CopyConfig) {
+				require.Len(t, cfg.Copies, 1)
+				require.Equal(t, "github.com/SchemaStore/schemastore", cfg.Copies[0].Source.Repo)
+				require.Equal(t, "022c82bdf96a5844c867ddcfc45ce1fbc41c3ecc", cfg.Copies[0].Source.Ref)
+				require.Equal(t, "commit", cfg.Copies[0].Source.RefType)
+				require.Equal(t, "src/schemas/json", cfg.Copies[0].Source.Path)
+				require.Equal(t, "./gen/schemastore", cfg.Copies[0].Destination.Path)
+				require.NotNil(t, cfg.Copies[0].Options)
+				require.Len(t, cfg.Copies[0].Options.FilePatterns, 1)
+				require.Equal(t, "tmlanguage.json", cfg.Copies[0].Options.FilePatterns[0])
+			},
+		},
 	}
 
 	for _, tt := range tests {
