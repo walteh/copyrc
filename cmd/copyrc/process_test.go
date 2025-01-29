@@ -101,3 +101,85 @@ func TestProcessFile_IgnoreFiles(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessFile_FilePatterns(t *testing.T) {
+	tests := []struct {
+		name         string
+		file         string
+		filePatterns []string
+		shouldCopy   bool
+	}{
+		{
+			name:         "test_match_exact_pattern",
+			file:         "README.md",
+			filePatterns: []string{"README.md"},
+			shouldCopy:   true,
+		},
+		{
+			name:         "test_match_glob_pattern",
+			file:         "src/main.go",
+			filePatterns: []string{"**/*.go"},
+			shouldCopy:   true,
+		},
+		{
+			name:         "test_match_multiple_patterns",
+			file:         "docs/api.md",
+			filePatterns: []string{"*.go", "docs/*.md"},
+			shouldCopy:   true,
+		},
+		{
+			name:         "test_no_pattern_match",
+			file:         "test.yaml",
+			filePatterns: []string{"*.go", "*.md"},
+			shouldCopy:   false,
+		},
+		{
+			name:         "test_empty_patterns",
+			file:         "test.go",
+			filePatterns: []string{},
+			shouldCopy:   true, // Should copy when no patterns specified
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock provider
+			mock := NewMockProvider(t)
+			mock.AddFile(tt.file, []byte("test content"))
+
+			// Create config with file patterns
+			cfg := &Config{
+				ProviderArgs: ProviderArgs{
+					Repo: "github.com/test/repo",
+					Ref:  "main",
+					Path: ".",
+				},
+				DestPath: t.TempDir(),
+				CopyArgs: &ConfigCopyArgs{
+					FilePatterns: tt.filePatterns,
+				},
+			}
+
+			// Create status file
+			status := &StatusFile{
+				CoppiedFiles:   make(map[string]StatusEntry),
+				GeneratedFiles: make(map[string]GeneratedFileEntry),
+			}
+
+			// Setup logger in context
+			logger := NewDiscardDebugLogger(os.Stdout)
+			ctx := NewLoggerInContext(context.Background(), logger)
+
+			var mu sync.Mutex
+			err := processFile(ctx, mock, cfg, tt.file, "test-hash", status, &mu, cfg.DestPath)
+
+			if tt.shouldCopy {
+				require.NoError(t, err, "should not return error when processing file")
+				assert.NotEmpty(t, status.CoppiedFiles, "should have copied files in status")
+			} else {
+				require.NoError(t, err, "should not return error when skipping file")
+				assert.Empty(t, status.CoppiedFiles, "should not have any copied files in status")
+			}
+		})
+	}
+}

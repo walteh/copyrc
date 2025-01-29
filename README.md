@@ -67,6 +67,10 @@ copy:
     ignore_files:
         - "*.tmp"
         - "*.log"
+    file_patterns:
+        - "*.go" # Only copy Go files
+        - "*.js" # And JavaScript files
+        - "docs/*.md" # And markdown files in docs directory
 go_embed: true
 async: true
 ```
@@ -95,10 +99,11 @@ copyrc --config .copyrc.yaml
 
 ### Copy Arguments
 
-| Field          | Description                     |
-| -------------- | ------------------------------- |
-| `replacements` | List of string replacements     |
-| `ignore_files` | List of file patterns to ignore |
+| Field           | Description                                               |
+| --------------- | --------------------------------------------------------- |
+| `replacements`  | List of string replacements                               |
+| `ignore_files`  | List of file patterns to ignore                           |
+| `file_patterns` | List of file patterns to include (if empty, includes all) |
 
 ### Other Options
 

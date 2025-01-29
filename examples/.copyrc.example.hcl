@@ -29,6 +29,11 @@ copy {
 		ignore_files = [
 			"*.txt",
 		]
+		file_patterns = [
+			"*.go",      # Only copy Go files
+			"*.js",      # And JavaScript files
+			"docs/*.md", # And markdown files in docs directory
+		]
 	}
 }
 

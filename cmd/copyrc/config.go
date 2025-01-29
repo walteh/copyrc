@@ -62,6 +62,7 @@ type CopyEntry_Destination struct {
 type CopyEntry_Options struct {
 	Replacements []Replacement `json:"replacements,omitempty" yaml:"replacements,omitempty" hcl:"replacements,optional" cty:"replacements"`
 	IgnoreFiles  []string      `json:"ignore_files,omitempty" yaml:"ignore_files,omitempty" hcl:"ignore_files,optional" cty:"ignore_files"`
+	FilePatterns []string      `json:"file_patterns,omitempty" yaml:"file_patterns,omitempty" hcl:"file_patterns,optional" cty:"file_patterns"`
 }
 
 // 📝 Individual copy entry

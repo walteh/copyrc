@@ -82,6 +82,25 @@ type FileGetter interface {
 
 func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
 
+	// Check if file should be included based on patterns
+	if cfg.CopyArgs != nil && len(cfg.CopyArgs.FilePatterns) > 0 {
+		matched := false
+		for _, pattern := range cfg.CopyArgs.FilePatterns {
+			isMatch, err := doublestar.Match(pattern, file)
+			if err != nil {
+				return errors.Errorf("matching file pattern %q: %w", pattern, err)
+			}
+			if isMatch {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			// File doesn't match any include pattern, skip it
+			return nil
+		}
+	}
+
 	// Check if file should be ignored
 	if cfg.CopyArgs != nil && len(cfg.CopyArgs.IgnoreFiles) > 0 {
 		for _, pattern := range cfg.CopyArgs.IgnoreFiles {

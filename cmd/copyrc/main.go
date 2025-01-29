@@ -68,6 +68,7 @@ type RepoProvider interface {
 type ConfigCopyArgs struct {
 	Replacements []Replacement `hcl:"replacements" yaml:"replacements" json:"replacements"`
 	IgnoreFiles  []string      `hcl:"ignore_files" yaml:"ignore_files" json:"ignore_files"`
+	FilePatterns []string      `hcl:"file_patterns" yaml:"file_patterns" json:"file_patterns"`
 }
 
 type ConfigArchiveArgs struct {
@@ -266,6 +267,18 @@ func run(ctx context.Context, cfg *Config, provider RepoProvider) error {
 		} else {
 			for i, f := range status.Args.CopyArgs.IgnoreFiles {
 				if f != cfg.CopyArgs.IgnoreFiles[i] {
+					argsAreSame = false
+					break
+				}
+			}
+		}
+
+		// Compare file patterns
+		if len(status.Args.CopyArgs.FilePatterns) != len(cfg.CopyArgs.FilePatterns) {
+			argsAreSame = false
+		} else {
+			for i, f := range status.Args.CopyArgs.FilePatterns {
+				if f != cfg.CopyArgs.FilePatterns[i] {
 					argsAreSame = false
 					break
 				}
