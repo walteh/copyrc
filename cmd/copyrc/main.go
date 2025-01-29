@@ -36,6 +36,7 @@ type Replacement struct {
 
 // 📦 Input represents raw command line input
 type Input struct {
+	SrcRefType   string     // commit, branch, empty (normal ref)
 	SrcRepo      string     // Full repo URL (e.g. github.com/org/repo)
 	SrcRef       string     // Branch or tag
 	SrcPath      string     // Path within repo
@@ -98,9 +99,10 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 
 	return &Config{
 		ProviderArgs: ProviderArgs{
-			Repo: input.SrcRepo,
-			Ref:  input.SrcRef,
-			Path: input.SrcPath,
+			Repo:    input.SrcRepo,
+			Ref:     input.SrcRef,
+			Path:    input.SrcPath,
+			RefType: input.SrcRef,
 		},
 		DestPath: input.DestPath,
 		CopyArgs: &ConfigCopyArgs{
@@ -116,9 +118,10 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 }
 
 type ProviderArgs struct {
-	Repo string
-	Ref  string
-	Path string
+	Repo    string
+	Ref     string
+	Path    string
+	RefType string // commit, branch, empty (plain ref)
 }
 
 func main() {
@@ -134,6 +137,7 @@ func main() {
 	flag.StringVar(&input.SrcRef, "ref", "main", "Source branch/ref")
 	flag.StringVar(&input.SrcPath, "src-path", "", "Source path within repository")
 	flag.StringVar(&input.DestPath, "dest-path", "", "Destination path")
+	flag.StringVar(&input.SrcRefType, "src-ref-type", "", "source ref type (commit, branch, empty)")
 	flag.Var(&input.Replacements, "replacements", "JSON array or comma-separated list of replacements in old:new format")
 	flag.Var(&input.IgnoreFiles, "ignore", "JSON array or comma-separated list of files to ignore")
 	flag.BoolVar(&input.Clean, "clean", false, "Clean destination directory before copying")

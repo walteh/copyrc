@@ -145,6 +145,10 @@ func (g *GithubProvider) GetCommitHash(ctx context.Context, args ProviderArgs) (
 }
 
 func (g *GithubProvider) tryGetCommitHash(ctx context.Context, args ProviderArgs) (string, error) {
+
+	if args.RefType == "commit" {
+		return args.Ref, nil
+	}
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return "", errors.Errorf("parsing github repository: %w", err)
@@ -198,6 +202,15 @@ func (g *GithubProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (
 	if err != nil {
 		return "", errors.Errorf("parsing github repository: %w", err)
 	}
-	return fmt.Sprintf("https://github.com/%s/%s/archive/refs/%s.tar.gz",
-		org, repo, args.Ref), nil
+	var refPath string
+	switch args.RefType {
+	case "commit":
+		refPath = args.Ref
+	case "branch":
+		refPath = "heads/" + args.Ref
+	default:
+		refPath = "refs/" + args.Ref
+	}
+
+	return fmt.Sprintf("https://github.com/%s/%s/archive/%s.tar.gz", org, repo, refPath), nil
 }
