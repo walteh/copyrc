@@ -133,7 +133,10 @@ func main() {
 	// 🎯 Parse command line flags
 	var input Input
 	var configFile string
-	flag.StringVar(&configFile, "config", "", "Path to config file (.copyrc)")
+	var showVersion bool
+
+	flag.StringVar(&configFile, "config", ".copyrc.hcl", "path to config file")
+	flag.BoolVar(&showVersion, "version", false, "show version information")
 	flag.StringVar(&input.SrcRepo, "src-repo", "", "Source repository (e.g. github.com/org/repo)")
 	flag.StringVar(&input.SrcRef, "ref", "main", "Source branch/ref")
 	flag.StringVar(&input.SrcPath, "src-path", "", "Source path within repository")
@@ -148,6 +151,11 @@ func main() {
 	flag.BoolVar(&input.Async, "async", false, "Process files asynchronously")
 	flag.BoolVar(&input.UseTarball, "use-tarball", false, "Whether to use tarball-based file access")
 	flag.Parse()
+
+	if showVersion {
+		fmt.Print(FormatVersion())
+		os.Exit(0)
+	}
 
 	gh, err := NewGithubProvider()
 	if err != nil {

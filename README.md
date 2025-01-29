@@ -49,7 +49,13 @@ go install github.com/walteh/copyrc/cmd/copyrc@latest
 
 ## 🎯 Usage
 
-1. Create a configuration file (`.copyrc.yaml`):
+1. Check version:
+
+```bash
+copyrc -version
+```
+
+2. Create a configuration file (`.copyrc.yaml`):
 
 ```yaml
 provider:
@@ -75,13 +81,13 @@ go_embed: true
 async: true
 ```
 
-2. Set up your GitHub token:
+3. Set up your GitHub token:
 
 ```bash
 export GITHUB_TOKEN=your_token_here
 ```
 
-3. Run copyrc:
+4. Run copyrc:
 
 ```bash
 copyrc --config .copyrc.yaml

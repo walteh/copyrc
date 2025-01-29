@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -182,4 +183,256 @@ func TestProcessFile_FilePatterns(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestProcessFile_PatternInteractions(t *testing.T) {
+	tests := []struct {
+		name         string
+		file         string
+		filePatterns []string
+		ignoreFiles  []string
+		shouldCopy   bool
+		description  string
+	}{
+		{
+			name:         "test_direct_filename_pattern",
+			file:         "specific.go",
+			filePatterns: []string{"specific.go"},
+			ignoreFiles:  []string{},
+			shouldCopy:   true,
+			description:  "Direct filename in patterns should match",
+		},
+		{
+			name:         "test_direct_filename_ignore",
+			file:         "ignore-me.go",
+			filePatterns: []string{"*.go"},
+			ignoreFiles:  []string{"ignore-me.go"},
+			shouldCopy:   false,
+			description:  "Direct filename in ignores should be skipped",
+		},
+		{
+			name:         "test_ignore_takes_precedence",
+			file:         "conflict.go",
+			filePatterns: []string{"conflict.go", "*.go"},
+			ignoreFiles:  []string{"conflict.go"},
+			shouldCopy:   false,
+			description:  "Ignore patterns should take precedence over include patterns",
+		},
+		{
+			name:         "test_nested_direct_filename",
+			file:         "src/internal/special.go",
+			filePatterns: []string{"src/internal/special.go"},
+			ignoreFiles:  []string{},
+			shouldCopy:   true,
+			description:  "Direct filename with path should match",
+		},
+		{
+			name:         "test_nested_direct_filename_ignore",
+			file:         "src/internal/ignore-me.go",
+			filePatterns: []string{"src/internal/*.go"},
+			ignoreFiles:  []string{"src/internal/ignore-me.go"},
+			shouldCopy:   false,
+			description:  "Direct filename with path in ignores should be skipped",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock provider
+			mock := NewMockProvider(t)
+			mock.AddFile(tt.file, []byte("test content"))
+
+			// Create config with patterns and ignores
+			cfg := &Config{
+				ProviderArgs: ProviderArgs{
+					Repo: "github.com/test/repo",
+					Ref:  "main",
+					Path: ".",
+				},
+				DestPath: t.TempDir(),
+				CopyArgs: &ConfigCopyArgs{
+					FilePatterns: tt.filePatterns,
+					IgnoreFiles:  tt.ignoreFiles,
+				},
+			}
+
+			// Create status file
+			status := &StatusFile{
+				CoppiedFiles:   make(map[string]StatusEntry),
+				GeneratedFiles: make(map[string]GeneratedFileEntry),
+			}
+
+			// Setup logger in context
+			logger := NewDiscardDebugLogger(os.Stdout)
+			ctx := NewLoggerInContext(context.Background(), logger)
+
+			var mu sync.Mutex
+			err := processFile(ctx, mock, cfg, tt.file, "test-hash", status, &mu, cfg.DestPath)
+
+			require.NoError(t, err, "should not return error")
+			if tt.shouldCopy {
+				assert.NotEmpty(t, status.CoppiedFiles, "should have copied files in status: %s", tt.description)
+			} else {
+				assert.Empty(t, status.CoppiedFiles, "should not have any copied files in status: %s", tt.description)
+			}
+		})
+	}
+}
+
+func TestProcessFile_SingleFilePattern(t *testing.T) {
+	// Create a mock provider with many files
+	mock := NewMockProvider(t)
+	for i := 0; i < 100; i++ {
+		mock.AddFile(fmt.Sprintf("file%d.go", i), []byte("test content"))
+	}
+	// Add our target file
+	targetFile := "src/internal/special.go"
+	mock.AddFile(targetFile, []byte("special content"))
+
+	// Create config to only copy the target file
+	cfg := &Config{
+		ProviderArgs: ProviderArgs{
+			Repo: "github.com/test/repo",
+			Ref:  "main",
+			Path: ".",
+		},
+		DestPath: t.TempDir(),
+		CopyArgs: &ConfigCopyArgs{
+			FilePatterns: []string{targetFile}, // Only match this exact file
+		},
+	}
+
+	// Create status file
+	status := &StatusFile{
+		CoppiedFiles:   make(map[string]StatusEntry),
+		GeneratedFiles: make(map[string]GeneratedFileEntry),
+	}
+
+	// Setup logger in context
+	logger := NewDiscardDebugLogger(os.Stdout)
+	ctx := NewLoggerInContext(context.Background(), logger)
+
+	var mu sync.Mutex
+	err := processFile(ctx, mock, cfg, targetFile, "test-hash", status, &mu, cfg.DestPath)
+
+	require.NoError(t, err, "should not return error")
+	assert.NotEmpty(t, status.CoppiedFiles, "should have copied the target file")
+	assert.Len(t, status.CoppiedFiles, 1, "should have copied exactly one file")
+
+	// Verify no other files were copied
+	for file := range status.CoppiedFiles {
+		assert.Equal(t, "special.copy.go", file, "only the target file should be copied")
+	}
+}
+
+func TestProcessDirectory_SingleFilePattern(t *testing.T) {
+	// Create a mock provider with many files
+	mock := NewMockProvider(t)
+	for i := 0; i < 100; i++ {
+		mock.AddFile(fmt.Sprintf("file%d.go", i), []byte("test content"))
+	}
+	// Add our target file
+	targetFile := "src/internal/special.go"
+	mock.AddFile(targetFile, []byte("special content"))
+
+	// Create config to only copy the target file
+	cfg := &Config{
+		ProviderArgs: ProviderArgs{
+			Repo: "github.com/test/repo",
+			Ref:  "main",
+			Path: ".",
+		},
+		DestPath: t.TempDir(),
+		CopyArgs: &ConfigCopyArgs{
+			FilePatterns: []string{targetFile}, // Only match this exact file
+		},
+	}
+
+	// Create status file
+	status := &StatusFile{
+		CoppiedFiles:   make(map[string]StatusEntry),
+		GeneratedFiles: make(map[string]GeneratedFileEntry),
+	}
+
+	// Setup logger in context
+	logger := NewDiscardDebugLogger(os.Stdout)
+	ctx := NewLoggerInContext(context.Background(), logger)
+
+	var mu sync.Mutex
+	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu, cfg.DestPath)
+
+	require.NoError(t, err, "should not return error")
+	assert.NotEmpty(t, status.CoppiedFiles, "should have copied the target file")
+	assert.Len(t, status.CoppiedFiles, 1, "should have copied exactly one file")
+
+	// Verify no other files were copied
+	for file := range status.CoppiedFiles {
+		assert.Equal(t, "special.copy.go", file, "only the target file should be copied")
+	}
+}
+
+func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
+	// Create a mock provider with many files
+	mock := NewMockProvider(t)
+
+	// Add some noise files
+	for i := 0; i < 50; i++ {
+		mock.AddFile(fmt.Sprintf("noise/file%d.txt", i), []byte("noise"))
+	}
+
+	// Add our target files
+	targetFiles := []string{
+		"src/main.go",
+		"docs/README.md",
+		"config/settings.yaml",
+	}
+	for _, file := range targetFiles {
+		mock.AddFile(file, []byte(fmt.Sprintf("content of %s", file)))
+	}
+
+	// Create config to match specific patterns
+	cfg := &Config{
+		ProviderArgs: ProviderArgs{
+			Repo: "github.com/test/repo",
+			Ref:  "main",
+			Path: ".",
+		},
+		DestPath: t.TempDir(),
+		CopyArgs: &ConfigCopyArgs{
+			FilePatterns: []string{
+				"src/*.go",      // Match main.go
+				"docs/*.md",     // Match README.md
+				"config/*.yaml", // Match settings.yaml
+			},
+		},
+	}
+
+	// Create status file
+	status := &StatusFile{
+		CoppiedFiles:   make(map[string]StatusEntry),
+		GeneratedFiles: make(map[string]GeneratedFileEntry),
+	}
+
+	// Setup logger in context
+	logger := NewDiscardDebugLogger(os.Stdout)
+	ctx := NewLoggerInContext(context.Background(), logger)
+
+	var mu sync.Mutex
+	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu, cfg.DestPath)
+
+	require.NoError(t, err, "should not return error")
+	assert.Len(t, status.CoppiedFiles, len(targetFiles), "should have copied exactly the target files")
+
+	// Verify each target file was copied
+	expectedFiles := map[string]bool{
+		"main.copy.go":       true,
+		"README.copy.md":     true,
+		"settings.copy.yaml": true,
+	}
+
+	for file := range status.CoppiedFiles {
+		assert.True(t, expectedFiles[file], "file %s should be in expected files", file)
+		delete(expectedFiles, file)
+	}
+	assert.Empty(t, expectedFiles, "all expected files should have been found")
 }
