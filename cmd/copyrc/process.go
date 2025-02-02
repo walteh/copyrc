@@ -76,7 +76,7 @@ func cleanDestination(ctx context.Context, status *StatusFile, destPath string) 
 }
 
 type FileGetter interface {
-	GetFile(ctx context.Context, args ProviderArgs, file string) ([]byte, error)
+	GetFile(ctx context.Context, args Source, file string) ([]byte, error)
 }
 
 func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file string, commitHash string, status *StatusFile, mu *sync.Mutex, destPath string) error {
@@ -87,30 +87,30 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file s
 	}
 
 	if cfg.ArchiveArgs != nil {
-		if cfg.ProviderArgs.Path != "" {
+		if cfg.Source.Path != "" {
 			return errors.New("path is not supported in tarball mode")
 		}
 
 		// Ensure cache directory exists
-		repoName := filepath.Base(cfg.ProviderArgs.Repo)
+		repoName := filepath.Base(cfg.Source.Repo)
 		if err := os.MkdirAll(destPath, 0755); err != nil {
 			return errors.Errorf("creating repo directory: %w", err)
 		}
 
 		// Download tarball
-		data, err := GetFileFromTarball(ctx, provider, cfg.ProviderArgs)
+		data, err := GetFileFromTarball(ctx, provider, cfg.Source)
 		if err != nil {
 			return errors.Errorf("getting file from tarball: %w", err)
 		}
 		tarballPath := filepath.Join(destPath, repoName+".tar.gz")
 
 		// Save tarball
-		sourceInfo, err := provider.GetSourceInfo(ctx, cfg.ProviderArgs, commitHash)
+		sourceInfo, err := provider.GetSourceInfo(ctx, cfg.Source, commitHash)
 		if err != nil {
 			return errors.Errorf("getting source info: %w", err)
 		}
 
-		permalink, err := provider.GetArchiveUrl(ctx, cfg.ProviderArgs)
+		permalink, err := provider.GetArchiveUrl(ctx, cfg.Source)
 		if err != nil {
 			return errors.Errorf("getting permalink: %w", err)
 		}
@@ -148,9 +148,9 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file s
 				fmt.Fprintf(&buf, "var Data []byte\n\n")
 				fmt.Fprintf(&buf, "// Metadata about the downloaded repository\n")
 				fmt.Fprintf(&buf, "var (\n")
-				fmt.Fprintf(&buf, "\tRef        = %q\n", cfg.ProviderArgs.Ref)
+				fmt.Fprintf(&buf, "\tRef        = %q\n", cfg.Source.Ref)
 				fmt.Fprintf(&buf, "\tCommit     = %q\n", commitHash)
-				fmt.Fprintf(&buf, "\tRepository = %q\n", cfg.ProviderArgs.Repo)
+				fmt.Fprintf(&buf, "\tRepository = %q\n", cfg.Source.Repo)
 				fmt.Fprintf(&buf, "\tPermalink  = %q\n", permalink)
 				fmt.Fprintf(&buf, "\tDownloaded = %q\n", tarStatus.LastUpdated.Format(time.RFC3339))
 				fmt.Fprintf(&buf, ")\n")
@@ -197,12 +197,12 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file s
 		}
 	}
 
-	sourceInfo, err := provider.GetSourceInfo(ctx, cfg.ProviderArgs, commitHash)
+	sourceInfo, err := provider.GetSourceInfo(ctx, cfg.Source, commitHash)
 	if err != nil {
 		return errors.Errorf("getting source info: %w", err)
 	}
 
-	permalink, err := provider.GetPermalink(ctx, cfg.ProviderArgs, commitHash, file)
+	permalink, err := provider.GetPermalink(ctx, cfg.Source, commitHash, file)
 	if err != nil {
 		return errors.Errorf("getting permalink: %w", err)
 	}
@@ -210,7 +210,7 @@ func processFile(ctx context.Context, provider RepoProvider, cfg *Config, file s
 	var contentz []byte
 	if mockProvider, ok := provider.(FileGetter); ok {
 		// For mock provider, use GetFile directly
-		contentz, err = mockProvider.GetFile(ctx, cfg.ProviderArgs, file)
+		contentz, err = mockProvider.GetFile(ctx, cfg.Source, file)
 		if err != nil {
 			return errors.Errorf("getting file content: %w", err)
 		}
@@ -338,7 +338,7 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, c
 	var err error
 	if cfg.ArchiveArgs == nil {
 		// Get list of files from provider
-		files, err = provider.ListFiles(ctx, cfg.ProviderArgs)
+		files, err = provider.ListFiles(ctx, cfg.Source)
 		if err != nil {
 			return errors.Errorf("listing files: %w", err)
 		}
@@ -426,7 +426,7 @@ func processUntracked(ctx context.Context, status *StatusFile, destPath string) 
 
 // 📦 Config holds the processed configuration
 type Config struct {
-	ProviderArgs ProviderArgs
+	Source       Source
 	DestPath     string
 	CopyArgs     *CopyEntry_Options
 	ArchiveArgs  *ArchiveEntry_Options
@@ -441,15 +441,15 @@ func process(ctx context.Context, cfg *Config, provider RepoProvider) error {
 	logger := loggerFromContext(ctx)
 
 	logger.formatRepoDisplay(RepoDisplay{
-		Name:        cfg.ProviderArgs.Repo,
-		Ref:         cfg.ProviderArgs.Ref,
+		Name:        cfg.Source.Repo,
+		Ref:         cfg.Source.Ref,
 		Destination: cfg.DestPath,
 		IsArchive:   cfg.ArchiveArgs != nil,
 	})
 
 	destPath := cfg.DestPath
 	if cfg.ArchiveArgs != nil {
-		destPath = filepath.Join(destPath, filepath.Base(cfg.ProviderArgs.Repo))
+		destPath = filepath.Join(destPath, filepath.Base(cfg.Source.Repo))
 	}
 
 	// Determine status file location based on mode
@@ -470,17 +470,17 @@ func process(ctx context.Context, cfg *Config, provider RepoProvider) error {
 			CoppiedFiles:   make(map[string]StatusEntry),
 			GeneratedFiles: make(map[string]GeneratedFileEntry),
 			Args: StatusFileArgs{
-				SrcRepo: cfg.ProviderArgs.Repo,
-				SrcRef:  cfg.ProviderArgs.Ref,
-				SrcPath: cfg.ProviderArgs.Path,
+				SrcRepo: cfg.Source.Repo,
+				SrcRef:  cfg.Source.Ref,
+				SrcPath: cfg.Source.Path,
 			},
 		}
 	}
 
 	// Compare arguments
-	argsAreSame := status.Args.SrcRepo == cfg.ProviderArgs.Repo &&
-		status.Args.SrcRef == cfg.ProviderArgs.Ref &&
-		status.Args.SrcPath == cfg.ProviderArgs.Path
+	argsAreSame := status.Args.SrcRepo == cfg.Source.Repo &&
+		status.Args.SrcRef == cfg.Source.Ref &&
+		status.Args.SrcPath == cfg.Source.Path
 
 	// Compare copy arguments if they exist
 	if status.Args.CopyArgs != nil && cfg.CopyArgs != nil {
@@ -548,7 +548,7 @@ func process(ctx context.Context, cfg *Config, provider RepoProvider) error {
 		return nil
 	}
 
-	commitHash, err := provider.GetCommitHash(ctx, cfg.ProviderArgs)
+	commitHash, err := provider.GetCommitHash(ctx, cfg.Source)
 	if err != nil {
 		return errors.Errorf("getting commit hash: %w", err)
 	}
@@ -571,18 +571,18 @@ func process(ctx context.Context, cfg *Config, provider RepoProvider) error {
 	}
 
 	status.CommitHash = commitHash
-	status.Ref = cfg.ProviderArgs.Ref
+	status.Ref = cfg.Source.Ref
 	status.Args = StatusFileArgs{
-		SrcRepo:     cfg.ProviderArgs.Repo,
-		SrcRef:      cfg.ProviderArgs.Ref,
-		SrcPath:     cfg.ProviderArgs.Path,
+		SrcRepo:     cfg.Source.Repo,
+		SrcRef:      cfg.Source.Ref,
+		SrcPath:     cfg.Source.Path,
 		CopyArgs:    cfg.CopyArgs,
 		ArchiveArgs: cfg.ArchiveArgs,
 	}
 
 	dest := cfg.DestPath
 	if cfg.ArchiveArgs != nil {
-		dest = filepath.Join(dest, filepath.Base(cfg.ProviderArgs.Repo))
+		dest = filepath.Join(dest, filepath.Base(cfg.Source.Repo))
 	}
 
 	if err := writeStatusFile(ctx, status, dest); err != nil {

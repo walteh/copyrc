@@ -89,7 +89,7 @@ func TestGithubProvider(t *testing.T) {
 	require.NoError(t, err, "creating provider")
 
 	t.Run("GetSourceInfo", func(t *testing.T) {
-		info, err := provider.GetSourceInfo(context.Background(), ProviderArgs{
+		info, err := provider.GetSourceInfo(context.Background(), Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "path/to/files",
@@ -99,7 +99,7 @@ func TestGithubProvider(t *testing.T) {
 	})
 
 	t.Run("GetPermalink", func(t *testing.T) {
-		link, err := provider.GetPermalink(context.Background(), ProviderArgs{
+		link, err := provider.GetPermalink(context.Background(), Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "path/to/files",
@@ -160,15 +160,15 @@ func Bar() {}`))
 
 func Other() {}`))
 
-	args := ProviderArgs{
+	args := Source{
 		Repo: mock.GetFullRepo(),
 		Ref:  mock.ref,
 		Path: mock.path,
 	}
 
 	cfg := &Config{
-		ProviderArgs: args,
-		DestPath:     t.TempDir(),
+		Source:   args,
+		DestPath: t.TempDir(),
 		CopyArgs: &CopyEntry_Options{
 			Replacements: []Replacement{
 				{Old: "Bar", New: "Baz"},
@@ -269,7 +269,7 @@ func Other() {}`))
 
 		// Test with same commit hash
 		cfg := &Config{
-			ProviderArgs: args,
+			Source:       args,
 			DestPath:     dir,
 			RemoteStatus: true,
 			CopyArgs:     &CopyEntry_Options{},
@@ -309,9 +309,9 @@ func Other() {}`))
 
 		// Test with same arguments
 		cfg := &Config{
-			ProviderArgs: args,
-			DestPath:     dir,
-			Status:       true,
+			Source:   args,
+			DestPath: dir,
+			Status:   true,
 			CopyArgs: &CopyEntry_Options{
 				Replacements: []Replacement{
 					{Old: "Bar", New: "Baz"},

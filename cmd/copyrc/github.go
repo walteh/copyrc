@@ -53,7 +53,7 @@ func parseGithubRepo(repo string) (org string, name string, err error) {
 	return parts[1], parts[2], nil
 }
 
-func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error) {
+func (g *GithubProvider) ListFiles(ctx context.Context, args Source) ([]ProviderFile, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return nil, errors.Errorf("parsing github repository: %w", err)
@@ -112,49 +112,46 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]Pr
 		Path string `json:"path"`
 		Type string `json:"type"`
 	}
-	if err := json.Unmarshal(body, &files); err == nil {
-		result := make([]ProviderFile, 0, len(files))
-		for _, f := range files {
-			fle := ProviderFile{
-				Path:     f.Path,
-				Dir:      f.Type == "dir",
-				File:     f.Type == "file",
-				Children: make([]ProviderFile, 0),
-			}
-			if f.Type == "dir" {
-				childs, err := g.ListFiles(ctx, ProviderArgs{
-					Repo: args.Repo,
-					Ref:  args.Ref,
-					Path: f.Path,
-				})
-				if err != nil {
-					return nil, errors.Errorf("listing files: %w", err)
-				}
-				fle.Children = childs
-			}
-			result = append(result, fle)
+	if err := json.Unmarshal(body, &files); err != nil {
+		var file struct {
+			Path string `json:"path"`
+			Type string `json:"type"`
 		}
-		return result, nil
+		if err := json.Unmarshal(body, &file); err != nil {
+			return nil, errors.Errorf("decoding response: %w", err)
+		}
+		files = []struct {
+			Path string `json:"path"`
+			Type string `json:"type"`
+		}{file}
 	}
 
-	// If array decode fails, try single file object
-	var file struct {
-		Path string `json:"path"`
-		Type string `json:"type"`
+	result := make([]ProviderFile, 0, len(files))
+	for _, f := range files {
+		fle := ProviderFile{
+			Path:     f.Path,
+			Dir:      f.Type == "dir",
+			File:     f.Type == "file",
+			Children: make([]ProviderFile, 0),
+		}
+		if f.Type == "dir" && args.Recursive {
+			childs, err := g.ListFiles(ctx, Source{
+				Repo:      args.Repo,
+				Ref:       args.Ref,
+				Path:      f.Path,
+				Recursive: args.Recursive,
+			})
+			if err != nil {
+				return nil, errors.Errorf("listing files: %w", err)
+			}
+			fle.Children = childs
+		}
+		result = append(result, fle)
 	}
-	if err := json.Unmarshal(body, &file); err != nil {
-		return nil, errors.Errorf("decoding response: %w", err)
-	}
-
-	return []ProviderFile{
-		{
-			Path: file.Path,
-			Dir:  file.Type == "dir",
-		},
-	}, nil
+	return result, nil
 }
 
-func (g *GithubProvider) GetCommitHash(ctx context.Context, args ProviderArgs) (string, error) {
+func (g *GithubProvider) GetCommitHash(ctx context.Context, args Source) (string, error) {
 	// Try the specified ref first
 	hash, err := g.tryGetCommitHash(ctx, args)
 	if err == nil {
@@ -164,7 +161,7 @@ func (g *GithubProvider) GetCommitHash(ctx context.Context, args ProviderArgs) (
 	return "", errors.Errorf("getting commit hash: %w", err)
 }
 
-func (g *GithubProvider) tryGetCommitHash(ctx context.Context, args ProviderArgs) (string, error) {
+func (g *GithubProvider) tryGetCommitHash(ctx context.Context, args Source) (string, error) {
 
 	if args.RefType == "commit" {
 		return args.Ref, nil
@@ -191,7 +188,7 @@ func (g *GithubProvider) tryGetCommitHash(ctx context.Context, args ProviderArgs
 	return parts[0], nil
 }
 
-func (g *GithubProvider) GetPermalink(ctx context.Context, args ProviderArgs, commitHash string, file string) (string, error) {
+func (g *GithubProvider) GetPermalink(ctx context.Context, args Source, commitHash string, file string) (string, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return "", errors.Errorf("parsing github repository: %w", err)
@@ -208,7 +205,7 @@ func (g *GithubProvider) GetPermalink(ctx context.Context, args ProviderArgs, co
 		org, repo, commitHash, file), nil
 }
 
-func (g *GithubProvider) GetSourceInfo(ctx context.Context, args ProviderArgs, commitHash string) (string, error) {
+func (g *GithubProvider) GetSourceInfo(ctx context.Context, args Source, commitHash string) (string, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return "", errors.Errorf("parsing github repository: %w", err)
@@ -217,7 +214,7 @@ func (g *GithubProvider) GetSourceInfo(ctx context.Context, args ProviderArgs, c
 }
 
 // GetArchiveUrl returns the URL to download the repository archive
-func (g *GithubProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error) {
+func (g *GithubProvider) GetArchiveUrl(ctx context.Context, args Source) (string, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return "", errors.Errorf("parsing github repository: %w", err)

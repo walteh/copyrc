@@ -31,7 +31,7 @@ func TestTarballFunctions(t *testing.T) {
 	mock.AddFile("dir/nested.txt", []byte("nested content"))
 
 	t.Run("test_get_file", func(t *testing.T) {
-		args := ProviderArgs{
+		args := Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "path/to/files",
@@ -43,7 +43,7 @@ func TestTarballFunctions(t *testing.T) {
 	})
 
 	t.Run("test_get_nested_file", func(t *testing.T) {
-		args := ProviderArgs{
+		args := Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "path/to/files",
@@ -55,7 +55,7 @@ func TestTarballFunctions(t *testing.T) {
 	})
 
 	t.Run("test_file_not_found", func(t *testing.T) {
-		args := ProviderArgs{
+		args := Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "/invalid/path",
@@ -67,7 +67,7 @@ func TestTarballFunctions(t *testing.T) {
 	})
 
 	t.Run("test_invalid_cache_dir", func(t *testing.T) {
-		args := ProviderArgs{
+		args := Source{
 			Repo: "github.com/org/repo",
 			Ref:  "main",
 			Path: "/invalid/path",
@@ -82,7 +82,7 @@ func TestTarballFunctions(t *testing.T) {
 		mock := NewMockErrorProvider(t)
 		mock.shouldReturn404 = true
 
-		args := ProviderArgs{
+		args := Source{
 			Repo: "github.com/org/repo",
 			Ref:  "v999.999.999", // Non-existent tag
 			Path: "path/to/files",
@@ -105,7 +105,7 @@ func NewMockErrorProvider(t *testing.T) *MockErrorProvider {
 	}
 }
 
-func (m *MockErrorProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error) {
+func (m *MockErrorProvider) GetArchiveUrl(ctx context.Context, args Source) (string, error) {
 	if m.shouldReturn404 {
 		// Create a temporary file with 404 content
 		f, err := os.CreateTemp("", "mock-404-*.tar.gz")

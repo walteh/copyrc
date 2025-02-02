@@ -138,12 +138,12 @@ func Other() {}`))
 		Defaults: &DefaultsBlock{},
 		Copies: []*CopyEntry{
 			{
-				Source: CopyEntry_Source{
+				Source: Source{
 					Repo: mock.GetFullRepo(),
 					Ref:  mock.ref,
 					Path: mock.path,
 				},
-				Destination: CopyEntry_Destination{
+				Destination: Destination{
 					Path: dest1,
 				},
 				Options: &CopyEntry_Options{
@@ -155,12 +155,12 @@ func Other() {}`))
 				},
 			},
 			{
-				Source: CopyEntry_Source{
+				Source: Source{
 					Repo: mock.GetFullRepo(),
 					Ref:  mock.ref,
 					Path: mock.path,
 				},
-				Destination: CopyEntry_Destination{
+				Destination: Destination{
 					Path: dest2,
 				},
 			},

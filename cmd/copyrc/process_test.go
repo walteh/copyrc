@@ -66,7 +66,7 @@ func TestProcessFile_IgnoreFiles(t *testing.T) {
 
 			// Create config with ignore patterns
 			cfg := &Config{
-				ProviderArgs: ProviderArgs{
+				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
@@ -150,7 +150,7 @@ func TestProcessFile_FilePatterns(t *testing.T) {
 
 			// Create config with file patterns
 			cfg := &Config{
-				ProviderArgs: ProviderArgs{
+				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
@@ -244,7 +244,7 @@ func TestProcessFile_PatternInteractions(t *testing.T) {
 
 			// Create config with patterns and ignores
 			cfg := &Config{
-				ProviderArgs: ProviderArgs{
+				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
@@ -291,7 +291,7 @@ func TestProcessFile_SingleFilePattern(t *testing.T) {
 
 	// Create config to only copy the target file
 	cfg := &Config{
-		ProviderArgs: ProviderArgs{
+		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",
@@ -337,7 +337,7 @@ func TestProcessDirectory_SingleFilePattern(t *testing.T) {
 
 	// Create config to only copy the target file
 	cfg := &Config{
-		ProviderArgs: ProviderArgs{
+		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",
@@ -392,7 +392,7 @@ func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
 
 	// Create config to match specific patterns
 	cfg := &Config{
-		ProviderArgs: ProviderArgs{
+		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",

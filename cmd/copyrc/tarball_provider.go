@@ -30,7 +30,7 @@ type TarballOptions struct {
 }
 
 // 📥 GetFileFromTarball downloads and extracts a specific file from a repository tarball
-func GetFileFromTarball(ctx context.Context, provider RepoProvider, args ProviderArgs) ([]byte, error) {
+func GetFileFromTarball(ctx context.Context, provider RepoProvider, args Source) ([]byte, error) {
 	// Validate path
 	if strings.HasPrefix(args.Path, "/invalid/") {
 		return nil, errors.Errorf("invalid path: %s", args.Path)
@@ -46,7 +46,7 @@ func GetFileFromTarball(ctx context.Context, provider RepoProvider, args Provide
 }
 
 // 🔄 getArchiveData downloads and caches the repository tarball
-func getArchiveData(ctx context.Context, provider RepoProvider, args ProviderArgs) ([]byte, error) {
+func getArchiveData(ctx context.Context, provider RepoProvider, args Source) ([]byte, error) {
 	// Get archive URL
 	url, err := provider.GetArchiveUrl(ctx, args)
 	if err != nil {

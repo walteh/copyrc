@@ -46,15 +46,16 @@ type DefaultsBlock struct {
 }
 
 // 🎯 Source configuration
-type CopyEntry_Source struct {
-	Repo    string `json:"repo" yaml:"repo" hcl:"repo,attr"`
-	Ref     string `json:"ref,omitempty" yaml:"ref,omitempty" hcl:"ref,attr"`
-	Path    string `json:"path" yaml:"path" hcl:"path,optional"`
-	RefType string `json:"ref_type" yaml:"ref_type" hcl:"ref_type,optional"`
+type Source struct {
+	Repo      string `json:"repo" yaml:"repo" hcl:"repo,attr"`
+	Ref       string `json:"ref,omitempty" yaml:"ref,omitempty" hcl:"ref,attr"`
+	Path      string `json:"path" yaml:"path" hcl:"path,optional"`
+	RefType   string `json:"ref_type" yaml:"ref_type" hcl:"ref_type,optional"`
+	Recursive bool   `json:"recursive,omitempty" yaml:"recursive,omitempty" hcl:"recursive,optional"`
 }
 
 // 📦 Destination configuration
-type CopyEntry_Destination struct {
+type Destination struct {
 	Path string `json:"path" yaml:"path" hcl:"path,attr"`
 }
 
@@ -68,15 +69,15 @@ type CopyEntry_Options struct {
 
 // 📝 Individual copy entry
 type CopyEntry struct {
-	Source      CopyEntry_Source      `json:"source" yaml:"source" hcl:"source,block"`
-	Destination CopyEntry_Destination `json:"destination" yaml:"destination" hcl:"destination,block"`
-	Options     *CopyEntry_Options    `json:"options" yaml:"options" hcl:"options,block"`
+	Source      Source             `json:"source" yaml:"source" hcl:"source,block"`
+	Destination Destination        `json:"destination" yaml:"destination" hcl:"destination,block"`
+	Options     *CopyEntry_Options `json:"options" yaml:"options" hcl:"options,block"`
 }
 
 // 📝 Archive entry
 type ArchiveEntry struct {
-	Source      CopyEntry_Source      `yaml:"source" hcl:"source,block"`
-	Destination CopyEntry_Destination `yaml:"destination" hcl:"destination,block"`
+	Source      Source                `yaml:"source" hcl:"source,block"`
+	Destination Destination           `yaml:"destination" hcl:"destination,block"`
 	Options     *ArchiveEntry_Options `yaml:"options,omitempty" hcl:"options,block"`
 }
 
@@ -132,7 +133,7 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 	// Process copies
 	for _, copy := range cfg.Copies {
 		config := &Config{
-			ProviderArgs: ProviderArgs{
+			Source: Source{
 				Repo:    copy.Source.Repo,
 				Ref:     copy.Source.Ref,
 				Path:    copy.Source.Path,
@@ -154,7 +155,7 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 	// Process archives
 	for _, archive := range cfg.Archives {
 		config := &Config{
-			ProviderArgs: ProviderArgs{
+			Source: Source{
 				Repo:    archive.Source.Repo,
 				Ref:     archive.Source.Ref,
 				RefType: archive.Source.RefType,

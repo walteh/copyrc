@@ -60,7 +60,7 @@ func (m *MockProvider) ClearFiles() {
 	m.files = make(map[string][]byte)
 }
 
-func (m *MockProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error) {
+func (m *MockProvider) ListFiles(ctx context.Context, args Source) ([]ProviderFile, error) {
 	// Return all files in the map
 	files := make([]ProviderFile, 0, len(m.files))
 	for f := range m.files {
@@ -75,11 +75,11 @@ func (m *MockProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]Prov
 	return files, nil
 }
 
-func (m *MockProvider) GetCommitHash(ctx context.Context, args ProviderArgs) (string, error) {
+func (m *MockProvider) GetCommitHash(ctx context.Context, args Source) (string, error) {
 	return m.commitHash, nil
 }
 
-func (m *MockProvider) GetPermalink(ctx context.Context, args ProviderArgs, commitHash string, file string) (string, error) {
+func (m *MockProvider) GetPermalink(ctx context.Context, args Source, commitHash string, file string) (string, error) {
 	// Remove the path prefix if it exists
 	cleanFile := strings.TrimPrefix(file, m.path+"/")
 	if m.files[cleanFile] == nil {
@@ -90,7 +90,7 @@ func (m *MockProvider) GetPermalink(ctx context.Context, args ProviderArgs, comm
 	return "mock://" + cleanFile, nil
 }
 
-func (m *MockProvider) GetSourceInfo(ctx context.Context, args ProviderArgs, commitHash string) (string, error) {
+func (m *MockProvider) GetSourceInfo(ctx context.Context, args Source, commitHash string) (string, error) {
 	return "mock@" + commitHash, nil
 }
 
@@ -99,7 +99,7 @@ func (m *MockProvider) GetFullRepo() string {
 }
 
 // GetArchiveUrl returns a mock URL for testing
-func (m *MockProvider) GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error) {
+func (m *MockProvider) GetArchiveUrl(ctx context.Context, args Source) (string, error) {
 	// Create a temporary file with the archive data
 	data, err := m.GetArchiveData()
 	if err != nil {
@@ -162,7 +162,7 @@ func (m *MockProvider) GetArchiveData() ([]byte, error) {
 }
 
 // GetFile returns the content of a file from the mock provider
-func (m *MockProvider) GetFile(ctx context.Context, args ProviderArgs, file string) ([]byte, error) {
+func (m *MockProvider) GetFile(ctx context.Context, args Source, file string) ([]byte, error) {
 	// Remove the path prefix if it exists
 	cleanFile := strings.TrimPrefix(file, m.path+"/")
 	content, ok := m.files[cleanFile]

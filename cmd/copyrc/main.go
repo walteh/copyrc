@@ -60,7 +60,7 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 	}
 
 	return &Config{
-		ProviderArgs: ProviderArgs{
+		Source: Source{
 			Repo:    input.SrcRepo,
 			Ref:     input.SrcRef,
 			Path:    input.SrcPath,
