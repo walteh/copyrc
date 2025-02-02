@@ -93,7 +93,7 @@ copies:
 			err := os.WriteFile(configPath, []byte(tt.config), 0644)
 			require.NoError(t, err)
 
-			cfg, err := LoadConfig(configPath)
+			cfg, err := LoadConfig(configPath, Input{})
 			if tt.expectError {
 				require.Error(t, err)
 				if tt.validate != nil {
@@ -365,7 +365,7 @@ copy {
 			err := os.WriteFile(configPath, []byte(tt.config), 0644)
 			require.NoError(t, err)
 
-			cfg, err := LoadConfig(configPath)
+			cfg, err := LoadConfig(configPath, Input{})
 			if tt.expectError {
 				require.Error(t, err)
 				if tt.validate != nil {

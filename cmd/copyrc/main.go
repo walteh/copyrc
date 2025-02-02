@@ -41,12 +41,11 @@ type Input struct {
 	DestPath     string     // Local destination path
 	Replacements arrayFlags // String replacements
 	IgnoreFiles  arrayFlags // Files to ignore
-	Clean        bool       // Whether to clean destination directory
-	Status       bool       // Whether to check local status
-	RemoteStatus bool       // Whether to check remote status
-	Force        bool       // Whether to force update even if status is ok
-	UseTarball   bool       // Whether to use tarball-based file access
-	Async        bool       // Whether to process files asynchronously
+	Clean        boolFlag   // Whether to clean destination directory
+	Status       boolFlag   // Whether to check local status
+	RemoteStatus boolFlag   // Whether to check remote status
+	Force        boolFlag   // Whether to force update even if status is ok
+	Async        boolFlag   // Whether to process files asynchronously
 }
 
 // 🏭 Create config from input (backward compatibility)
@@ -74,11 +73,12 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*SingleConfig, erro
 			IgnoreFiles:  []string(input.IgnoreFiles),
 		},
 		Flags: FlagsBlock{
-			Clean:        input.Clean,
-			Status:       input.Status,
-			RemoteStatus: input.RemoteStatus,
-			Force:        input.Force,
-			Async:        input.Async,
+			// no other input
+			Clean:        input.Clean.value,
+			Status:       input.Status.value,
+			RemoteStatus: input.RemoteStatus.value,
+			Force:        input.Force.value,
+			Async:        input.Async.value,
 		},
 	}, nil
 }
@@ -89,7 +89,13 @@ func main() {
 	ctx = NewLoggerInContext(ctx, logger)
 
 	// 🎯 Parse command line flags
-	var input Input
+	input := Input{
+		Clean:        newDefaultFalseBoolFlag(),
+		Status:       newDefaultFalseBoolFlag(),
+		RemoteStatus: newDefaultFalseBoolFlag(),
+		Force:        newDefaultFalseBoolFlag(),
+		Async:        newDefaultFalseBoolFlag(),
+	}
 	var configFile string
 	var showVersion bool
 
@@ -102,12 +108,11 @@ func main() {
 	flag.StringVar(&input.SrcRefType, "src-ref-type", "", "source ref type (commit, branch, empty)")
 	flag.Var(&input.Replacements, "replacements", "JSON array or comma-separated list of replacements in old:new format")
 	flag.Var(&input.IgnoreFiles, "ignore", "JSON array or comma-separated list of files to ignore")
-	flag.BoolVar(&input.Clean, "clean", false, "Clean destination directory before copying")
-	flag.BoolVar(&input.Status, "status", false, "Check if files are up to date (local check only)")
-	flag.BoolVar(&input.RemoteStatus, "remote-status", false, "Check if files are up to date (includes remote check)")
-	flag.BoolVar(&input.Force, "force", false, "Force update even if status is ok")
-	flag.BoolVar(&input.Async, "async", false, "Process files asynchronously")
-	flag.BoolVar(&input.UseTarball, "use-tarball", false, "Whether to use tarball-based file access")
+	flag.BoolVar(&input.Clean.value, "clean", false, "Clean destination directory before copying")
+	flag.BoolVar(&input.Status.value, "status", false, "Check if files are up to date (local check only)")
+	flag.BoolVar(&input.RemoteStatus.value, "remote-status", false, "Check if files are up to date (includes remote check)")
+	flag.BoolVar(&input.Force.value, "force", false, "Force update even if status is ok")
+	flag.BoolVar(&input.Async.value, "async", false, "Process files asynchronously")
 	flag.Parse()
 
 	if showVersion {
@@ -123,7 +128,7 @@ func main() {
 
 	// 🔍 Check if using config file
 	if configFile != "" {
-		cfg, err := LoadConfig(configFile)
+		cfg, err := LoadConfig(configFile, input)
 		if err != nil {
 			logger.Error(err.Error())
 			os.Exit(1)
@@ -196,5 +201,37 @@ func (i *arrayFlags) Set(value string) error {
 
 	// Single value
 	*i = append(*i, value)
+	return nil
+}
+
+type boolFlag struct {
+	value        bool
+	defaultValue bool
+}
+
+func newDefaultTrueBoolFlag() boolFlag {
+	return boolFlag{
+		value:        true,
+		defaultValue: true,
+	}
+}
+
+func newDefaultFalseBoolFlag() boolFlag {
+	return boolFlag{
+		value:        false,
+		defaultValue: false,
+	}
+}
+
+func (b *boolFlag) String() string {
+	return fmt.Sprintf("%v", b.value)
+}
+
+func (b *boolFlag) IsSet() bool {
+	return b.value != b.defaultValue
+}
+
+func (b *boolFlag) Set(value string) error {
+	b.value = value == "true" || value == "1"
 	return nil
 }

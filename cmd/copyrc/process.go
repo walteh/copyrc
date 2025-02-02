@@ -245,8 +245,10 @@ func processCopy(ctx context.Context, provider RepoProvider, src Source, dest De
 	ext := filepath.Ext(file.Path)
 	base := strings.TrimSuffix(filepath.Base(file.Path), ext)
 
+	realPath := strings.TrimPrefix(file.Path, src.Path+"/")
+
 	// Create output path and ensure its directory exists
-	outPath := filepath.Join(dest.Path, filepath.Dir(file.Path), base+".copy"+ext)
+	outPath := filepath.Join(dest.Path, filepath.Dir(realPath), base+".copy"+ext)
 	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
 		return errors.Errorf("creating output directory: %w", err)
 	}
@@ -413,13 +415,22 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *SingleCon
 	return nil
 }
 
-func allEntries(path string, recursive bool) ([]os.DirEntry, error) {
+type EntryItem struct {
+	Path string
+	Info os.DirEntry
+}
+
+func allEntries(path string, recursive bool) ([]EntryItem, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return nil, errors.Errorf("reading directory: %w", err)
 	}
-	addEntries := []os.DirEntry{}
+	copyrclockDirs := []string{}
+	addEntries := []EntryItem{}
 	for _, entry := range entries {
+		if entry.Name() == ".copyrc.lock" {
+			copyrclockDirs = append(copyrclockDirs, path)
+		}
 		if entry.IsDir() && recursive {
 			subEntries, err := allEntries(filepath.Join(path, entry.Name()), recursive)
 			if err != nil {
@@ -427,8 +438,15 @@ func allEntries(path string, recursive bool) ([]os.DirEntry, error) {
 			}
 			addEntries = append(addEntries, subEntries...)
 		} else {
-			addEntries = append(addEntries, entry)
+			addEntries = append(addEntries, EntryItem{Path: filepath.Join(path, entry.Name()), Info: entry})
 		}
+	}
+
+	// remove all copyrclockDirs from addEntries
+	for _, dir := range copyrclockDirs {
+		addEntries = slices.DeleteFunc(addEntries, func(entry EntryItem) bool {
+			return strings.HasPrefix(entry.Path, dir+"/") && entry.Path != dir+"/.copyrc.lock"
+		})
 	}
 
 	return addEntries, nil
@@ -441,20 +459,23 @@ func processUntracked(ctx context.Context, status *StatusFile, dest Destination,
 		return errors.Errorf("reading directory: %w", err)
 	}
 
-	entries = slices.DeleteFunc(entries, func(entry os.DirEntry) bool {
-		_, genStatus := status.GeneratedFiles[entry.Name()]
-		_, copyStatus := status.CoppiedFiles[entry.Name()]
-		return genStatus || copyStatus || entry.IsDir() || entry.Name() == ".copyrc.lock" || entry.Name() == ".git" || entry.Name() == ".DS_Store"
+	entries = slices.DeleteFunc(entries, func(entry EntryItem) bool {
+		trimmedPath := strings.TrimPrefix(entry.Path, dest.Path+"/")
+
+		_, genStatus := status.GeneratedFiles[trimmedPath]
+		_, copyStatus := status.CoppiedFiles[trimmedPath]
+		return genStatus || copyStatus || entry.Info.IsDir() || entry.Path == ".copyrc.lock" || entry.Path == ".git" || entry.Path == ".DS_Store"
 	})
 
-	slices.SortFunc(entries, func(a, b os.DirEntry) int {
-		return strings.Compare(a.Name(), b.Name())
+	slices.SortFunc(entries, func(a, b EntryItem) int {
+		return strings.Compare(a.Path, b.Path)
 	})
 
 	for _, entry := range entries {
+		trimmedPath := strings.TrimPrefix(entry.Path, dest.Path+"/")
 		if _, err := writeFile(ctx, WriteFileOpts{
 			Destination: dest,
-			Path:        filepath.Join(dest.Path, entry.Name()),
+			Path:        trimmedPath,
 			IsUntracked: true,
 		}); err != nil {
 			return errors.Errorf("writing untracked file: %w", err)
@@ -549,7 +570,6 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 			}
 		}
 	}
-
 	// Check if arguments have changed
 	if (cfg.Flags.Status || cfg.Flags.RemoteStatus) && !cfg.Flags.Force {
 		if !argsAreSame {
@@ -583,7 +603,27 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 
 	if !cfg.Flags.Force && !cfg.Flags.Clean && status.CommitHash != "" {
 		if status.CommitHash == commitHash && argsAreSame {
-			return nil
+			// loop through all files in status and print them out
+			for _, file := range status.CoppiedFiles {
+				logFileOperation(ctx, FileInfo{
+					Name:         file.File,
+					IsModified:   false,
+					Replacements: len(file.Changes),
+				})
+			}
+			for _, file := range status.GeneratedFiles {
+				logFileOperation(ctx, FileInfo{
+					Name:       file.File,
+					IsManaged:  true,
+					IsModified: false,
+				})
+			}
+
+			defer func() {
+				logger.LogNewline()
+			}()
+
+			return processUntracked(ctx, status, cfg.Destination, cfg.CopyArgs != nil && cfg.CopyArgs.Recursive)
 		}
 		if cfg.Flags.Status || cfg.Flags.RemoteStatus {
 			return errors.New("files are out of date")

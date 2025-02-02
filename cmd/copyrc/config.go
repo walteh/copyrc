@@ -94,7 +94,7 @@ type ArchiveEntry_Options struct {
 }
 
 // 📝 Load config from file (supports YAML and HCL)
-func LoadConfig(path string) (*CopyConfig, error) {
+func LoadConfig(path string, input Input) (*CopyConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Errorf("reading config file: %w", err)
@@ -126,6 +126,29 @@ func LoadConfig(path string) (*CopyConfig, error) {
 	diags = gohcl.DecodeBody(hclFile.Body, ctx, &cfg)
 	if diags.HasErrors() {
 		return nil, errors.Errorf("decoding HCL: %s", diags.Error())
+	}
+
+	if cfg.Flags == nil {
+		cfg.Flags = &FlagsBlock{}
+	}
+
+	if input.Status.IsSet() {
+		cfg.Flags.Status = input.Status.value
+	}
+	if input.RemoteStatus.IsSet() {
+		cfg.Flags.RemoteStatus = input.RemoteStatus.value
+	}
+
+	if input.Force.IsSet() {
+		cfg.Flags.Force = input.Force.value
+	}
+
+	if input.Async.IsSet() {
+		cfg.Flags.Async = input.Async.value
+	}
+
+	if input.Clean.IsSet() {
+		cfg.Flags.Clean = input.Clean.value
 	}
 
 	// Convert to internal format
