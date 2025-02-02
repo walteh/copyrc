@@ -20,9 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
-	"sync"
 
 	"gitlab.com/tozd/go/errors"
 )
@@ -49,33 +47,6 @@ type Input struct {
 	Force        bool       // Whether to force update even if status is ok
 	UseTarball   bool       // Whether to use tarball-based file access
 	Async        bool       // Whether to process files asynchronously
-}
-
-// 🌐 RepoProvider interface for different Git providers
-type RepoProvider interface {
-	// ListFiles returns a list of files in the given path
-	ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error)
-	// GetCommitHash returns the commit hash for the current ref
-	GetCommitHash(ctx context.Context, args ProviderArgs) (string, error)
-	// GetPermalink returns a permanent link to the file
-	GetPermalink(ctx context.Context, args ProviderArgs, commitHash string, file string) (string, error)
-	// GetSourceInfo returns a string describing the source (e.g. "github.com/org/repo@hash")
-	GetSourceInfo(ctx context.Context, args ProviderArgs, commitHash string) (string, error)
-	// GetArchiveUrl returns the URL to download the repository archive
-	GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error)
-}
-
-// 📦 Config holds the processed configuration
-type Config struct {
-	ProviderArgs ProviderArgs
-	DestPath     string
-	CopyArgs     *CopyEntry_Options
-	ArchiveArgs  *ArchiveEntry_Options
-	Clean        bool // Whether to clean destination directory
-	Status       bool // Whether to check local status
-	RemoteStatus bool // Whether to check remote status
-	Force        bool // Whether to force update even if status is ok
-	Async        bool // Whether to process files asynchronously
 }
 
 // 🏭 Create config from input (backward compatibility)
@@ -106,13 +77,6 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 		Force:        input.Force,
 		Async:        input.Async,
 	}, nil
-}
-
-type ProviderArgs struct {
-	Repo    string
-	Ref     string
-	Path    string
-	RefType string // commit, branch, empty (plain ref)
 }
 
 func main() {
@@ -193,167 +157,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := run(ctx, cfg, gh); err != nil {
+	if err := process(ctx, cfg, gh); err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-}
-
-func run(ctx context.Context, cfg *Config, provider RepoProvider) error {
-	logger := loggerFromContext(ctx)
-
-	logger.formatRepoDisplay(RepoDisplay{
-		Name:        cfg.ProviderArgs.Repo,
-		Ref:         cfg.ProviderArgs.Ref,
-		Destination: cfg.DestPath,
-		IsArchive:   cfg.ArchiveArgs != nil,
-	})
-
-	destPath := cfg.DestPath
-	if cfg.ArchiveArgs != nil {
-		destPath = filepath.Join(destPath, filepath.Base(cfg.ProviderArgs.Repo))
-	}
-
-	// Determine status file location based on mode
-	var statusFile string
-	if cfg.ArchiveArgs != nil {
-		statusFile = filepath.Join(destPath, ".copyrc.lock")
-		// Create repo directory if it doesn't exist
-		if err := os.MkdirAll(destPath, 0755); err != nil {
-			return errors.Errorf("creating repo directory: %w", err)
-		}
-	} else {
-		statusFile = filepath.Join(destPath, ".copyrc.lock")
-	}
-
-	status, err := loadStatusFile(statusFile)
-	if err != nil || status == nil {
-		status = &StatusFile{
-			CoppiedFiles:   make(map[string]StatusEntry),
-			GeneratedFiles: make(map[string]GeneratedFileEntry),
-			Args: StatusFileArgs{
-				SrcRepo: cfg.ProviderArgs.Repo,
-				SrcRef:  cfg.ProviderArgs.Ref,
-				SrcPath: cfg.ProviderArgs.Path,
-			},
-		}
-	}
-
-	// Compare arguments
-	argsAreSame := status.Args.SrcRepo == cfg.ProviderArgs.Repo &&
-		status.Args.SrcRef == cfg.ProviderArgs.Ref &&
-		status.Args.SrcPath == cfg.ProviderArgs.Path
-
-	// Compare copy arguments if they exist
-	if status.Args.CopyArgs != nil && cfg.CopyArgs != nil {
-		// Compare replacements
-		if len(status.Args.CopyArgs.Replacements) != len(cfg.CopyArgs.Replacements) {
-			argsAreSame = false
-		} else {
-			for i, r := range status.Args.CopyArgs.Replacements {
-				if r.Old != cfg.CopyArgs.Replacements[i].Old ||
-					r.New != cfg.CopyArgs.Replacements[i].New {
-					argsAreSame = false
-					break
-				}
-			}
-		}
-
-		// Compare ignore files
-		if len(status.Args.CopyArgs.IgnoreFiles) != len(cfg.CopyArgs.IgnoreFiles) {
-			argsAreSame = false
-		} else {
-			for i, f := range status.Args.CopyArgs.IgnoreFiles {
-				if f != cfg.CopyArgs.IgnoreFiles[i] {
-					argsAreSame = false
-					break
-				}
-			}
-		}
-
-		// Compare file patterns
-		if len(status.Args.CopyArgs.FilePatterns) != len(cfg.CopyArgs.FilePatterns) {
-			argsAreSame = false
-		} else {
-			for i, f := range status.Args.CopyArgs.FilePatterns {
-				if f != cfg.CopyArgs.FilePatterns[i] {
-					argsAreSame = false
-					break
-				}
-			}
-		}
-	}
-
-	// Check if arguments have changed
-	if (cfg.Status || cfg.RemoteStatus) && !cfg.Force {
-		if !argsAreSame {
-			return errors.New("configuration has changed")
-		}
-		// For local status check, we're done
-		if cfg.Status && !cfg.RemoteStatus {
-			return nil
-		}
-	}
-
-	if cfg.Clean {
-
-		if err := cleanDestination(ctx, status, destPath); err != nil {
-			return errors.Errorf("cleaning destination: %w", err)
-		}
-
-		if err := processUntracked(ctx, status, destPath); err != nil {
-			return errors.Errorf("processing untracked files: %w", err)
-		}
-
-		// for all
-		logger.LogNewline()
-		return nil
-	}
-
-	commitHash, err := provider.GetCommitHash(ctx, cfg.ProviderArgs)
-	if err != nil {
-		return errors.Errorf("getting commit hash: %w", err)
-	}
-
-	if !cfg.Force && !cfg.Clean && status.CommitHash != "" {
-		if status.CommitHash == commitHash && argsAreSame {
-			return nil
-		}
-		if cfg.Status || cfg.RemoteStatus {
-			return errors.New("files are out of date")
-		}
-	}
-
-	// Reset processed files map for each repository
-	processedFiles = sync.Map{}
-
-	var mu sync.Mutex
-	if err := processDirectory(ctx, provider, cfg, commitHash, status, &mu, destPath); err != nil {
-		return errors.Errorf("processing directory: %w", err)
-	}
-
-	status.CommitHash = commitHash
-	status.Ref = cfg.ProviderArgs.Ref
-	status.Args = StatusFileArgs{
-		SrcRepo:     cfg.ProviderArgs.Repo,
-		SrcRef:      cfg.ProviderArgs.Ref,
-		SrcPath:     cfg.ProviderArgs.Path,
-		CopyArgs:    cfg.CopyArgs,
-		ArchiveArgs: cfg.ArchiveArgs,
-	}
-
-	dest := cfg.DestPath
-	if cfg.ArchiveArgs != nil {
-		dest = filepath.Join(dest, filepath.Base(cfg.ProviderArgs.Repo))
-	}
-
-	if err := writeStatusFile(ctx, status, dest); err != nil {
-		return errors.Errorf("writing status file: %w", err)
-	}
-
-	logger.LogNewline()
-
-	return nil
 }
 
 // processDirectory is defined in process.go

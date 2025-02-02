@@ -53,13 +53,6 @@ func parseGithubRepo(repo string) (org string, name string, err error) {
 	return parts[1], parts[2], nil
 }
 
-type ProviderFile struct {
-	Path     string `json:"path"`
-	Dir      bool   `json:"dir"`
-	File     bool   `json:"file"`
-	Children []ProviderFile
-}
-
 func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {

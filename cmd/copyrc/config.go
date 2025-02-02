@@ -146,7 +146,7 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 			Force:        force,
 		}
 
-		if err := run(ctx, config, provider); err != nil {
+		if err := process(ctx, config, provider); err != nil {
 			return errors.Errorf("running copy %s: %w", copy.Destination.Path, err)
 		}
 	}
@@ -167,7 +167,7 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 			Force:        force,
 		}
 
-		if err := run(ctx, config, provider); err != nil {
+		if err := process(ctx, config, provider); err != nil {
 			return errors.Errorf("running archive %s: %w", archive.Destination.Path, err)
 		}
 	}

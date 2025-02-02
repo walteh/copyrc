@@ -274,13 +274,13 @@ func Other() {}`))
 			RemoteStatus: true,
 			CopyArgs:     &CopyEntry_Options{},
 		}
-		err := run(ctx, cfg, mock)
+		err := process(ctx, cfg, mock)
 		require.NoError(t, err)
 
 		// Test with different commit hash
 		status.CommitHash = "different"
 		require.NoError(t, writeStatusFile(ctx, status, dir))
-		err = run(ctx, cfg, mock)
+		err = process(ctx, cfg, mock)
 		assert.Error(t, err)
 	})
 
@@ -319,12 +319,12 @@ func Other() {}`))
 				IgnoreFiles: []string{"*.tmp", "*.bak"},
 			},
 		}
-		err := run(ctx, cfg, mock)
+		err := process(ctx, cfg, mock)
 		require.NoError(t, err)
 
 		// Test with different arguments
 		cfg.CopyArgs.Replacements[0].New = "Different"
-		err = run(ctx, cfg, mock)
+		err = process(ctx, cfg, mock)
 		assert.Error(t, err, "should error when configuration changes")
 	})
 }
