@@ -59,7 +59,7 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 	if opts.Path == "" {
 		return false, errors.New("path is required")
 	}
-
+	opts.Path = filepath.Clean(opts.Path)
 	fileName := strings.TrimPrefix(opts.Path, opts.Destination.Path+"/")
 
 	if opts.IsUntracked {
@@ -128,13 +128,15 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 			diffs := dmp.DiffMain(string(existing), string(opts.Contents), false)
 			encodedCustomizations = dmp.DiffToDelta(diffs)
 			rcount = len(diffs)
-		} else {
+		} else if customizations != "" {
 			diffs, err := dmp.DiffFromDelta(string(existing), customizations)
 			if err != nil {
 				return false, errors.Errorf("diffing customizations: %w", err)
 			}
 			encodedCustomizations = dmp.DiffToDelta(diffs)
 			rcount = len(diffs)
+		} else {
+			rcount = -1
 		}
 	}
 

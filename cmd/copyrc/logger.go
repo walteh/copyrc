@@ -80,6 +80,9 @@ func (me FileType) ColorStringWithReplacements(replacements int) string {
 }
 
 func (me FileType) UncoloredStringWithReplacements(replacements int) string {
+	if replacements == -1 {
+		return fmt.Sprintf("%s [~?]", me.Name)
+	}
 	return fmt.Sprintf("%s [~%d]", me.Name, replacements)
 }
 
@@ -172,11 +175,12 @@ var (
 )
 
 type Logger struct {
-	zlog        zerolog.Logger
-	consoleOut  io.Writer
-	mu          sync.Mutex
-	currentRepo *RepoDisplay
-	repoMu      sync.Mutex
+	zlog            zerolog.Logger
+	consoleOut      io.Writer
+	mu              sync.Mutex
+	currentRepo     *RepoDisplay
+	repoMu          sync.Mutex
+	longestNeighbor int
 }
 
 type loggerContextKey struct{}
@@ -267,11 +271,15 @@ func (me FileInfo) Type() FileType {
 
 func (l *Logger) formatFileOperation(opts FileInfo) string {
 	// Build filename part
-	namePart := fmt.Sprintf("%-*s", nameWidth, opts.Name)
+	effectiveWidth := nameWidth
+	if l.longestNeighbor > 0 {
+		effectiveWidth = l.longestNeighbor + 2 // Add some padding
+	}
+	namePart := fmt.Sprintf("%-*s", effectiveWidth, opts.Name)
 
 	// Build type part with optional replacements
 	var typePart string
-	if opts.Replacements > 0 && (opts.Type().Name == FileTypeCopy.Name || opts.Type().Name == FileTypeCustomized.Name) {
+	if opts.Replacements != 0 && (opts.Type().Name == FileTypeCopy.Name || opts.Type().Name == FileTypeCustomized.Name) {
 		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredStringWithReplacements(opts.Replacements))
 	} else {
 		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredString())

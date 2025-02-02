@@ -371,6 +371,16 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *SingleCon
 		return strings.Compare(a.Path, b.Path)
 	})
 
+	longestNeighbor := 0
+	for _, file := range files {
+		if len(file.Path) > longestNeighbor {
+			longestNeighbor = len(file.Path)
+		}
+	}
+
+	logger := loggerFromContext(ctx)
+	logger.longestNeighbor = longestNeighbor
+
 	// Process each file
 	if cfg.Flags.Async {
 		var wg sync.WaitGroup
@@ -476,7 +486,7 @@ func processUntracked(ctx context.Context, status *StatusFile, dest Destination,
 
 		_, genStatus := status.GeneratedFiles[trimmedPath]
 		_, copyStatus := status.CoppiedFiles[trimmedPath]
-		return genStatus || copyStatus || entry.Info.IsDir() || entry.Path == ".copyrc.lock" || entry.Path == ".git" || entry.Path == ".DS_Store"
+		return genStatus || copyStatus || entry.Info.IsDir() || entry.Info.Name() == ".copyrc.lock" || entry.Info.Name() == ".git" || entry.Info.Name() == ".DS_Store"
 	})
 
 	slices.SortFunc(entries, func(a, b EntryItem) int {
@@ -617,12 +627,13 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 
 	if !cfg.Flags.Force && !cfg.Flags.Clean && status.CommitHash != "" {
 		if status.CommitHash == commitHash && argsAreSame {
+			logger.longestNeighbor = status.GetLongestNeighbor()
 			// loop through all files in status and print them out
-			for _, file := range status.CoppiedFiles {
+			for _, file := range status.OrderedCoppiedFiles() {
 				if _, err := writeFile(ctx, WriteFileOpts{
 					SourcePath:    filepath.Join(cfg.Source.Path, file.File),
 					Destination:   cfg.Destination,
-					Path:          filepath.Join(cfg.Destination.Path, file.File),
+					Path:          file.File,
 					Contents:      nil,
 					IsManaged:     false,
 					StatusFile:    status,
@@ -632,11 +643,14 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 					return errors.Errorf("writing embed.gen.go: %w", err)
 				}
 			}
-			for _, file := range status.GeneratedFiles {
+			for _, file := range status.OrderedGeneratedFiles() {
+				if filepath.Base(file.File) == ".copyrc.lock" {
+					continue
+				}
 				if _, err := writeFile(ctx, WriteFileOpts{
 					SourcePath:    filepath.Join(cfg.Source.Path, file.File),
 					Destination:   cfg.Destination,
-					Path:          filepath.Join(cfg.Destination.Path, file.File),
+					Path:          file.File,
 					Contents:      nil,
 					IsManaged:     true,
 					StatusFile:    status,

@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"time"
 
 	"gitlab.com/tozd/go/errors"
@@ -64,6 +66,38 @@ type StatusFile struct {
 	GeneratedFiles map[string]GeneratedFileEntry `json:"generated_files"`
 	Warnings       []string                      `json:"warnings,omitempty" hcl:"warnings,omitempty" yaml:"warnings,omitempty"`
 	Args           StatusFileArgs                `json:"args" hcl:"args" yaml:"args"`
+}
+
+func (me *StatusFile) OrderedCoppiedFiles() []StatusEntry {
+	files := make([]StatusEntry, 0, len(me.CoppiedFiles))
+	for _, file := range me.CoppiedFiles {
+		files = append(files, file)
+	}
+	slices.SortFunc(files, func(a, b StatusEntry) int {
+		return strings.Compare(a.File, b.File)
+	})
+	return files
+}
+
+func (me *StatusFile) OrderedGeneratedFiles() []GeneratedFileEntry {
+	files := make([]GeneratedFileEntry, 0, len(me.GeneratedFiles))
+	for _, file := range me.GeneratedFiles {
+		files = append(files, file)
+	}
+	slices.SortFunc(files, func(a, b GeneratedFileEntry) int {
+		return strings.Compare(a.File, b.File)
+	})
+	return files
+}
+
+func (me *StatusFile) GetLongestNeighbor() int {
+	longest := 0
+	for _, file := range me.CoppiedFiles {
+		if len(file.File) > longest {
+			longest = len(file.File)
+		}
+	}
+	return longest
 }
 
 // 📝 Load status file
