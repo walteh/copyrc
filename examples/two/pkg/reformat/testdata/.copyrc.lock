@@ -8,1355 +8,1355 @@
 	},
 	"branch": "main",
 	"coppied_files": {
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/arrayAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/arrayAdditionalProperties.go",
+		"core/additionalProperties/arrayAdditionalProperties.go": {
+			"file": "core/additionalProperties/arrayAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/arrayAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:34.766697Z",
+			"last_updated": "2025-02-02T19:52:00.620218Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "cdyjPwqPTTgjqkFGUU6c1nTVackBovx8MFdwghMis6Y="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/arrayAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/arrayAdditionalProperties.json",
+		"core/additionalProperties/arrayAdditionalProperties.json": {
+			"file": "core/additionalProperties/arrayAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/arrayAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:34.866046Z",
+			"last_updated": "2025-02-02T19:46:35.670192Z",
 			"remote_hash": "0WGUWmiC5st1bQX6odnOp2RWSmeok96CpUHS_ZTVLNE="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/boolAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/boolAdditionalProperties.go",
+		"core/additionalProperties/boolAdditionalProperties.go": {
+			"file": "core/additionalProperties/boolAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/boolAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:34.961574Z",
+			"last_updated": "2025-02-02T19:52:01.0383Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "a4YrP2JiXgamXSNMXSR4C2RooWpDMk6_Et7sThtpa1c="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/boolAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/boolAdditionalProperties.json",
+		"core/additionalProperties/boolAdditionalProperties.json": {
+			"file": "core/additionalProperties/boolAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/boolAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:35.067382Z",
+			"last_updated": "2025-02-02T19:46:35.956135Z",
 			"remote_hash": "2AqZlqWsSq97otAAvFZzdza5hVbve833ROFmbuWeLUg="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/intAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/intAdditionalProperties.go",
+		"core/additionalProperties/intAdditionalProperties.go": {
+			"file": "core/additionalProperties/intAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/intAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:35.179733Z",
+			"last_updated": "2025-02-02T19:52:01.243842Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "Km7nU9EY5xaEBvQEeKf3_MpyP2akU1j3ZL8RVTuRa7c="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/intAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/intAdditionalProperties.json",
+		"core/additionalProperties/intAdditionalProperties.json": {
+			"file": "core/additionalProperties/intAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/intAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:35.286148Z",
+			"last_updated": "2025-02-02T19:46:36.21726Z",
 			"remote_hash": "IABfj2RvA62k_XmuJcqWCIo_tLvIPxkvXyEbYzN08FA="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/numberAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/numberAdditionalProperties.go",
+		"core/additionalProperties/numberAdditionalProperties.go": {
+			"file": "core/additionalProperties/numberAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/numberAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:35.400086Z",
+			"last_updated": "2025-02-02T19:52:01.457915Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "9VTs8XKGvPXkeqCi6dzdQVl47lPZyA1W_H8MZ1S_Usg="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/numberAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/numberAdditionalProperties.json",
+		"core/additionalProperties/numberAdditionalProperties.json": {
+			"file": "core/additionalProperties/numberAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/numberAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:35.500547Z",
+			"last_updated": "2025-02-02T19:46:36.549554Z",
 			"remote_hash": "HqdsGWN1eOrgHhTzbtLQ8pmAxCD8PAEysx-GrEpGTjs="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/objectAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/objectAdditionalProperties.go",
+		"core/additionalProperties/objectAdditionalProperties.go": {
+			"file": "core/additionalProperties/objectAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/objectAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:35.602107Z",
+			"last_updated": "2025-02-02T19:52:01.683495Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "jXP2jq0scBQioWdS0rcvGAoG_hNe-TzYFGi44qn_6V4="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/objectAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/objectAdditionalProperties.json",
+		"core/additionalProperties/objectAdditionalProperties.json": {
+			"file": "core/additionalProperties/objectAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/objectAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:35.705135Z",
+			"last_updated": "2025-02-02T19:46:37.023684Z",
 			"remote_hash": "x8dZ98eOC1ti1tJ-qEs-ke0zaf1XrsWlXPz5OE6yHWY="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/objectWithPropsAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/objectWithPropsAdditionalProperties.go",
+		"core/additionalProperties/objectWithPropsAdditionalProperties.go": {
+			"file": "core/additionalProperties/objectWithPropsAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/objectWithPropsAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:35.82984Z",
+			"last_updated": "2025-02-02T19:52:01.908574Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "txALvrL9IWuPhvkUlIh_GbtP5NzU6ulfK8OpJ62uDB4="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/objectWithPropsAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/objectWithPropsAdditionalProperties.json",
+		"core/additionalProperties/objectWithPropsAdditionalProperties.json": {
+			"file": "core/additionalProperties/objectWithPropsAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/objectWithPropsAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:35.938494Z",
+			"last_updated": "2025-02-02T19:46:37.296645Z",
 			"remote_hash": "o1JxWqvVGREYHvSrX-5qWH2FlFy83i8KMaMIlh0i8eE="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/stringAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/stringAdditionalProperties.go",
+		"core/additionalProperties/stringAdditionalProperties.go": {
+			"file": "core/additionalProperties/stringAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/stringAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:36.106277Z",
+			"last_updated": "2025-02-02T19:52:02.13675Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "P14JsvsI7JHMRO2g_8H5DaPn2Gt2v523in0rZo_BFW0="
 		},
-		"examples/two/pkg/reformat/testdata/core/additionalProperties/stringAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/additionalProperties/stringAdditionalProperties.json",
+		"core/additionalProperties/stringAdditionalProperties.json": {
+			"file": "core/additionalProperties/stringAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/additionalProperties/stringAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:36.211772Z",
+			"last_updated": "2025-02-02T19:46:37.672815Z",
 			"remote_hash": "NA9BXBYpGAAsMir_xgkHxb_0GS9KAe7Cstk5gCzirTk="
 		},
-		"examples/two/pkg/reformat/testdata/core/array/array.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/array/array.go",
+		"core/array/array.go": {
+			"file": "core/array/array.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/array/array.go",
-			"last_updated": "2025-02-02T19:15:36.344869Z",
+			"last_updated": "2025-02-02T19:52:02.500487Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "L_0EDWGXcNSU7bbKw4m97BjglTXrDk3-AUHxiQstG0c="
 		},
-		"examples/two/pkg/reformat/testdata/core/array/array.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/array/array.json",
+		"core/array/array.json": {
+			"file": "core/array/array.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/array/array.json",
-			"last_updated": "2025-02-02T19:15:36.464398Z",
+			"last_updated": "2025-02-02T19:46:38.091684Z",
 			"remote_hash": "eqLCLHScJteJZ4KvqlDnnth2t-zWzaOVt01vvyxj2ek="
 		},
-		"examples/two/pkg/reformat/testdata/core/date/date.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/date/date.go",
+		"core/date/date.go": {
+			"file": "core/date/date.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/date/date.go",
-			"last_updated": "2025-02-02T19:15:36.576895Z",
+			"last_updated": "2025-02-02T19:52:02.719182Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "gvnZcbewXUkeg_b5UX-__VMm7F2XVQu77bZ77zp0tMc="
 		},
-		"examples/two/pkg/reformat/testdata/core/date/date.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/date/date.json",
+		"core/date/date.json": {
+			"file": "core/date/date.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/date/date.json",
-			"last_updated": "2025-02-02T19:15:36.681017Z",
+			"last_updated": "2025-02-02T19:46:38.388827Z",
 			"remote_hash": "gX3sRZMoOMRlH957JV_yxLrCVElP-3V-TWF8PVrhM1A="
 		},
-		"examples/two/pkg/reformat/testdata/core/dateTime/dateTime.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/dateTime/dateTime.go",
+		"core/dateTime/dateTime.go": {
+			"file": "core/dateTime/dateTime.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/dateTime/dateTime.go",
-			"last_updated": "2025-02-02T19:15:36.896152Z",
+			"last_updated": "2025-02-02T19:52:02.930635Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "-OOV8lgooPdvGMT2EIHOc30gkpx2zhuRV-04yGr41cU="
 		},
-		"examples/two/pkg/reformat/testdata/core/dateTime/dateTime.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/dateTime/dateTime.json",
+		"core/dateTime/dateTime.json": {
+			"file": "core/dateTime/dateTime.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/dateTime/dateTime.json",
-			"last_updated": "2025-02-02T19:15:37.011921Z",
+			"last_updated": "2025-02-02T19:46:38.71778Z",
 			"remote_hash": "o5ciZkjOuonsQBqMq88WxEn74My44uFUwMD89ol8SMA="
 		},
-		"examples/two/pkg/reformat/testdata/core/ip/ip.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/ip/ip.go",
+		"core/ip/ip.go": {
+			"file": "core/ip/ip.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/ip/ip.go",
-			"last_updated": "2025-02-02T19:15:37.132018Z",
+			"last_updated": "2025-02-02T19:52:03.151951Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "U-_jAZvowS7oVdGW0qTe1EhjK_J593YIWWkOK5_DuRQ="
 		},
-		"examples/two/pkg/reformat/testdata/core/ip/ip.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/ip/ip.json",
+		"core/ip/ip.json": {
+			"file": "core/ip/ip.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/ip/ip.json",
-			"last_updated": "2025-02-02T19:15:37.326149Z",
+			"last_updated": "2025-02-02T19:46:38.922433Z",
 			"remote_hash": "Evtw6uUE-p4f4HXsyvzidjcEFZS1dunw2a3GUBchZ1o="
 		},
-		"examples/two/pkg/reformat/testdata/core/nullableType/nullableType.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/nullableType/nullableType.go",
+		"core/nullableType/nullableType.go": {
+			"file": "core/nullableType/nullableType.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/nullableType/nullableType.go",
-			"last_updated": "2025-02-02T19:15:37.455132Z",
+			"last_updated": "2025-02-02T19:52:03.352112Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "Qta_8QG0ymHC4cZGRWuKm2INa6xdfx_-TBsVqaOXV7s="
 		},
-		"examples/two/pkg/reformat/testdata/core/nullableType/nullableType.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/nullableType/nullableType.json",
+		"core/nullableType/nullableType.json": {
+			"file": "core/nullableType/nullableType.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/nullableType/nullableType.json",
-			"last_updated": "2025-02-02T19:15:37.613372Z",
+			"last_updated": "2025-02-02T19:46:39.178078Z",
 			"remote_hash": "-KMg-Wuo2LTUO3BMggzcYsPRRhBED3CZfxf9FRaT06c="
 		},
-		"examples/two/pkg/reformat/testdata/core/object/object.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/object/object.go",
+		"core/object/object.go": {
+			"file": "core/object/object.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/object/object.go",
-			"last_updated": "2025-02-02T19:15:37.854074Z",
+			"last_updated": "2025-02-02T19:52:03.572422Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "IkupiE6rGsfBnPuleCbFPtuJ9rPhRCA7WklRs9zlzKE="
 		},
-		"examples/two/pkg/reformat/testdata/core/object/object.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/object/object.json",
+		"core/object/object.json": {
+			"file": "core/object/object.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/object/object.json",
-			"last_updated": "2025-02-02T19:15:37.972058Z",
+			"last_updated": "2025-02-02T19:46:39.408682Z",
 			"remote_hash": "SHtoZsyFsoNRoSrXN5LdcC4uGW7JD2cxlNENU-aBNIU="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectAdditionalProperties/objectAdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectAdditionalProperties/objectAdditionalProperties.go",
+		"core/objectAdditionalProperties/objectAdditionalProperties.go": {
+			"file": "core/objectAdditionalProperties/objectAdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectAdditionalProperties/objectAdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:38.083728Z",
+			"last_updated": "2025-02-02T19:52:03.775491Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "GZZdP-qkmDoLheDQtzk-l0H1In1GyVcKhJa-qx2B1ZA="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectAdditionalProperties/objectAdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectAdditionalProperties/objectAdditionalProperties.json",
+		"core/objectAdditionalProperties/objectAdditionalProperties.json": {
+			"file": "core/objectAdditionalProperties/objectAdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectAdditionalProperties/objectAdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:38.293147Z",
+			"last_updated": "2025-02-02T19:46:39.678589Z",
 			"remote_hash": "9veGp0qShr0K0hl3GN_GtFfFJAHdA4icgDPNmHC_poA="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectEmpty/objectEmpty.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectEmpty/objectEmpty.go",
+		"core/objectEmpty/objectEmpty.go": {
+			"file": "core/objectEmpty/objectEmpty.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectEmpty/objectEmpty.go",
-			"last_updated": "2025-02-02T19:15:38.390494Z",
+			"last_updated": "2025-02-02T19:52:04.12749Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "EQMrBgxCf5jCyrLaPjXRCjYg9WR0jdt_avlNDkrCWWM="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectEmpty/objectEmpty.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectEmpty/objectEmpty.json",
+		"core/objectEmpty/objectEmpty.json": {
+			"file": "core/objectEmpty/objectEmpty.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectEmpty/objectEmpty.json",
-			"last_updated": "2025-02-02T19:15:38.500427Z",
+			"last_updated": "2025-02-02T19:46:40.113382Z",
 			"remote_hash": "74SpqI6kuGisKtZ8x2e0Q3bmLVOmXn2WDZSY1rFV_Lc="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectNested/objectNested.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectNested/objectNested.go",
+		"core/objectNested/objectNested.go": {
+			"file": "core/objectNested/objectNested.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectNested/objectNested.go",
-			"last_updated": "2025-02-02T19:15:38.601878Z",
+			"last_updated": "2025-02-02T19:52:04.33996Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "kiJSQevlr_RmeAoAVEQM69a0jQnsEmgCjEMQmfZuzYo="
 		},
-		"examples/two/pkg/reformat/testdata/core/objectNested/objectNested.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/objectNested/objectNested.json",
+		"core/objectNested/objectNested.json": {
+			"file": "core/objectNested/objectNested.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/objectNested/objectNested.json",
-			"last_updated": "2025-02-02T19:15:38.702449Z",
+			"last_updated": "2025-02-02T19:46:40.544378Z",
 			"remote_hash": "3NKrG9OJvvnkilU1C4gBxd0C-RaNebgvFjeZnXL5oIw="
 		},
-		"examples/two/pkg/reformat/testdata/core/primitives/primitives.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/primitives/primitives.go",
+		"core/primitives/primitives.go": {
+			"file": "core/primitives/primitives.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/primitives/primitives.go",
-			"last_updated": "2025-02-02T19:15:38.804546Z",
+			"last_updated": "2025-02-02T19:52:04.547464Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "6Y9s7_2UCDMy3Jj-uh5EUca32xrcg1Kg6PCQGuM4gWw="
 		},
-		"examples/two/pkg/reformat/testdata/core/primitives/primitives.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/primitives/primitives.json",
+		"core/primitives/primitives.json": {
+			"file": "core/primitives/primitives.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/primitives/primitives.json",
-			"last_updated": "2025-02-02T19:15:38.985085Z",
+			"last_updated": "2025-02-02T19:46:40.752679Z",
 			"remote_hash": "IlkuVSbB6Sg7GkcGL0NaL58oq4BbZ9zfY8FIKFZ-NBw="
 		},
-		"examples/two/pkg/reformat/testdata/core/ref/ref.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/ref/ref.go",
+		"core/ref/ref.go": {
+			"file": "core/ref/ref.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/ref/ref.go",
-			"last_updated": "2025-02-02T19:15:39.129285Z",
+			"last_updated": "2025-02-02T19:52:04.761593Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "oe-kaJ6rMjgT-yse3sby0W3c8jzyDXJhNLVPAjZ7pYM="
 		},
-		"examples/two/pkg/reformat/testdata/core/ref/ref.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/ref/ref.json",
+		"core/ref/ref.json": {
+			"file": "core/ref/ref.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/ref/ref.json",
-			"last_updated": "2025-02-02T19:15:39.230948Z",
+			"last_updated": "2025-02-02T19:46:40.956626Z",
 			"remote_hash": "YTkM2rYxmvGEaVzbu2Mf99hsmVhnVjLeYYqdY1wHcdY="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFile/refExternalFile.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFile/refExternalFile.go",
+		"core/refExternalFile/refExternalFile.go": {
+			"file": "core/refExternalFile/refExternalFile.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFile/refExternalFile.go",
-			"last_updated": "2025-02-02T19:15:39.364965Z",
+			"last_updated": "2025-02-02T19:52:05.123554Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "ad9YpwhsmZjhAwmbyE7OiqwPrm8k2XJkz5Iv7zoXrV0="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFile/refExternalFile.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFile/refExternalFile.json",
+		"core/refExternalFile/refExternalFile.json": {
+			"file": "core/refExternalFile/refExternalFile.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFile/refExternalFile.json",
-			"last_updated": "2025-02-02T19:15:39.477084Z",
+			"last_updated": "2025-02-02T19:46:41.160184Z",
 			"remote_hash": "79UyeoHaLH-_zm2wHFAWqu4CPGmUSQFjTdtvq9Vo7-g="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileWithDupe/refExternalFileWithDupe.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileWithDupe/refExternalFileWithDupe.go",
+		"core/refExternalFileWithDupe/refExternalFileWithDupe.go": {
+			"file": "core/refExternalFileWithDupe/refExternalFileWithDupe.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileWithDupe/refExternalFileWithDupe.go",
-			"last_updated": "2025-02-02T19:15:39.597511Z",
+			"last_updated": "2025-02-02T19:52:05.397949Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "xIvxL4yl95yzHwR4WodFNr0-DQloGas3Ale3uYxRZSM="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileWithDupe/refExternalFileWithDupe.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileWithDupe/refExternalFileWithDupe.json",
+		"core/refExternalFileWithDupe/refExternalFileWithDupe.json": {
+			"file": "core/refExternalFileWithDupe/refExternalFileWithDupe.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileWithDupe/refExternalFileWithDupe.json",
-			"last_updated": "2025-02-02T19:15:39.702871Z",
+			"last_updated": "2025-02-02T19:46:41.374905Z",
 			"remote_hash": "aeEmfD88_9crpVXOEYvKLxXIE7E0Tn_cgLk9qfgma1g="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileWithScheme/refExternalFileWithScheme.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileWithScheme/refExternalFileWithScheme.go",
+		"core/refExternalFileWithScheme/refExternalFileWithScheme.go": {
+			"file": "core/refExternalFileWithScheme/refExternalFileWithScheme.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileWithScheme/refExternalFileWithScheme.go",
-			"last_updated": "2025-02-02T19:15:39.808877Z",
+			"last_updated": "2025-02-02T19:52:05.774687Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "PLbhthLweVqbnpWnGHkFC-y37z0rCUyeE27UknVFOPE="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileWithScheme/refExternalFileWithScheme.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileWithScheme/refExternalFileWithScheme.json",
+		"core/refExternalFileWithScheme/refExternalFileWithScheme.json": {
+			"file": "core/refExternalFileWithScheme/refExternalFileWithScheme.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileWithScheme/refExternalFileWithScheme.json",
-			"last_updated": "2025-02-02T19:15:39.928889Z",
+			"last_updated": "2025-02-02T19:46:41.584289Z",
 			"remote_hash": "k60OIqiUlD-vrbsg5go6IInBja5pea0urpjlRajawGc="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileYaml/refExternalFile.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileYaml/refExternalFile.go",
+		"core/refExternalFileYaml/refExternalFile.go": {
+			"file": "core/refExternalFileYaml/refExternalFile.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileYaml/refExternalFile.go",
-			"last_updated": "2025-02-02T19:15:40.2624Z",
+			"last_updated": "2025-02-02T19:52:06.005249Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "dEGlXRfiHGdPrYD_SIuGWUF2az4WXWi4gyfG2GoEoHs="
 		},
-		"examples/two/pkg/reformat/testdata/core/refExternalFileYaml/refExternalFile.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refExternalFileYaml/refExternalFile.json",
+		"core/refExternalFileYaml/refExternalFile.json": {
+			"file": "core/refExternalFileYaml/refExternalFile.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refExternalFileYaml/refExternalFile.json",
-			"last_updated": "2025-02-02T19:15:40.533312Z",
+			"last_updated": "2025-02-02T19:46:41.806495Z",
 			"remote_hash": "qxmowEHd0jaVxnl0jEpqGOyVtwyst0bdppB6asL0u0Q="
 		},
-		"examples/two/pkg/reformat/testdata/core/refOld/refOld.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refOld/refOld.go",
+		"core/refOld/refOld.go": {
+			"file": "core/refOld/refOld.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refOld/refOld.go",
-			"last_updated": "2025-02-02T19:15:40.729725Z",
+			"last_updated": "2025-02-02T19:52:06.23257Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "m3OiNTOhQ0UW4k1Twtv6PuvZZZAOmYUnQCDM2QWn_Xw="
 		},
-		"examples/two/pkg/reformat/testdata/core/refOld/refOld.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refOld/refOld.json",
+		"core/refOld/refOld.json": {
+			"file": "core/refOld/refOld.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refOld/refOld.json",
-			"last_updated": "2025-02-02T19:15:40.930069Z",
+			"last_updated": "2025-02-02T19:46:42.040576Z",
 			"remote_hash": "BqxeZYhMoq8jOi3yugzczJdhfGBEfahJRsRdLu5e5Xk="
 		},
-		"examples/two/pkg/reformat/testdata/core/refToEnum/refToEnum.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refToEnum/refToEnum.go",
+		"core/refToEnum/refToEnum.go": {
+			"file": "core/refToEnum/refToEnum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refToEnum/refToEnum.go",
-			"last_updated": "2025-02-02T19:15:41.047886Z",
+			"last_updated": "2025-02-02T19:52:06.559345Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "lwL6uAzs-ajegYbEpuOrqLOSjC0vWJ-UTfRkJsXdBNM="
 		},
-		"examples/two/pkg/reformat/testdata/core/refToEnum/refToEnum.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refToEnum/refToEnum.json",
+		"core/refToEnum/refToEnum.json": {
+			"file": "core/refToEnum/refToEnum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refToEnum/refToEnum.json",
-			"last_updated": "2025-02-02T19:15:41.247712Z",
+			"last_updated": "2025-02-02T19:46:42.244819Z",
 			"remote_hash": "LppFcRX3nQv7YiKG6SRKmvoM2RXCThs5rD5YTX5cDBM="
 		},
-		"examples/two/pkg/reformat/testdata/core/refToPrimitiveString/refToPrimitiveString.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/refToPrimitiveString/refToPrimitiveString.go",
+		"core/refToPrimitiveString/refToPrimitiveString.go": {
+			"file": "core/refToPrimitiveString/refToPrimitiveString.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refToPrimitiveString/refToPrimitiveString.go",
-			"last_updated": "2025-02-02T19:15:41.348958Z",
+			"last_updated": "2025-02-02T19:52:06.786832Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "vX55XtgzU2jFmni-rbZdCGUeF5pKINmHxBKxq0v3-GE="
 		},
-		"examples/two/pkg/reformat/testdata/core/refToPrimitiveString/refToPrimitiveString.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/refToPrimitiveString/refToPrimitiveString.json",
+		"core/refToPrimitiveString/refToPrimitiveString.json": {
+			"file": "core/refToPrimitiveString/refToPrimitiveString.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/refToPrimitiveString/refToPrimitiveString.json",
-			"last_updated": "2025-02-02T19:15:41.452655Z",
+			"last_updated": "2025-02-02T19:46:42.483036Z",
 			"remote_hash": "-8Sn18mrdljVIaySiT3XQUqwA8Qww2PeLwBzuM8V_kg="
 		},
-		"examples/two/pkg/reformat/testdata/core/time/time.go": {
-			"file": "examples/two/pkg/reformat/testdata/core/time/time.go",
+		"core/time/time.go": {
+			"file": "core/time/time.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/time/time.go",
-			"last_updated": "2025-02-02T19:15:41.575651Z",
+			"last_updated": "2025-02-02T19:52:07.006833Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "GFfzp7ColIpZ_NCYOnAquFqGGK4RuZpRmOGBE8jRZog="
 		},
-		"examples/two/pkg/reformat/testdata/core/time/time.json": {
-			"file": "examples/two/pkg/reformat/testdata/core/time/time.json",
+		"core/time/time.json": {
+			"file": "core/time/time.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/core/time/time.json",
-			"last_updated": "2025-02-02T19:15:41.689396Z",
+			"last_updated": "2025-02-02T19:46:42.705426Z",
 			"remote_hash": "G09p68v7mx3HUWdErY_M4JyWaExq9TAiBhQCTK1e7oM="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackage/other/other.go": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackage/other/other.go",
+		"crossPackage/other/other.go": {
+			"file": "crossPackage/other/other.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackage/other/other.go",
-			"last_updated": "2025-02-02T19:15:41.802363Z",
+			"last_updated": "2025-02-02T19:52:07.326146Z",
 			"remote_hash": "xakhJqpmWt10nnHBDEsFztQhH2it3s5_WaJ_4wWgU1M="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackage/other/other.json": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackage/other/other.json",
+		"crossPackage/other/other.json": {
+			"file": "crossPackage/other/other.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackage/other/other.json",
-			"last_updated": "2025-02-02T19:15:42.058686Z",
+			"last_updated": "2025-02-02T19:46:42.929291Z",
 			"remote_hash": "ywHYm0SniAVtx0Wt2Mfd4QVOAyoNfABkgSg5vRY8roA="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackage/schema/schema.go": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackage/schema/schema.go",
+		"crossPackage/schema/schema.go": {
+			"file": "crossPackage/schema/schema.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackage/schema/schema.go",
-			"last_updated": "2025-02-02T19:15:42.253535Z",
+			"last_updated": "2025-02-02T19:52:07.567086Z",
 			"remote_hash": "aArucDzssfsNHVTXqy-x0uC5wfazxhTsLzJDTYe8g6s="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackage/schema/schema.json": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackage/schema/schema.json",
+		"crossPackage/schema/schema.json": {
+			"file": "crossPackage/schema/schema.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackage/schema/schema.json",
-			"last_updated": "2025-02-02T19:15:42.352961Z",
+			"last_updated": "2025-02-02T19:46:43.172607Z",
 			"remote_hash": "Q_j9V7Vd1eQ4fPjlVAMrkEzYgd1AikQAms1-sFUMwVc="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackageNoOutput/other/other.go": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackageNoOutput/other/other.go",
+		"crossPackageNoOutput/other/other.go": {
+			"file": "crossPackageNoOutput/other/other.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackageNoOutput/other/other.go",
-			"last_updated": "2025-02-02T19:15:42.673215Z",
+			"last_updated": "2025-02-02T19:52:07.923536Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "IWnqQVoVKmrmNrazBITyF99LKj_QRRKfG4UEIq2Tlfg="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackageNoOutput/other/other.json": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackageNoOutput/other/other.json",
+		"crossPackageNoOutput/other/other.json": {
+			"file": "crossPackageNoOutput/other/other.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackageNoOutput/other/other.json",
-			"last_updated": "2025-02-02T19:15:42.924971Z",
+			"last_updated": "2025-02-02T19:46:43.37041Z",
 			"remote_hash": "ywHYm0SniAVtx0Wt2Mfd4QVOAyoNfABkgSg5vRY8roA="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackageNoOutput/schema/schema.go": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackageNoOutput/schema/schema.go",
+		"crossPackageNoOutput/schema/schema.go": {
+			"file": "crossPackageNoOutput/schema/schema.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackageNoOutput/schema/schema.go",
-			"last_updated": "2025-02-02T19:15:43.135374Z",
+			"last_updated": "2025-02-02T19:52:08.347132Z",
 			"remote_hash": "5Y_i3O_Krj-D5SYbAeBCbkinyC7u_XXGtZrR6Vdn2XI="
 		},
-		"examples/two/pkg/reformat/testdata/crossPackageNoOutput/schema/schema.json": {
-			"file": "examples/two/pkg/reformat/testdata/crossPackageNoOutput/schema/schema.json",
+		"crossPackageNoOutput/schema/schema.json": {
+			"file": "crossPackageNoOutput/schema/schema.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/crossPackageNoOutput/schema/schema.json",
-			"last_updated": "2025-02-02T19:15:43.283497Z",
+			"last_updated": "2025-02-02T19:46:43.732452Z",
 			"remote_hash": "Q_j9V7Vd1eQ4fPjlVAMrkEzYgd1AikQAms1-sFUMwVc="
 		},
-		"examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3/gopkgYAMLv3.go": {
-			"file": "examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3/gopkgYAMLv3.go",
+		"extraImports/gopkgYAMLv3/gopkgYAMLv3.go": {
+			"file": "extraImports/gopkgYAMLv3/gopkgYAMLv3.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/extraImports/gopkgYAMLv3/gopkgYAMLv3.go",
-			"last_updated": "2025-02-02T19:15:43.381905Z",
+			"last_updated": "2025-02-02T19:52:08.547855Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "LhtiovnfauUgMllgeedVH7KMSqxO8pmu-Ar7F8XBQx4="
 		},
-		"examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3/gopkgYAMLv3.json": {
-			"file": "examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3/gopkgYAMLv3.json",
+		"extraImports/gopkgYAMLv3/gopkgYAMLv3.json": {
+			"file": "extraImports/gopkgYAMLv3/gopkgYAMLv3.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/extraImports/gopkgYAMLv3/gopkgYAMLv3.json",
-			"last_updated": "2025-02-02T19:15:43.673049Z",
+			"last_updated": "2025-02-02T19:46:43.949293Z",
 			"remote_hash": "1lFU6mvy4znUtlU4lg_f0H8fgn4PosfwpsEP_NksC2U="
 		},
-		"examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.go": {
-			"file": "examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.go",
+		"extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.go": {
+			"file": "extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.go",
-			"last_updated": "2025-02-02T19:15:43.770423Z",
+			"last_updated": "2025-02-02T19:52:08.878473Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "AyyY4_2mGXoR3qxDIi3iE8Ofn6w-SjcpOqI2L0s6S7c="
 		},
-		"examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.json": {
-			"file": "examples/two/pkg/reformat/testdata/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.json",
+		"extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.json": {
+			"file": "extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/extraImports/gopkgYAMLv3AdditionalProperties/gopkgYAMLv3AdditionalProperties.json",
-			"last_updated": "2025-02-02T19:15:43.889302Z",
+			"last_updated": "2025-02-02T19:46:44.191264Z",
 			"remote_hash": "qYUDyFTotGWGVqi9zsjb7aaA0TQLUKEWX4HMLJJ0haw="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/arrays/exact.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/arrays/exact.go",
+		"minSizedInts/arrays/exact.go": {
+			"file": "minSizedInts/arrays/exact.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/arrays/exact.go",
-			"last_updated": "2025-02-02T19:15:44.102653Z",
+			"last_updated": "2025-02-02T19:52:09.114195Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "ljxF-3d9-mwzQjVlLkHaH3eX1qx4bqJ8KN4rlMT7Gbg="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/arrays/exact.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/arrays/exact.json",
+		"minSizedInts/arrays/exact.json": {
+			"file": "minSizedInts/arrays/exact.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/arrays/exact.json",
-			"last_updated": "2025-02-02T19:15:44.202932Z",
+			"last_updated": "2025-02-02T19:46:44.537907Z",
 			"remote_hash": "xzrEc5XvT1OszfNPNsaYc6IeBsuxzxQIRnhgQn8Eeio="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactReferences/exact.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactReferences/exact.go",
+		"minSizedInts/exactReferences/exact.go": {
+			"file": "minSizedInts/exactReferences/exact.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactReferences/exact.go",
-			"last_updated": "2025-02-02T19:15:44.297803Z",
+			"last_updated": "2025-02-02T19:52:09.332615Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "EwR_jw8FJt3qHiA77qzHjdA8YXgZqHyyetWXv79fRPQ="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactReferences/exact.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactReferences/exact.json",
+		"minSizedInts/exactReferences/exact.json": {
+			"file": "minSizedInts/exactReferences/exact.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactReferences/exact.json",
-			"last_updated": "2025-02-02T19:15:44.401391Z",
+			"last_updated": "2025-02-02T19:46:44.789763Z",
 			"remote_hash": "vv-Grn4oZFNxOaaHjRdQaMeS7WtXGAI09TU7qVRstX0="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizes/exact.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizes/exact.go",
+		"minSizedInts/exactSizes/exact.go": {
+			"file": "minSizedInts/exactSizes/exact.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizes/exact.go",
-			"last_updated": "2025-02-02T19:15:44.502992Z",
+			"last_updated": "2025-02-02T19:52:09.611211Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "Dk6GpwbGGJ3d3EZmBaKJKuACjdBR1rzDGFfYD04dZAM="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizes/exact.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizes/exact.json",
+		"minSizedInts/exactSizes/exact.json": {
+			"file": "minSizedInts/exactSizes/exact.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizes/exact.json",
-			"last_updated": "2025-02-02T19:15:44.602015Z",
+			"last_updated": "2025-02-02T19:46:44.998168Z",
 			"remote_hash": "7vE2z88eC2UbDfxndibUZ-DjF1eYQJNx5f0zZvB8KpM="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveBool/exact.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveBool/exact.go",
+		"minSizedInts/exactSizesExclusiveBool/exact.go": {
+			"file": "minSizedInts/exactSizesExclusiveBool/exact.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizesExclusiveBool/exact.go",
-			"last_updated": "2025-02-02T19:15:44.710094Z",
+			"last_updated": "2025-02-02T19:52:09.822056Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "T0Q3ttgTWXhAvsuT1Q5HtRhs2D-BmFuGWv5cUkllo1M="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveBool/exact.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveBool/exact.json",
+		"minSizedInts/exactSizesExclusiveBool/exact.json": {
+			"file": "minSizedInts/exactSizesExclusiveBool/exact.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizesExclusiveBool/exact.json",
-			"last_updated": "2025-02-02T19:15:44.821699Z",
+			"last_updated": "2025-02-02T19:46:45.226129Z",
 			"remote_hash": "jfzG5Sh9Y2g9vpR5X2Nx-BiQZ6wRcZF9YEIRsk4UkYc="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveNum/exact.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveNum/exact.go",
+		"minSizedInts/exactSizesExclusiveNum/exact.go": {
+			"file": "minSizedInts/exactSizesExclusiveNum/exact.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizesExclusiveNum/exact.go",
-			"last_updated": "2025-02-02T19:15:45.03101Z",
+			"last_updated": "2025-02-02T19:52:10.04608Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "soDegTB_xY9NFP3baMgXyQnavYxRUdpz-tB2nqK7YdU="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveNum/exact.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/exactSizesExclusiveNum/exact.json",
+		"minSizedInts/exactSizesExclusiveNum/exact.json": {
+			"file": "minSizedInts/exactSizesExclusiveNum/exact.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/exactSizesExclusiveNum/exact.json",
-			"last_updated": "2025-02-02T19:15:45.213147Z",
+			"last_updated": "2025-02-02T19:46:45.437002Z",
 			"remote_hash": "MGLx3Wik-vI5puNumELeMwEqmS5SFRPGY1mB6uC0uGM="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/largerSizes/larger.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/largerSizes/larger.go",
+		"minSizedInts/largerSizes/larger.go": {
+			"file": "minSizedInts/largerSizes/larger.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/largerSizes/larger.go",
-			"last_updated": "2025-02-02T19:15:45.314494Z",
+			"last_updated": "2025-02-02T19:52:10.249144Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "fBnPyLkJePQfYX02bWj-xA7kz6_Vv10m3aFgyvu5nWA="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/largerSizes/larger.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/largerSizes/larger.json",
+		"minSizedInts/largerSizes/larger.json": {
+			"file": "minSizedInts/largerSizes/larger.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/largerSizes/larger.json",
-			"last_updated": "2025-02-02T19:15:45.415182Z",
+			"last_updated": "2025-02-02T19:46:45.645628Z",
 			"remote_hash": "IwSPAc4pjWz42wtAIgWqOYbCW2qns2-QiRH9kYzgPac="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizes/restricted.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizes/restricted.go",
+		"minSizedInts/restrictedSizes/restricted.go": {
+			"file": "minSizedInts/restrictedSizes/restricted.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/restrictedSizes/restricted.go",
-			"last_updated": "2025-02-02T19:15:45.542787Z",
+			"last_updated": "2025-02-02T19:52:10.485954Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "yMCftgTdrzWBBWDXLF3_IEX8MMQoAsb2Xw7q3kHWYRg="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizes/restricted.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizes/restricted.json",
+		"minSizedInts/restrictedSizes/restricted.json": {
+			"file": "minSizedInts/restrictedSizes/restricted.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/restrictedSizes/restricted.json",
-			"last_updated": "2025-02-02T19:15:45.684814Z",
+			"last_updated": "2025-02-02T19:46:45.846837Z",
 			"remote_hash": "HD4tFoK3gO8IkAyx9lnfQrjwkDuTQPTbjiEZ1KuexkA="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizesReferences/restricted.go": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizesReferences/restricted.go",
+		"minSizedInts/restrictedSizesReferences/restricted.go": {
+			"file": "minSizedInts/restrictedSizesReferences/restricted.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/restrictedSizesReferences/restricted.go",
-			"last_updated": "2025-02-02T19:15:45.78471Z",
+			"last_updated": "2025-02-02T19:52:10.697223Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "4Ys_rjCw1jwZeKRM47zB2MEw6GKRtkjPkn1WGtJ8D5Y="
 		},
-		"examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizesReferences/restricted.json": {
-			"file": "examples/two/pkg/reformat/testdata/minSizedInts/restrictedSizesReferences/restricted.json",
+		"minSizedInts/restrictedSizesReferences/restricted.json": {
+			"file": "minSizedInts/restrictedSizesReferences/restricted.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/minSizedInts/restrictedSizesReferences/restricted.json",
-			"last_updated": "2025-02-02T19:15:45.887756Z",
+			"last_updated": "2025-02-02T19:46:46.069846Z",
 			"remote_hash": "4eaAb4vg0iWZqc5kGNV_44F2u5aDq85jtUj_1P-eNK4="
 		},
-		"examples/two/pkg/reformat/testdata/misc/booleanAsSchema/booleanAsSchema.go": {
-			"file": "examples/two/pkg/reformat/testdata/misc/booleanAsSchema/booleanAsSchema.go",
+		"misc/booleanAsSchema/booleanAsSchema.go": {
+			"file": "misc/booleanAsSchema/booleanAsSchema.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/booleanAsSchema/booleanAsSchema.go",
-			"last_updated": "2025-02-02T19:15:46.001213Z",
+			"last_updated": "2025-02-02T19:52:10.92393Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "mHEFxqxRpYnVLjsJC7J01Gtq-Ygaqm4hScqGVPYkB1g="
 		},
-		"examples/two/pkg/reformat/testdata/misc/booleanAsSchema/booleanAsSchema.json": {
-			"file": "examples/two/pkg/reformat/testdata/misc/booleanAsSchema/booleanAsSchema.json",
+		"misc/booleanAsSchema/booleanAsSchema.json": {
+			"file": "misc/booleanAsSchema/booleanAsSchema.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/booleanAsSchema/booleanAsSchema.json",
-			"last_updated": "2025-02-02T19:15:46.126357Z",
+			"last_updated": "2025-02-02T19:46:46.285128Z",
 			"remote_hash": "4VVKGJGt5rbPUfwBLBgBzISbw-3xW3NbrmeOAofdJyc="
 		},
-		"examples/two/pkg/reformat/testdata/misc/capitalization/capitalization.go": {
-			"file": "examples/two/pkg/reformat/testdata/misc/capitalization/capitalization.go",
+		"misc/capitalization/capitalization.go": {
+			"file": "misc/capitalization/capitalization.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/capitalization/capitalization.go",
-			"last_updated": "2025-02-02T19:15:46.359348Z",
+			"last_updated": "2025-02-02T19:52:11.154615Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "Cw5_2hlznjQ6iJORULf6V8nPLCbGFJk50b7E_sgi9LY="
 		},
-		"examples/two/pkg/reformat/testdata/misc/capitalization/capitalization.json": {
-			"file": "examples/two/pkg/reformat/testdata/misc/capitalization/capitalization.json",
+		"misc/capitalization/capitalization.json": {
+			"file": "misc/capitalization/capitalization.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/capitalization/capitalization.json",
-			"last_updated": "2025-02-02T19:15:46.508187Z",
+			"last_updated": "2025-02-02T19:46:46.494591Z",
 			"remote_hash": "P7N5bGYr4rlAvrpXj2VxhI_y6PcZOUEydRa71vp_Hbo="
 		},
-		"examples/two/pkg/reformat/testdata/misc/onlyModels/onlyModels.go": {
-			"file": "examples/two/pkg/reformat/testdata/misc/onlyModels/onlyModels.go",
+		"misc/onlyModels/onlyModels.go": {
+			"file": "misc/onlyModels/onlyModels.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/onlyModels/onlyModels.go",
-			"last_updated": "2025-02-02T19:15:46.618391Z",
+			"last_updated": "2025-02-02T19:52:11.37898Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "_N6RUCcqJQVwS1wvFtk-qZ_R4za73fh8KYl8jJgausw="
 		},
-		"examples/two/pkg/reformat/testdata/misc/onlyModels/onlyModels.json": {
-			"file": "examples/two/pkg/reformat/testdata/misc/onlyModels/onlyModels.json",
+		"misc/onlyModels/onlyModels.json": {
+			"file": "misc/onlyModels/onlyModels.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/onlyModels/onlyModels.json",
-			"last_updated": "2025-02-02T19:15:46.71851Z",
+			"last_updated": "2025-02-02T19:46:46.691171Z",
 			"remote_hash": "1lFU6mvy4znUtlU4lg_f0H8fgn4PosfwpsEP_NksC2U="
 		},
-		"examples/two/pkg/reformat/testdata/misc/specialCharacters/specialCharacters.go": {
-			"file": "examples/two/pkg/reformat/testdata/misc/specialCharacters/specialCharacters.go",
+		"misc/specialCharacters/specialCharacters.go": {
+			"file": "misc/specialCharacters/specialCharacters.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/specialCharacters/specialCharacters.go",
-			"last_updated": "2025-02-02T19:15:46.819247Z",
+			"last_updated": "2025-02-02T19:52:11.591453Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "5cdHbRHIVy3XfXoLn83o5RMp9KqdRxRwr1UKo_zU2PU="
 		},
-		"examples/two/pkg/reformat/testdata/misc/specialCharacters/specialCharacters.json": {
-			"file": "examples/two/pkg/reformat/testdata/misc/specialCharacters/specialCharacters.json",
+		"misc/specialCharacters/specialCharacters.json": {
+			"file": "misc/specialCharacters/specialCharacters.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/specialCharacters/specialCharacters.json",
-			"last_updated": "2025-02-02T19:15:46.926867Z",
+			"last_updated": "2025-02-02T19:46:46.896092Z",
 			"remote_hash": "thPOM53uv-0sbxFYxO6S7s-gtsN7ezpV7uyXQlnBNEA="
 		},
-		"examples/two/pkg/reformat/testdata/misc/tags/tags.go": {
-			"file": "examples/two/pkg/reformat/testdata/misc/tags/tags.go",
+		"misc/tags/tags.go": {
+			"file": "misc/tags/tags.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/tags/tags.go",
-			"last_updated": "2025-02-02T19:15:47.021793Z",
+			"last_updated": "2025-02-02T19:52:11.821996Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "OumPDQU5qKbIHu7lJcsQozrHQAyv0UHrzljIbRCmcXk="
 		},
-		"examples/two/pkg/reformat/testdata/misc/tags/tags.json": {
-			"file": "examples/two/pkg/reformat/testdata/misc/tags/tags.json",
+		"misc/tags/tags.json": {
+			"file": "misc/tags/tags.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/misc/tags/tags.json",
-			"last_updated": "2025-02-02T19:15:47.156551Z",
+			"last_updated": "2025-02-02T19:46:47.178759Z",
 			"remote_hash": "qNL9GZLWxytKbfIVlHAH2KpZVW1wLMFn-xrVWV0SMJs="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/case/case.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/case/case.go",
+		"miscWithDefaults/case/case.go": {
+			"file": "miscWithDefaults/case/case.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/case/case.go",
-			"last_updated": "2025-02-02T19:15:47.385307Z",
+			"last_updated": "2025-02-02T19:52:12.071093Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "K41MO1gqZ3yg5GgEvtUY_9pNsnkWLLdtnPvJ3uSgLfk="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/case/case.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/case/case.json",
+		"miscWithDefaults/case/case.json": {
+			"file": "miscWithDefaults/case/case.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/case/case.json",
-			"last_updated": "2025-02-02T19:15:47.489542Z",
+			"last_updated": "2025-02-02T19:46:47.395752Z",
 			"remote_hash": "OowAp2RkbiyT1gpADWtYokZaFq2Hb1joQEDfYFYnwdE="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/caseDupes/caseDupes.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/caseDupes/caseDupes.go",
+		"miscWithDefaults/caseDupes/caseDupes.go": {
+			"file": "miscWithDefaults/caseDupes/caseDupes.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/caseDupes/caseDupes.go",
-			"last_updated": "2025-02-02T19:15:47.5917Z",
+			"last_updated": "2025-02-02T19:52:12.295816Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "qT62Ds4Qz9REIepeo1QDQSR5LDKvCW8BemdM8ZIHh0w="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/caseDupes/caseDupes.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/caseDupes/caseDupes.json",
+		"miscWithDefaults/caseDupes/caseDupes.json": {
+			"file": "miscWithDefaults/caseDupes/caseDupes.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/caseDupes/caseDupes.json",
-			"last_updated": "2025-02-02T19:15:47.691606Z",
+			"last_updated": "2025-02-02T19:46:47.623046Z",
 			"remote_hash": "_nQyjuxzO7AOqQLVv8GjDZLsvTYA0pzoe361LWtOiOA="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/cyclic/cyclic.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/cyclic/cyclic.go",
+		"miscWithDefaults/cyclic/cyclic.go": {
+			"file": "miscWithDefaults/cyclic/cyclic.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/cyclic/cyclic.go",
-			"last_updated": "2025-02-02T19:15:47.809398Z",
+			"last_updated": "2025-02-02T19:52:12.722416Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "SGDJHO9RBxNT2YQOoXmsspEwrW9Uttfqt-v5lPXy80k="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/cyclic/cyclic.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/cyclic/cyclic.json",
+		"miscWithDefaults/cyclic/cyclic.json": {
+			"file": "miscWithDefaults/cyclic/cyclic.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/cyclic/cyclic.json",
-			"last_updated": "2025-02-02T19:15:47.91392Z",
+			"last_updated": "2025-02-02T19:46:48.016998Z",
 			"remote_hash": "ZBAvrN-46geZh2hQDGjIRVAOZFwTuY58p3GJhBP6Ko0="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.go",
+		"miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.go": {
+			"file": "miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.go",
-			"last_updated": "2025-02-02T19:15:48.118767Z",
+			"last_updated": "2025-02-02T19:52:13.07537Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "xDc43UQviLAasbhKwO4mn-4wVg3UahCL_Yg1N60PCnM="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.json",
+		"miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.json": {
+			"file": "miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/cyclicAndRequired1/cyclicAndRequired1.json",
-			"last_updated": "2025-02-02T19:15:48.226863Z",
+			"last_updated": "2025-02-02T19:46:48.425365Z",
 			"remote_hash": "7z1eKiYZ4W65d7i_FKODVAS43tNjRdf57D6Xu1_Bqlc="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.go",
+		"miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.go": {
+			"file": "miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.go",
-			"last_updated": "2025-02-02T19:15:48.510044Z",
+			"last_updated": "2025-02-02T19:52:13.307829Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "TxnklBfOvcHQABaX6l0g13dUSxNboF82NxmnbWRHVl8="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.json",
+		"miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.json": {
+			"file": "miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/rootEmptyJustDefinitions/rootEmptyJustDefinitions.json",
-			"last_updated": "2025-02-02T19:15:48.611533Z",
+			"last_updated": "2025-02-02T19:46:48.621241Z",
 			"remote_hash": "GN6hgeOKFidI_YtEGjpalWLFq2Oidgae2MC628tMTAw="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.go": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.go",
+		"miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.go": {
+			"file": "miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.go",
-			"last_updated": "2025-02-02T19:15:48.734544Z",
+			"last_updated": "2025-02-02T19:52:13.508723Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "sHOjd8_rk76uIF_X3qyiGHoKE-wYYYo7JgAyFoWzx-0="
 		},
-		"examples/two/pkg/reformat/testdata/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.json": {
-			"file": "examples/two/pkg/reformat/testdata/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.json",
+		"miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.json": {
+			"file": "miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/miscWithDefaults/rootIsArrayOfString/rootIsArrayOfString.json",
-			"last_updated": "2025-02-02T19:15:48.835105Z",
+			"last_updated": "2025-02-02T19:46:48.858296Z",
 			"remote_hash": "wyHIDq2lO7M0P5rYVBYyb6C9HoWRL1QjVMmAauuYjzg="
 		},
-		"examples/two/pkg/reformat/testdata/nameFromTitle/ref/ref.go": {
-			"file": "examples/two/pkg/reformat/testdata/nameFromTitle/ref/ref.go",
+		"nameFromTitle/ref/ref.go": {
+			"file": "nameFromTitle/ref/ref.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/nameFromTitle/ref/ref.go",
-			"last_updated": "2025-02-02T19:15:48.940451Z",
+			"last_updated": "2025-02-02T19:52:13.713567Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "XQdfYccO-6eVJpmQM4G4wOdAZsr8n_HqeRdRQA5_f9A="
 		},
-		"examples/two/pkg/reformat/testdata/nameFromTitle/ref/ref.json": {
-			"file": "examples/two/pkg/reformat/testdata/nameFromTitle/ref/ref.json",
+		"nameFromTitle/ref/ref.json": {
+			"file": "nameFromTitle/ref/ref.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/nameFromTitle/ref/ref.json",
-			"last_updated": "2025-02-02T19:15:49.056596Z",
+			"last_updated": "2025-02-02T19:46:49.278278Z",
 			"remote_hash": "yDkVe055-J0Tobgg5DSlAoUWy1HCIHr1jYH4K8jqank="
 		},
-		"examples/two/pkg/reformat/testdata/nameFromTitle/refExternalFile/refExternalFile.go": {
-			"file": "examples/two/pkg/reformat/testdata/nameFromTitle/refExternalFile/refExternalFile.go",
+		"nameFromTitle/refExternalFile/refExternalFile.go": {
+			"file": "nameFromTitle/refExternalFile/refExternalFile.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/nameFromTitle/refExternalFile/refExternalFile.go",
-			"last_updated": "2025-02-02T19:15:49.175085Z",
+			"last_updated": "2025-02-02T19:52:13.923344Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "_Tqysd39Ya4Yc1-pCPLia7a3u7mrDnt-PyeqR5OAm18="
 		},
-		"examples/two/pkg/reformat/testdata/nameFromTitle/refExternalFile/refExternalFile.json": {
-			"file": "examples/two/pkg/reformat/testdata/nameFromTitle/refExternalFile/refExternalFile.json",
+		"nameFromTitle/refExternalFile/refExternalFile.json": {
+			"file": "nameFromTitle/refExternalFile/refExternalFile.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/nameFromTitle/refExternalFile/refExternalFile.json",
-			"last_updated": "2025-02-02T19:15:49.287724Z",
+			"last_updated": "2025-02-02T19:46:49.562915Z",
 			"remote_hash": "zyflpMf9l3OdXx0q7WXQ8FQdY6BJvNlzP1NYLr5wN_8="
 		},
-		"examples/two/pkg/reformat/testdata/regressions/issue32/issue32.go": {
-			"file": "examples/two/pkg/reformat/testdata/regressions/issue32/issue32.go",
+		"regressions/issue32/issue32.go": {
+			"file": "regressions/issue32/issue32.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/regressions/issue32/issue32.go",
-			"last_updated": "2025-02-02T19:15:49.39443Z",
+			"last_updated": "2025-02-02T19:52:14.155034Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "XCNc7SGtXZKdHVJ5qlS3pE87QuJL9m2IVfa5GFjd7hc="
 		},
-		"examples/two/pkg/reformat/testdata/regressions/issue32/issue32.json": {
-			"file": "examples/two/pkg/reformat/testdata/regressions/issue32/issue32.json",
+		"regressions/issue32/issue32.json": {
+			"file": "regressions/issue32/issue32.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/regressions/issue32/issue32.json",
-			"last_updated": "2025-02-02T19:15:49.504303Z",
+			"last_updated": "2025-02-02T19:46:50.112889Z",
 			"remote_hash": "wqkzTK_bz-XlCb51Wf5A78_R_zepnxIGavk5YRX3Xn4="
 		},
-		"examples/two/pkg/reformat/testdata/regressions/issue51/issue51.go": {
-			"file": "examples/two/pkg/reformat/testdata/regressions/issue51/issue51.go",
+		"regressions/issue51/issue51.go": {
+			"file": "regressions/issue51/issue51.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/regressions/issue51/issue51.go",
-			"last_updated": "2025-02-02T19:15:49.604854Z",
+			"last_updated": "2025-02-02T19:52:14.403554Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "vaGt-vGlBbfiQPZ7LNGx3src19z_EroecmFrCL8OjbE="
 		},
-		"examples/two/pkg/reformat/testdata/regressions/issue51/issue51.json": {
-			"file": "examples/two/pkg/reformat/testdata/regressions/issue51/issue51.json",
+		"regressions/issue51/issue51.json": {
+			"file": "regressions/issue51/issue51.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/regressions/issue51/issue51.json",
-			"last_updated": "2025-02-02T19:15:49.70381Z",
+			"last_updated": "2025-02-02T19:46:50.401128Z",
 			"remote_hash": "r15o3PpPG2CVejDkjUgylSaLK_VeVdlmQx5jOWs9JoQ="
 		},
-		"examples/two/pkg/reformat/testdata/schemaExtensions/nillable/nillability.go": {
-			"file": "examples/two/pkg/reformat/testdata/schemaExtensions/nillable/nillability.go",
+		"schemaExtensions/nillable/nillability.go": {
+			"file": "schemaExtensions/nillable/nillability.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/schemaExtensions/nillable/nillability.go",
-			"last_updated": "2025-02-02T19:15:49.808361Z",
+			"last_updated": "2025-02-02T19:52:14.612188Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "ZTSLhsSiKNvSeHZU2G2lmGXt9Q8NAX1Htq-HSdMoiQc="
 		},
-		"examples/two/pkg/reformat/testdata/schemaExtensions/nillable/nillability.json": {
-			"file": "examples/two/pkg/reformat/testdata/schemaExtensions/nillable/nillability.json",
+		"schemaExtensions/nillable/nillability.json": {
+			"file": "schemaExtensions/nillable/nillability.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/schemaExtensions/nillable/nillability.json",
-			"last_updated": "2025-02-02T19:15:49.938068Z",
+			"last_updated": "2025-02-02T19:46:50.650174Z",
 			"remote_hash": "CHrLLmtnBq1y2q4lLNHaluvnBBEgXF59NJ6wvVK0T9o="
 		},
-		"examples/two/pkg/reformat/testdata/schemaExtensions/nonNillable/nillability.go": {
-			"file": "examples/two/pkg/reformat/testdata/schemaExtensions/nonNillable/nillability.go",
+		"schemaExtensions/nonNillable/nillability.go": {
+			"file": "schemaExtensions/nonNillable/nillability.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/schemaExtensions/nonNillable/nillability.go",
-			"last_updated": "2025-02-02T19:15:50.249329Z",
+			"last_updated": "2025-02-02T19:52:14.822391Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "pczPY2IfAXqG923qG5v5ik0u0rzduUROgnExGRfKHvo="
 		},
-		"examples/two/pkg/reformat/testdata/schemaExtensions/nonNillable/nillability.json": {
-			"file": "examples/two/pkg/reformat/testdata/schemaExtensions/nonNillable/nillability.json",
+		"schemaExtensions/nonNillable/nillability.json": {
+			"file": "schemaExtensions/nonNillable/nillability.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/schemaExtensions/nonNillable/nillability.json",
-			"last_updated": "2025-02-02T19:15:50.353973Z",
+			"last_updated": "2025-02-02T19:46:50.866913Z",
 			"remote_hash": "OMwJzo8apmOpAuJdDc9si79TqV3myI6wsP75jx-u_ds="
 		},
-		"examples/two/pkg/reformat/testdata/validation/description/description.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/description/description.go",
+		"validation/description/description.go": {
+			"file": "validation/description/description.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/description/description.go",
-			"last_updated": "2025-02-02T19:15:50.598156Z",
+			"last_updated": "2025-02-02T19:52:15.055291Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "QqYAywMPzffv8EUwp06D1VkqvCXhqs1tYC8t8-9mstQ="
 		},
-		"examples/two/pkg/reformat/testdata/validation/description/description.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/description/description.json",
+		"validation/description/description.json": {
+			"file": "validation/description/description.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/description/description.json",
-			"last_updated": "2025-02-02T19:15:50.734371Z",
+			"last_updated": "2025-02-02T19:46:51.181698Z",
 			"remote_hash": "RvqExR30y1E3DHFPSSYlw4jLEe9RFsuYU5eDD5dU8Ec="
 		},
-		"examples/two/pkg/reformat/testdata/validation/enum/enum.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/enum/enum.go",
+		"validation/enum/enum.go": {
+			"file": "validation/enum/enum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/enum/enum.go",
-			"last_updated": "2025-02-02T19:15:50.954103Z",
+			"last_updated": "2025-02-02T19:52:15.254009Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "fUX5Brl3YTByRWhBzmIZfHOtjQNro-EaEZV7Ru-v4J4="
 		},
-		"examples/two/pkg/reformat/testdata/validation/enum/enum.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/enum/enum.json",
+		"validation/enum/enum.json": {
+			"file": "validation/enum/enum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/enum/enum.json",
-			"last_updated": "2025-02-02T19:15:51.061219Z",
+			"last_updated": "2025-02-02T19:46:51.626857Z",
 			"remote_hash": "Ppg4bslS9gQPh4stgFU32r_nP4eRQkBf3oC17F1goH8="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximum.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximum.go",
+		"validation/exclusiveMaximum/exclusiveMaximum.go": {
+			"file": "validation/exclusiveMaximum/exclusiveMaximum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMaximum/exclusiveMaximum.go",
-			"last_updated": "2025-02-02T19:15:51.425346Z",
+			"last_updated": "2025-02-02T19:52:15.471333Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "x3wsMFuN285IDo3_sTn0v7LPgn-xk7Gywzmf7Nx5Ft8="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximum.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximum.json",
+		"validation/exclusiveMaximum/exclusiveMaximum.json": {
+			"file": "validation/exclusiveMaximum/exclusiveMaximum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMaximum/exclusiveMaximum.json",
-			"last_updated": "2025-02-02T19:15:51.521875Z",
+			"last_updated": "2025-02-02T19:46:51.882683Z",
 			"remote_hash": "u2d1vKCwqSdEDcQ5poVK8slayDZApJhtah7Hr2ZQWwE="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximumOld.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximumOld.go",
+		"validation/exclusiveMaximum/exclusiveMaximumOld.go": {
+			"file": "validation/exclusiveMaximum/exclusiveMaximumOld.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMaximum/exclusiveMaximumOld.go",
-			"last_updated": "2025-02-02T19:15:51.634097Z",
+			"last_updated": "2025-02-02T19:52:15.79443Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "n-LztX2HUPuNAFgm64VD43KBteKSzy5wNBzCaORbeIg="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximumOld.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMaximum/exclusiveMaximumOld.json",
+		"validation/exclusiveMaximum/exclusiveMaximumOld.json": {
+			"file": "validation/exclusiveMaximum/exclusiveMaximumOld.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMaximum/exclusiveMaximumOld.json",
-			"last_updated": "2025-02-02T19:15:51.739623Z",
+			"last_updated": "2025-02-02T19:46:52.079975Z",
 			"remote_hash": "QGsr7YHWSS4UYjQxs62ZkPN5ShsrLxYugqCSyLPoGlE="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimum.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimum.go",
+		"validation/exclusiveMinimum/exclusiveMinimum.go": {
+			"file": "validation/exclusiveMinimum/exclusiveMinimum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMinimum/exclusiveMinimum.go",
-			"last_updated": "2025-02-02T19:15:51.856167Z",
+			"last_updated": "2025-02-02T19:52:16.020123Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "ddeSEBP3cfWkxKlR00WnDS1Wg35il_zuVfUs4bnzncU="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimum.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimum.json",
+		"validation/exclusiveMinimum/exclusiveMinimum.json": {
+			"file": "validation/exclusiveMinimum/exclusiveMinimum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMinimum/exclusiveMinimum.json",
-			"last_updated": "2025-02-02T19:15:51.955897Z",
+			"last_updated": "2025-02-02T19:46:52.523576Z",
 			"remote_hash": "AuTywP8U12uKUGhAtCrC5QDd2b_rDn0AcEdgxXh8BKo="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimumOld.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimumOld.go",
+		"validation/exclusiveMinimum/exclusiveMinimumOld.go": {
+			"file": "validation/exclusiveMinimum/exclusiveMinimumOld.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMinimum/exclusiveMinimumOld.go",
-			"last_updated": "2025-02-02T19:15:52.063012Z",
+			"last_updated": "2025-02-02T19:52:16.356188Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "_K_4ixoWyvO2KR5AUVQivHEUS-mm1xNVmPHlsPUOVQk="
 		},
-		"examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimumOld.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/exclusiveMinimum/exclusiveMinimumOld.json",
+		"validation/exclusiveMinimum/exclusiveMinimumOld.json": {
+			"file": "validation/exclusiveMinimum/exclusiveMinimumOld.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/exclusiveMinimum/exclusiveMinimumOld.json",
-			"last_updated": "2025-02-02T19:15:52.165655Z",
+			"last_updated": "2025-02-02T19:46:52.848338Z",
 			"remote_hash": "OGBQ2Ix7jNAr1kiU42AYmKRnGFACR76L-IZiZ_lnXGs="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maxItems/maxItems.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maxItems/maxItems.go",
+		"validation/maxItems/maxItems.go": {
+			"file": "validation/maxItems/maxItems.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maxItems/maxItems.go",
-			"last_updated": "2025-02-02T19:15:52.263742Z",
+			"last_updated": "2025-02-02T19:52:16.558094Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "txI_EQrpdHZqeC9sr2cC-a0_Mw_RMkvMkmixGfoKi4U="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maxItems/maxItems.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maxItems/maxItems.json",
+		"validation/maxItems/maxItems.json": {
+			"file": "validation/maxItems/maxItems.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maxItems/maxItems.json",
-			"last_updated": "2025-02-02T19:15:52.395115Z",
+			"last_updated": "2025-02-02T19:46:53.081959Z",
 			"remote_hash": "VpYdKWPg93XDWg7FqGDtKcQfIcU0r5CdLdHicIgNL20="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maxLength/maxLength.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maxLength/maxLength.go",
+		"validation/maxLength/maxLength.go": {
+			"file": "validation/maxLength/maxLength.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maxLength/maxLength.go",
-			"last_updated": "2025-02-02T19:15:52.501575Z",
+			"last_updated": "2025-02-02T19:52:16.793823Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "kOjf57cGb0CTNgO_eychXed-6wixXc2rZj9-WuK4W9I="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maxLength/maxLength.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maxLength/maxLength.json",
+		"validation/maxLength/maxLength.json": {
+			"file": "validation/maxLength/maxLength.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maxLength/maxLength.json",
-			"last_updated": "2025-02-02T19:15:52.782402Z",
+			"last_updated": "2025-02-02T19:46:53.379664Z",
 			"remote_hash": "keTJ8jJT5gVmC9jqiuqMexE1UUiMkHBlbMFrEpwR7LM="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maximum/maximum.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maximum/maximum.go",
+		"validation/maximum/maximum.go": {
+			"file": "validation/maximum/maximum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maximum/maximum.go",
-			"last_updated": "2025-02-02T19:15:52.884452Z",
+			"last_updated": "2025-02-02T19:52:16.996524Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "eDN9hoVID1GpvnGFKZ87ZiUhMo5lNcAvPrppu_QbhZQ="
 		},
-		"examples/two/pkg/reformat/testdata/validation/maximum/maximum.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/maximum/maximum.json",
+		"validation/maximum/maximum.json": {
+			"file": "validation/maximum/maximum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/maximum/maximum.json",
-			"last_updated": "2025-02-02T19:15:53.019716Z",
+			"last_updated": "2025-02-02T19:46:53.587291Z",
 			"remote_hash": "Fcut-oiNnJXBEB2aWCLRvCOirSgcBn32XSDOk_GeE-c="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minItems/minItems.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minItems/minItems.go",
+		"validation/minItems/minItems.go": {
+			"file": "validation/minItems/minItems.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minItems/minItems.go",
-			"last_updated": "2025-02-02T19:15:53.130465Z",
+			"last_updated": "2025-02-02T19:52:17.196765Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "_SMkKkJkLiiLADJPzRscbBsTL-rFFe18dlqz2iFvBOU="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minItems/minItems.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minItems/minItems.json",
+		"validation/minItems/minItems.json": {
+			"file": "validation/minItems/minItems.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minItems/minItems.json",
-			"last_updated": "2025-02-02T19:15:53.242225Z",
+			"last_updated": "2025-02-02T19:46:53.792591Z",
 			"remote_hash": "bmvKWHSJAiQw0eZuAmdC8sveVLTzWNELNDRt8TZTmEE="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minLength/minLength.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minLength/minLength.go",
+		"validation/minLength/minLength.go": {
+			"file": "validation/minLength/minLength.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minLength/minLength.go",
-			"last_updated": "2025-02-02T19:15:53.347956Z",
+			"last_updated": "2025-02-02T19:52:17.409996Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "ynyTYuFX2gEQp1g_l9MaASvrlFGFo4o2Qqk6M9G9yEc="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minLength/minLength.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minLength/minLength.json",
+		"validation/minLength/minLength.json": {
+			"file": "validation/minLength/minLength.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minLength/minLength.json",
-			"last_updated": "2025-02-02T19:15:53.443583Z",
+			"last_updated": "2025-02-02T19:46:54.069895Z",
 			"remote_hash": "fpDGwUDGmsfbY-I_a6akX6F8bKI-QyLwSCIO63qIrG4="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minMaxItems/minMaxItems.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minMaxItems/minMaxItems.go",
+		"validation/minMaxItems/minMaxItems.go": {
+			"file": "validation/minMaxItems/minMaxItems.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minMaxItems/minMaxItems.go",
-			"last_updated": "2025-02-02T19:15:53.546674Z",
+			"last_updated": "2025-02-02T19:52:17.644414Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "o2057AEhNOupGHaHqG80FJKpKo8U5CIaitbRns6kT_U="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minMaxItems/minMaxItems.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minMaxItems/minMaxItems.json",
+		"validation/minMaxItems/minMaxItems.json": {
+			"file": "validation/minMaxItems/minMaxItems.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minMaxItems/minMaxItems.json",
-			"last_updated": "2025-02-02T19:15:53.646973Z",
+			"last_updated": "2025-02-02T19:46:54.521124Z",
 			"remote_hash": "CWsmBDOQcr4lI7aMrbZNXn-rj6GA2qoJ_7pIxWwycPM="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minimum/minimum.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minimum/minimum.go",
+		"validation/minimum/minimum.go": {
+			"file": "validation/minimum/minimum.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minimum/minimum.go",
-			"last_updated": "2025-02-02T19:15:53.744598Z",
+			"last_updated": "2025-02-02T19:52:17.852661Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "RBlUkA1pelu3ClTmi7vJsP1J3JRlVoCojM7UcTtj7zk="
 		},
-		"examples/two/pkg/reformat/testdata/validation/minimum/minimum.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/minimum/minimum.json",
+		"validation/minimum/minimum.json": {
+			"file": "validation/minimum/minimum.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/minimum/minimum.json",
-			"last_updated": "2025-02-02T19:15:53.936036Z",
+			"last_updated": "2025-02-02T19:46:54.843185Z",
 			"remote_hash": "Q6LqtuwHB1JdohjIJawlMicjLFzu8olrOiK62pnU5h4="
 		},
-		"examples/two/pkg/reformat/testdata/validation/multipleOf/multipleOf.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/multipleOf/multipleOf.go",
+		"validation/multipleOf/multipleOf.go": {
+			"file": "validation/multipleOf/multipleOf.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/multipleOf/multipleOf.go",
-			"last_updated": "2025-02-02T19:15:54.244645Z",
+			"last_updated": "2025-02-02T19:52:18.087394Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "QQeMYxDWRRuVah_jL9oA_oOMNxAahBEjDTR1Q9jKSYA="
 		},
-		"examples/two/pkg/reformat/testdata/validation/multipleOf/multipleOf.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/multipleOf/multipleOf.json",
+		"validation/multipleOf/multipleOf.json": {
+			"file": "validation/multipleOf/multipleOf.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/multipleOf/multipleOf.json",
-			"last_updated": "2025-02-02T19:15:54.350801Z",
+			"last_updated": "2025-02-02T19:46:55.054628Z",
 			"remote_hash": "M73D1MlkvLxTCiRDSTi9Vj3wHslp-3CfXO7D0pevg2g="
 		},
-		"examples/two/pkg/reformat/testdata/validation/pattern/pattern.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/pattern/pattern.go",
+		"validation/pattern/pattern.go": {
+			"file": "validation/pattern/pattern.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/pattern/pattern.go",
-			"last_updated": "2025-02-02T19:15:54.463895Z",
+			"last_updated": "2025-02-02T19:52:18.330184Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "THoNcGkT9YIw92h74Hewgy77x-3UxTyPr6b-5zjIs4Y="
 		},
-		"examples/two/pkg/reformat/testdata/validation/pattern/pattern.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/pattern/pattern.json",
+		"validation/pattern/pattern.json": {
+			"file": "validation/pattern/pattern.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/pattern/pattern.json",
-			"last_updated": "2025-02-02T19:15:54.565551Z",
+			"last_updated": "2025-02-02T19:46:55.25515Z",
 			"remote_hash": "pD4DtVd1hZOHUBT3UA-eqhriAJmS5SQrsurDf1MaQMA="
 		},
-		"examples/two/pkg/reformat/testdata/validation/primitive_defs/primitive_defs.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/primitive_defs/primitive_defs.go",
+		"validation/primitive_defs/primitive_defs.go": {
+			"file": "validation/primitive_defs/primitive_defs.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/primitive_defs/primitive_defs.go",
-			"last_updated": "2025-02-02T19:15:54.668246Z",
+			"last_updated": "2025-02-02T19:52:18.544105Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "SFnE2M7FhcwKge1kfQZlDhYEkIw5U-rvvbxEm4t3MAE="
 		},
-		"examples/two/pkg/reformat/testdata/validation/primitive_defs/primitive_defs.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/primitive_defs/primitive_defs.json",
+		"validation/primitive_defs/primitive_defs.json": {
+			"file": "validation/primitive_defs/primitive_defs.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/primitive_defs/primitive_defs.json",
-			"last_updated": "2025-02-02T19:15:54.778055Z",
+			"last_updated": "2025-02-02T19:46:55.623811Z",
 			"remote_hash": "kKtqDM1k4sl_SphJSGase13oy3ukphOdbNc_cFSLhuk="
 		},
-		"examples/two/pkg/reformat/testdata/validation/requiredFields/requiredFields.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/requiredFields/requiredFields.go",
+		"validation/requiredFields/requiredFields.go": {
+			"file": "validation/requiredFields/requiredFields.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/requiredFields/requiredFields.go",
-			"last_updated": "2025-02-02T19:15:54.899269Z",
+			"last_updated": "2025-02-02T19:52:18.802201Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "_UvSJigi3ZvtVYCCfqLYf0r0G9AemAH7umeXrAaRdfo="
 		},
-		"examples/two/pkg/reformat/testdata/validation/requiredFields/requiredFields.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/requiredFields/requiredFields.json",
+		"validation/requiredFields/requiredFields.json": {
+			"file": "validation/requiredFields/requiredFields.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/requiredFields/requiredFields.json",
-			"last_updated": "2025-02-02T19:15:55.01188Z",
+			"last_updated": "2025-02-02T19:46:55.832315Z",
 			"remote_hash": "3KRz6-2vXMIv-wd3RCAt9X664WxF-yryqRws6Qp5_8w="
 		},
-		"examples/two/pkg/reformat/testdata/validation/requiredFields/requiredNullable.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/requiredFields/requiredNullable.go",
+		"validation/requiredFields/requiredNullable.go": {
+			"file": "validation/requiredFields/requiredNullable.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/requiredFields/requiredNullable.go",
-			"last_updated": "2025-02-02T19:15:55.128761Z",
+			"last_updated": "2025-02-02T19:52:19.020355Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "hvqMZsR6XN9XCd_r3w0bwhLE1a9Sgf2h-NF0L3jGfak="
 		},
-		"examples/two/pkg/reformat/testdata/validation/requiredFields/requiredNullable.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/requiredFields/requiredNullable.json",
+		"validation/requiredFields/requiredNullable.json": {
+			"file": "validation/requiredFields/requiredNullable.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/requiredFields/requiredNullable.json",
-			"last_updated": "2025-02-02T19:15:55.268147Z",
+			"last_updated": "2025-02-02T19:46:56.203595Z",
 			"remote_hash": "gSD70-s6iWQiEaq5hm4nI1R7AE6RnhoumehrOsb9se8="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typeMultiple/typeMultiple.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typeMultiple/typeMultiple.go",
+		"validation/typeMultiple/typeMultiple.go": {
+			"file": "validation/typeMultiple/typeMultiple.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typeMultiple/typeMultiple.go",
-			"last_updated": "2025-02-02T19:15:55.386Z",
+			"last_updated": "2025-02-02T19:52:19.379913Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "OQBggW1Cy9Fb00o2d5sP3nt0epXQu08b2b59hKhjeMs="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typeMultiple/typeMultiple.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typeMultiple/typeMultiple.json",
+		"validation/typeMultiple/typeMultiple.json": {
+			"file": "validation/typeMultiple/typeMultiple.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typeMultiple/typeMultiple.json",
-			"last_updated": "2025-02-02T19:15:55.489682Z",
+			"last_updated": "2025-02-02T19:46:56.500489Z",
 			"remote_hash": "jaLRt0zvDDd8xC833RrXCPNaRuGhJcV-fQPam0F1NPo="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default/typed_default.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default/typed_default.go",
+		"validation/typed_default/typed_default.go": {
+			"file": "validation/typed_default/typed_default.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default/typed_default.go",
-			"last_updated": "2025-02-02T19:15:55.596527Z",
+			"last_updated": "2025-02-02T19:52:19.586594Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "GdANYyAlzr9aN3fT8fIIE229JU1F97mSh9X0Nsbf2o0="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default/typed_default.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default/typed_default.json",
+		"validation/typed_default/typed_default.json": {
+			"file": "validation/typed_default/typed_default.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default/typed_default.json",
-			"last_updated": "2025-02-02T19:15:55.689832Z",
+			"last_updated": "2025-02-02T19:46:56.798902Z",
 			"remote_hash": "ZeHl-SdSCVQpMt5PWikDMGBkk8bmkfRUl5sJ0jLvxq0="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default_empty/typed_default_empty.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default_empty/typed_default_empty.go",
+		"validation/typed_default_empty/typed_default_empty.go": {
+			"file": "validation/typed_default_empty/typed_default_empty.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default_empty/typed_default_empty.go",
-			"last_updated": "2025-02-02T19:15:55.797523Z",
+			"last_updated": "2025-02-02T19:52:19.78775Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "bqVk4-LyJjSWTVWkbLT-TK0kqp-B7_6HAYOxY1heRTU="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default_empty/typed_default_empty.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default_empty/typed_default_empty.json",
+		"validation/typed_default_empty/typed_default_empty.json": {
+			"file": "validation/typed_default_empty/typed_default_empty.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default_empty/typed_default_empty.json",
-			"last_updated": "2025-02-02T19:15:55.907045Z",
+			"last_updated": "2025-02-02T19:46:57.222849Z",
 			"remote_hash": "8azI6fIZpdaBe4tyvkoHKnmeiXGfo4qoaw62M_bJHXM="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default_enums/typed_default_enums.go": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default_enums/typed_default_enums.go",
+		"validation/typed_default_enums/typed_default_enums.go": {
+			"file": "validation/typed_default_enums/typed_default_enums.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default_enums/typed_default_enums.go",
-			"last_updated": "2025-02-02T19:15:56.059015Z",
+			"last_updated": "2025-02-02T19:52:19.999279Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "w0BYNeWAXDDvqOX-PF57n3eTVhPHX26Xac6k2yQWvDc="
 		},
-		"examples/two/pkg/reformat/testdata/validation/typed_default_enums/typed_default_enums.json": {
-			"file": "examples/two/pkg/reformat/testdata/validation/typed_default_enums/typed_default_enums.json",
+		"validation/typed_default_enums/typed_default_enums.json": {
+			"file": "validation/typed_default_enums/typed_default_enums.json",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/validation/typed_default_enums/typed_default_enums.json",
-			"last_updated": "2025-02-02T19:15:56.161033Z",
+			"last_updated": "2025-02-02T19:46:57.481278Z",
 			"remote_hash": "q-1k1bYNMxJ6WpiB7YBRB-p5B9osrUGXUrVwIC7TGjk="
 		},
-		"examples/two/pkg/reformat/testdata/yaml/yamlMultilineDescriptions/yamlMultilineDescriptions.go": {
-			"file": "examples/two/pkg/reformat/testdata/yaml/yamlMultilineDescriptions/yamlMultilineDescriptions.go",
+		"yaml/yamlMultilineDescriptions/yamlMultilineDescriptions.go": {
+			"file": "yaml/yamlMultilineDescriptions/yamlMultilineDescriptions.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/yaml/yamlMultilineDescriptions/yamlMultilineDescriptions.go",
-			"last_updated": "2025-02-02T19:15:56.277784Z",
+			"last_updated": "2025-02-02T19:52:20.213062Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],
 			"remote_hash": "J4Lj6sbmf04xm6Pkr0YcLcjya8RqD5-mTGnv87pO7J4="
 		},
-		"examples/two/pkg/reformat/testdata/yaml/yamlStructNameFromFile/yamlStructNameFromFile.go": {
-			"file": "examples/two/pkg/reformat/testdata/yaml/yamlStructNameFromFile/yamlStructNameFromFile.go",
+		"yaml/yamlStructNameFromFile/yamlStructNameFromFile.go": {
+			"file": "yaml/yamlStructNameFromFile/yamlStructNameFromFile.go",
 			"source": "github.com/omissis/go-jsonschema@442a4c100c62a7d8543d1a7ab7052397057add86",
 			"permalink": "https://raw.githubusercontent.com/omissis/go-jsonschema/442a4c100c62a7d8543d1a7ab7052397057add86/tests/data/yaml/yamlStructNameFromFile/yamlStructNameFromFile.go",
-			"last_updated": "2025-02-02T19:15:56.389945Z",
+			"last_updated": "2025-02-02T19:52:20.328878Z",
 			"changes": [
 				"Line 8: Replaced 'package test' with 'package testdata'"
 			],

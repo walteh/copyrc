@@ -152,6 +152,17 @@ func LoadConfig(path string, input Input) (*CopyConfig, error) {
 		cfg.Flags.Clean = input.Clean.value
 	}
 
+	// remove all ./ from dest and source
+	for _, copy := range cfg.Copies {
+		copy.Destination.Path = strings.TrimPrefix(copy.Destination.Path, "./")
+		copy.Source.Path = strings.TrimPrefix(copy.Source.Path, "./")
+	}
+
+	for _, archive := range cfg.Archives {
+		archive.Destination.Path = strings.TrimPrefix(archive.Destination.Path, "./")
+		archive.Source.Path = strings.TrimPrefix(archive.Source.Path, "./")
+	}
+
 	// Convert to internal format
 	return &cfg, nil
 

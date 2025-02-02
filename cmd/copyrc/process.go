@@ -628,12 +628,13 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 	if !cfg.Flags.Force && !cfg.Flags.Clean && status.CommitHash != "" {
 		if status.CommitHash == commitHash && argsAreSame {
 			logger.longestNeighbor = status.GetLongestNeighbor()
+
 			// loop through all files in status and print them out
 			for _, file := range status.OrderedCoppiedFiles() {
 				if _, err := writeFile(ctx, WriteFileOpts{
 					SourcePath:    filepath.Join(cfg.Source.Path, file.File),
 					Destination:   cfg.Destination,
-					Path:          file.File,
+					Path:          filepath.Join(cfg.Destination.Path, file.File),
 					Contents:      nil,
 					IsManaged:     false,
 					StatusFile:    status,
@@ -650,7 +651,7 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 				if _, err := writeFile(ctx, WriteFileOpts{
 					SourcePath:    filepath.Join(cfg.Source.Path, file.File),
 					Destination:   cfg.Destination,
-					Path:          file.File,
+					Path:          filepath.Join(cfg.Destination.Path, file.File),
 					Contents:      nil,
 					IsManaged:     true,
 					StatusFile:    status,

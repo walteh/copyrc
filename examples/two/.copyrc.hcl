@@ -35,7 +35,7 @@ copy {
 		path     = "tests/data"
 	}
 	destination {
-		path = "./examples/two/pkg/reformat/testdata"
+		path = "examples/two/pkg/reformat/testdata"
 	}
 	options {
 		recursive = true

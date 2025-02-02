@@ -22,9 +22,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
-	"time"
 
 	"gitlab.com/tozd/go/errors"
 )
@@ -59,8 +57,7 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source, recursive b
 		return nil, errors.Errorf("parsing github repository: %w", err)
 	}
 
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s?ref=%s",
-		org, repo, args.Path, args.Ref)
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", org, repo, args.Path, args.Ref)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -83,18 +80,8 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source, recursive b
 	}
 
 	if resp.StatusCode == http.StatusForbidden {
-		// Check if we're rate limited
-		if resp.Header.Get("X-RateLimit-Remaining") == "0" {
-			resetTime := resp.Header.Get("X-RateLimit-Reset")
-			resetTimestamp, err := strconv.ParseInt(resetTime, 10, 64)
-			if err == nil {
-				waitDuration := time.Until(time.Unix(resetTimestamp, 0))
-				if waitDuration > 0 {
-					time.Sleep(waitDuration)
-					return g.ListFiles(ctx, args, recursive) // Retry after waiting
-				}
-			}
-		}
+
+		return nil, errors.Errorf("unexpected status code: %d - try setting GITHUB_TOKEN", resp.StatusCode)
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -247,9 +234,22 @@ func (g *GithubProvider) GetLicense(ctx context.Context, args Source, commitHash
 		return LicenseEntry{}, errors.Errorf("creating request: %w", err)
 	}
 
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		req.Header.Set("Authorization", "token "+token)
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return LicenseEntry{}, errors.Errorf("fetching license: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusForbidden {
+			return LicenseEntry{}, errors.Errorf("unexpected status code: %d - try setting GITHUB_TOKEN", resp.StatusCode)
+		}
+		return LicenseEntry{}, errors.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var data struct {
