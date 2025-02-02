@@ -72,7 +72,7 @@ func TestProcessFile_IgnoreFiles(t *testing.T) {
 					Path: ".",
 				},
 				DestPath: t.TempDir(),
-				CopyArgs: &ConfigCopyArgs{
+				CopyArgs: &CopyEntry_Options{
 					IgnoreFiles: tt.ignoreFiles,
 				},
 			}
@@ -156,7 +156,7 @@ func TestProcessFile_FilePatterns(t *testing.T) {
 					Path: ".",
 				},
 				DestPath: t.TempDir(),
-				CopyArgs: &ConfigCopyArgs{
+				CopyArgs: &CopyEntry_Options{
 					FilePatterns: tt.filePatterns,
 				},
 			}
@@ -250,7 +250,7 @@ func TestProcessFile_PatternInteractions(t *testing.T) {
 					Path: ".",
 				},
 				DestPath: t.TempDir(),
-				CopyArgs: &ConfigCopyArgs{
+				CopyArgs: &CopyEntry_Options{
 					FilePatterns: tt.filePatterns,
 					IgnoreFiles:  tt.ignoreFiles,
 				},
@@ -297,7 +297,7 @@ func TestProcessFile_SingleFilePattern(t *testing.T) {
 			Path: ".",
 		},
 		DestPath: t.TempDir(),
-		CopyArgs: &ConfigCopyArgs{
+		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{targetFile}, // Only match this exact file
 		},
 	}
@@ -343,7 +343,7 @@ func TestProcessDirectory_SingleFilePattern(t *testing.T) {
 			Path: ".",
 		},
 		DestPath: t.TempDir(),
-		CopyArgs: &ConfigCopyArgs{
+		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{targetFile}, // Only match this exact file
 		},
 	}
@@ -398,7 +398,7 @@ func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
 			Path: ".",
 		},
 		DestPath: t.TempDir(),
-		CopyArgs: &ConfigCopyArgs{
+		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{
 				"src/*.go",      // Match main.go
 				"docs/*.md",     // Match README.md

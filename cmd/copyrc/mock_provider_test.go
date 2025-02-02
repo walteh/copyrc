@@ -60,11 +60,15 @@ func (m *MockProvider) ClearFiles() {
 	m.files = make(map[string][]byte)
 }
 
-func (m *MockProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]string, error) {
+func (m *MockProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error) {
 	// Return all files in the map
-	files := make([]string, 0, len(m.files))
+	files := make([]ProviderFile, 0, len(m.files))
 	for f := range m.files {
-		files = append(files, f)
+		files = append(files, ProviderFile{
+			Path: f,
+			Dir:  false,
+			File: true,
+		})
 	}
 	logger := loggerFromContext(ctx)
 	logger.zlog.Debug().Msgf("🧪 Mock provider listing %d files: %v", len(files), files)

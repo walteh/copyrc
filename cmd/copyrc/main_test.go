@@ -169,7 +169,7 @@ func Other() {}`))
 	cfg := &Config{
 		ProviderArgs: args,
 		DestPath:     t.TempDir(),
-		CopyArgs: &ConfigCopyArgs{
+		CopyArgs: &CopyEntry_Options{
 			Replacements: []Replacement{
 				{Old: "Bar", New: "Baz"},
 			},
@@ -261,7 +261,7 @@ func Other() {}`))
 				SrcRepo:  args.Repo,
 				SrcRef:   args.Ref,
 				SrcPath:  args.Path,
-				CopyArgs: &ConfigCopyArgs{},
+				CopyArgs: &CopyEntry_Options{},
 			},
 			CoppiedFiles: make(map[string]StatusEntry),
 		}
@@ -272,7 +272,7 @@ func Other() {}`))
 			ProviderArgs: args,
 			DestPath:     dir,
 			RemoteStatus: true,
-			CopyArgs:     &ConfigCopyArgs{},
+			CopyArgs:     &CopyEntry_Options{},
 		}
 		err := run(ctx, cfg, mock)
 		require.NoError(t, err)
@@ -297,7 +297,7 @@ func Other() {}`))
 				SrcRepo: args.Repo,
 				SrcRef:  args.Ref,
 				SrcPath: args.Path,
-				CopyArgs: &ConfigCopyArgs{
+				CopyArgs: &CopyEntry_Options{
 					Replacements: []Replacement{
 						{Old: "Bar", New: "Baz"},
 					},
@@ -312,7 +312,7 @@ func Other() {}`))
 			ProviderArgs: args,
 			DestPath:     dir,
 			Status:       true,
-			CopyArgs: &ConfigCopyArgs{
+			CopyArgs: &CopyEntry_Options{
 				Replacements: []Replacement{
 					{Old: "Bar", New: "Baz"},
 				},

@@ -54,7 +54,7 @@ type Input struct {
 // 🌐 RepoProvider interface for different Git providers
 type RepoProvider interface {
 	// ListFiles returns a list of files in the given path
-	ListFiles(ctx context.Context, args ProviderArgs) ([]string, error)
+	ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error)
 	// GetCommitHash returns the commit hash for the current ref
 	GetCommitHash(ctx context.Context, args ProviderArgs) (string, error)
 	// GetPermalink returns a permanent link to the file
@@ -65,22 +65,12 @@ type RepoProvider interface {
 	GetArchiveUrl(ctx context.Context, args ProviderArgs) (string, error)
 }
 
-type ConfigCopyArgs struct {
-	Replacements []Replacement `hcl:"replacements" yaml:"replacements" json:"replacements"`
-	IgnoreFiles  []string      `hcl:"ignore_files" yaml:"ignore_files" json:"ignore_files"`
-	FilePatterns []string      `hcl:"file_patterns" yaml:"file_patterns" json:"file_patterns"`
-}
-
-type ConfigArchiveArgs struct {
-	GoEmbed bool `hcl:"go_embed" yaml:"go_embed"`
-}
-
 // 📦 Config holds the processed configuration
 type Config struct {
 	ProviderArgs ProviderArgs
 	DestPath     string
-	CopyArgs     *ConfigCopyArgs
-	ArchiveArgs  *ConfigArchiveArgs
+	CopyArgs     *CopyEntry_Options
+	ArchiveArgs  *ArchiveEntry_Options
 	Clean        bool // Whether to clean destination directory
 	Status       bool // Whether to check local status
 	RemoteStatus bool // Whether to check remote status
@@ -106,7 +96,7 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 			RefType: input.SrcRef,
 		},
 		DestPath: input.DestPath,
-		CopyArgs: &ConfigCopyArgs{
+		CopyArgs: &CopyEntry_Options{
 			Replacements: replacements,
 			IgnoreFiles:  []string(input.IgnoreFiles),
 		},

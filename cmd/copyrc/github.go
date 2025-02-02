@@ -53,7 +53,14 @@ func parseGithubRepo(repo string) (org string, name string, err error) {
 	return parts[1], parts[2], nil
 }
 
-func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]string, error) {
+type ProviderFile struct {
+	Path     string `json:"path"`
+	Dir      bool   `json:"dir"`
+	File     bool   `json:"file"`
+	Children []ProviderFile
+}
+
+func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]ProviderFile, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return nil, errors.Errorf("parsing github repository: %w", err)
@@ -79,7 +86,7 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]st
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNotFound {
-		return []string{}, nil
+		return []ProviderFile{}, nil
 	}
 
 	if resp.StatusCode == http.StatusForbidden {
@@ -113,11 +120,26 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]st
 		Type string `json:"type"`
 	}
 	if err := json.Unmarshal(body, &files); err == nil {
-		result := make([]string, 0, len(files))
+		result := make([]ProviderFile, 0, len(files))
 		for _, f := range files {
-			if f.Type == "file" {
-				result = append(result, f.Path)
+			fle := ProviderFile{
+				Path:     f.Path,
+				Dir:      f.Type == "dir",
+				File:     f.Type == "file",
+				Children: make([]ProviderFile, 0),
 			}
+			if f.Type == "dir" {
+				childs, err := g.ListFiles(ctx, ProviderArgs{
+					Repo: args.Repo,
+					Ref:  args.Ref,
+					Path: f.Path,
+				})
+				if err != nil {
+					return nil, errors.Errorf("listing files: %w", err)
+				}
+				fle.Children = childs
+			}
+			result = append(result, fle)
 		}
 		return result, nil
 	}
@@ -131,7 +153,12 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args ProviderArgs) ([]st
 		return nil, errors.Errorf("decoding response: %w", err)
 	}
 
-	return []string{file.Path}, nil
+	return []ProviderFile{
+		{
+			Path: file.Path,
+			Dir:  file.Type == "dir",
+		},
+	}, nil
 }
 
 func (g *GithubProvider) GetCommitHash(ctx context.Context, args ProviderArgs) (string, error) {

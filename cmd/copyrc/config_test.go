@@ -146,7 +146,7 @@ func Other() {}`))
 				Destination: CopyEntry_Destination{
 					Path: dest1,
 				},
-				Options: CopyEntry_Options{
+				Options: &CopyEntry_Options{
 					Replacements: []Replacement{
 						{Old: "Bar", New: "Baz"},
 						{Old: "foo", New: "bar"},
@@ -207,7 +207,7 @@ func Other() {}`))
 			SrcRepo:  mock.GetFullRepo(),
 			SrcRef:   mock.ref,
 			SrcPath:  mock.path,
-			CopyArgs: &ConfigCopyArgs{},
+			CopyArgs: &CopyEntry_Options{},
 		},
 		CoppiedFiles: make(map[string]StatusEntry),
 	}

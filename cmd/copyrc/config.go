@@ -63,13 +63,14 @@ type CopyEntry_Options struct {
 	Replacements []Replacement `json:"replacements,omitempty" yaml:"replacements,omitempty" hcl:"replacements,optional" cty:"replacements"`
 	IgnoreFiles  []string      `json:"ignore_files,omitempty" yaml:"ignore_files,omitempty" hcl:"ignore_files,optional" cty:"ignore_files"`
 	FilePatterns []string      `json:"file_patterns,omitempty" yaml:"file_patterns,omitempty" hcl:"file_patterns,optional" cty:"file_patterns"`
+	Recursive    bool          `json:"recursive,omitempty" yaml:"recursive,omitempty" hcl:"recursive,optional" cty:"recursive"` // 📁 Enable recursive directory copying
 }
 
 // 📝 Individual copy entry
 type CopyEntry struct {
 	Source      CopyEntry_Source      `json:"source" yaml:"source" hcl:"source,block"`
 	Destination CopyEntry_Destination `json:"destination" yaml:"destination" hcl:"destination,block"`
-	Options     CopyEntry_Options     `json:"options" yaml:"options" hcl:"options,block"`
+	Options     *CopyEntry_Options    `json:"options" yaml:"options" hcl:"options,block"`
 }
 
 // 📝 Archive entry
@@ -137,12 +138,8 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 				Path:    copy.Source.Path,
 				RefType: copy.Source.RefType,
 			},
-			DestPath: copy.Destination.Path,
-			CopyArgs: &ConfigCopyArgs{
-				Replacements: copy.Options.Replacements,
-				IgnoreFiles:  copy.Options.IgnoreFiles,
-				FilePatterns: copy.Options.FilePatterns,
-			},
+			DestPath:     copy.Destination.Path,
+			CopyArgs:     copy.Options,
 			Clean:        clean,
 			Status:       status,
 			RemoteStatus: remoteStatus,
@@ -162,10 +159,8 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 				Ref:     archive.Source.Ref,
 				RefType: archive.Source.RefType,
 			},
-			DestPath: archive.Destination.Path,
-			ArchiveArgs: &ConfigArchiveArgs{
-				GoEmbed: archive.Options.GoEmbed,
-			},
+			DestPath:     archive.Destination.Path,
+			ArchiveArgs:  archive.Options,
 			Clean:        clean,
 			Status:       status,
 			RemoteStatus: remoteStatus,

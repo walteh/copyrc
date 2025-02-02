@@ -39,11 +39,11 @@ type GeneratedFileEntry struct {
 }
 
 type StatusFileArgs struct {
-	SrcRepo     string             `json:"src_repo"`
-	SrcRef      string             `json:"src_ref"`
-	SrcPath     string             `json:"src_path,omitempty"`
-	CopyArgs    *ConfigCopyArgs    `json:"copy_args,omitempty"`
-	ArchiveArgs *ConfigArchiveArgs `json:"archive_args,omitempty"`
+	SrcRepo     string                `json:"src_repo"`
+	SrcRef      string                `json:"src_ref"`
+	SrcPath     string                `json:"src_path,omitempty"`
+	CopyArgs    *CopyEntry_Options    `json:"copy_args,omitempty"`
+	ArchiveArgs *ArchiveEntry_Options `json:"archive_args,omitempty"`
 }
 
 // 📦 Status file structure
