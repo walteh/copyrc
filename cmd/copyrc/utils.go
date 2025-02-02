@@ -124,9 +124,18 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 	if (remoteHash != "" && existingHash != remoteHash) || customizations != "" {
 		isCustomized = true
 		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(string(existing), string(opts.Contents), false)
-		encodedCustomizations = dmp.DiffToDelta(diffs)
-		rcount = len(diffs)
+		if len(opts.Contents) > 0 {
+			diffs := dmp.DiffMain(string(existing), string(opts.Contents), false)
+			encodedCustomizations = dmp.DiffToDelta(diffs)
+			rcount = len(diffs)
+		} else {
+			diffs, err := dmp.DiffFromDelta(string(existing), customizations)
+			if err != nil {
+				return false, errors.Errorf("diffing customizations: %w", err)
+			}
+			encodedCustomizations = dmp.DiffToDelta(diffs)
+			rcount = len(diffs)
+		}
 	}
 
 	if hasEntry && len(opts.Contents) == 0 {
@@ -222,6 +231,10 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 		opts.StatusMutex.Unlock()
 	}
 
+	if !isCustomized {
+		rcount = opts.ReplacementCount
+	}
+
 	// Log the operation based on what changed
 	logFileOperation(ctx, FileInfo{
 		Name:         fileName,
@@ -229,7 +242,7 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 		IsModified:   true,
 		IsCustomized: isCustomized,
 		IsManaged:    opts.IsManaged,
-		Replacements: opts.ReplacementCount,
+		Replacements: rcount,
 	})
 
 	return true, nil

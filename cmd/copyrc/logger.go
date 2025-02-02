@@ -61,9 +61,10 @@ type FileType struct {
 }
 
 var (
-	FileTypeManaged = FileType{Name: "managed", Color: ManagedColor}
-	FileTypeLocal   = FileType{Name: "local", Color: LocalColor}
-	FileTypeCopy    = FileType{Name: "copy", Color: CopyColor}
+	FileTypeManaged    = FileType{Name: "managed", Color: ManagedColor}
+	FileTypeLocal      = FileType{Name: "local", Color: LocalColor}
+	FileTypeCopy       = FileType{Name: "copy", Color: CopyColor}
+	FileTypeCustomized = FileType{Name: "customized", Color: CustomizedColor}
 )
 
 func (me FileType) ColorString() string {
@@ -79,7 +80,7 @@ func (me FileType) ColorStringWithReplacements(replacements int) string {
 }
 
 func (me FileType) UncoloredStringWithReplacements(replacements int) string {
-	return fmt.Sprintf("%s [%d]", me.Name, replacements)
+	return fmt.Sprintf("%s [~%d]", me.Name, replacements)
 }
 
 // FileChangeStatus represents the change state of a file
@@ -257,6 +258,8 @@ func (me FileInfo) Type() FileType {
 		return FileTypeLocal
 	} else if me.IsManaged {
 		return FileTypeManaged
+	} else if me.IsCustomized {
+		return FileTypeCustomized
 	} else {
 		return FileTypeCopy
 	}
@@ -268,7 +271,7 @@ func (l *Logger) formatFileOperation(opts FileInfo) string {
 
 	// Build type part with optional replacements
 	var typePart string
-	if opts.Replacements > 0 && opts.Type().Name == FileTypeCopy.Name {
+	if opts.Replacements > 0 && (opts.Type().Name == FileTypeCopy.Name || opts.Type().Name == FileTypeCustomized.Name) {
 		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredStringWithReplacements(opts.Replacements))
 	} else {
 		typePart = fmt.Sprintf("%-*s", typeWidth, opts.Type().UncoloredString())
