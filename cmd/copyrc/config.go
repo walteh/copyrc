@@ -30,19 +30,28 @@ import (
 
 // 📝 Config file structure
 type CopyConfig struct {
-	// 🔧 Default settings block
-	Defaults *DefaultsBlock `json:"defaults,omitempty" hcl:"defaults,block" yaml:"defaults,omitempty"`
-
 	// 📝 Copy configurations
 	Copies []*CopyEntry `json:"copies" hcl:"copy,block" yaml:"copies"`
 	// 📝 Archive configurations
 	Archives []*ArchiveEntry `json:"archives" hcl:"archive,block" yaml:"archives"`
+	// 🔧 Flags block
+	Flags *FlagsBlock `json:"flags,omitempty" hcl:"flags,block" yaml:"flags,omitempty"`
 }
 
-// 🔧 Default settings that apply to all copies
-type DefaultsBlock struct {
-	CopyOptions    *CopyEntry_Options    `json:"copy_options,omitempty" yaml:"copy_options,omitempty" hcl:"copy_options,block"`
-	ArchiveOptions *ArchiveEntry_Options `json:"archive_options,omitempty" yaml:"archive_options,omitempty" hcl:"archive_options,block"`
+type SingleConfig struct {
+	Source      Source
+	Destination Destination
+	CopyArgs    *CopyEntry_Options
+	ArchiveArgs *ArchiveEntry_Options
+	Flags       FlagsBlock
+}
+
+type FlagsBlock struct {
+	Clean        bool `json:"clean,omitempty" hcl:"clean,optional" yaml:"clean,omitempty"`
+	Status       bool `json:"status,omitempty" hcl:"status,optional" yaml:"status,omitempty"`
+	RemoteStatus bool `json:"remote_status,omitempty" hcl:"remote_status,optional" yaml:"remote_status,omitempty"`
+	Force        bool `json:"force,omitempty" hcl:"force,optional" yaml:"force,omitempty"`
+	Async        bool `json:"async,omitempty" hcl:"async,optional" yaml:"async,omitempty"`
 }
 
 // 🎯 Source configuration
@@ -125,25 +134,20 @@ func LoadConfig(path string) (*CopyConfig, error) {
 }
 
 // 🏃 Run all copy operations
-func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, force bool, provider RepoProvider) error {
+func (cfg *CopyConfig) RunAll(ctx context.Context, provider RepoProvider) error {
 	logger := loggerFromContext(ctx)
 	logger.Header("Copying files from repositories")
 
 	// Process copies
 	for _, copy := range cfg.Copies {
-		config := &Config{
-			Source: Source{
-				Repo:    copy.Source.Repo,
-				Ref:     copy.Source.Ref,
-				Path:    copy.Source.Path,
-				RefType: copy.Source.RefType,
-			},
-			DestPath:     copy.Destination.Path,
-			CopyArgs:     copy.Options,
-			Clean:        clean,
-			Status:       status,
-			RemoteStatus: remoteStatus,
-			Force:        force,
+		config := &SingleConfig{
+			Source:      copy.Source,
+			Destination: copy.Destination,
+			CopyArgs:    copy.Options,
+			ArchiveArgs: nil,
+		}
+		if cfg.Flags != nil {
+			config.Flags = *cfg.Flags
 		}
 
 		if err := process(ctx, config, provider); err != nil {
@@ -153,18 +157,14 @@ func (cfg *CopyConfig) RunAll(ctx context.Context, clean, status, remoteStatus, 
 
 	// Process archives
 	for _, archive := range cfg.Archives {
-		config := &Config{
-			Source: Source{
-				Repo:    archive.Source.Repo,
-				Ref:     archive.Source.Ref,
-				RefType: archive.Source.RefType,
-			},
-			DestPath:     archive.Destination.Path,
-			ArchiveArgs:  archive.Options,
-			Clean:        clean,
-			Status:       status,
-			RemoteStatus: remoteStatus,
-			Force:        force,
+		config := &SingleConfig{
+			Source:      archive.Source,
+			Destination: archive.Destination,
+			ArchiveArgs: archive.Options,
+			CopyArgs:    nil,
+		}
+		if cfg.Flags != nil {
+			config.Flags = *cfg.Flags
 		}
 
 		if err := process(ctx, config, provider); err != nil {

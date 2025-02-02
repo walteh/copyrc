@@ -65,13 +65,15 @@ func TestProcessFile_IgnoreFiles(t *testing.T) {
 			mock.AddFile(tt.file, []byte("test content"))
 
 			// Create config with ignore patterns
-			cfg := &Config{
+			cfg := &SingleConfig{
 				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
 				},
-				DestPath: t.TempDir(),
+				Destination: Destination{
+					Path: t.TempDir(),
+				},
 				CopyArgs: &CopyEntry_Options{
 					IgnoreFiles: tt.ignoreFiles,
 				},
@@ -88,7 +90,9 @@ func TestProcessFile_IgnoreFiles(t *testing.T) {
 			ctx := NewLoggerInContext(context.Background(), logger)
 
 			var mu sync.Mutex
-			err := processFile(ctx, mock, cfg, tt.file, "test-hash", status, &mu, cfg.DestPath)
+			err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, "test-hash", status, &mu, ProviderFile{
+				Path: tt.file,
+			})
 
 			if tt.shouldSkip {
 				// If file should be ignored, we expect no error and no file in status
@@ -149,13 +153,15 @@ func TestProcessFile_FilePatterns(t *testing.T) {
 			mock.AddFile(tt.file, []byte("test content"))
 
 			// Create config with file patterns
-			cfg := &Config{
+			cfg := &SingleConfig{
 				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
 				},
-				DestPath: t.TempDir(),
+				Destination: Destination{
+					Path: t.TempDir(),
+				},
 				CopyArgs: &CopyEntry_Options{
 					FilePatterns: tt.filePatterns,
 				},
@@ -172,7 +178,9 @@ func TestProcessFile_FilePatterns(t *testing.T) {
 			ctx := NewLoggerInContext(context.Background(), logger)
 
 			var mu sync.Mutex
-			err := processFile(ctx, mock, cfg, tt.file, "test-hash", status, &mu, cfg.DestPath)
+			err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, "test-hash", status, &mu, ProviderFile{
+				Path: tt.file,
+			})
 
 			if tt.shouldCopy {
 				require.NoError(t, err, "should not return error when processing file")
@@ -243,13 +251,15 @@ func TestProcessFile_PatternInteractions(t *testing.T) {
 			mock.AddFile(tt.file, []byte("test content"))
 
 			// Create config with patterns and ignores
-			cfg := &Config{
+			cfg := &SingleConfig{
 				Source: Source{
 					Repo: "github.com/test/repo",
 					Ref:  "main",
 					Path: ".",
 				},
-				DestPath: t.TempDir(),
+				Destination: Destination{
+					Path: t.TempDir(),
+				},
 				CopyArgs: &CopyEntry_Options{
 					FilePatterns: tt.filePatterns,
 					IgnoreFiles:  tt.ignoreFiles,
@@ -267,7 +277,9 @@ func TestProcessFile_PatternInteractions(t *testing.T) {
 			ctx := NewLoggerInContext(context.Background(), logger)
 
 			var mu sync.Mutex
-			err := processFile(ctx, mock, cfg, tt.file, "test-hash", status, &mu, cfg.DestPath)
+			err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, "test-hash", status, &mu, ProviderFile{
+				Path: tt.file,
+			})
 
 			require.NoError(t, err, "should not return error")
 			if tt.shouldCopy {
@@ -290,13 +302,15 @@ func TestProcessFile_SingleFilePattern(t *testing.T) {
 	mock.AddFile(targetFile, []byte("special content"))
 
 	// Create config to only copy the target file
-	cfg := &Config{
+	cfg := &SingleConfig{
 		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",
 		},
-		DestPath: t.TempDir(),
+		Destination: Destination{
+			Path: t.TempDir(),
+		},
 		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{targetFile}, // Only match this exact file
 		},
@@ -313,7 +327,9 @@ func TestProcessFile_SingleFilePattern(t *testing.T) {
 	ctx := NewLoggerInContext(context.Background(), logger)
 
 	var mu sync.Mutex
-	err := processFile(ctx, mock, cfg, targetFile, "test-hash", status, &mu, cfg.DestPath)
+	err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, "test-hash", status, &mu, ProviderFile{
+		Path: targetFile,
+	})
 
 	require.NoError(t, err, "should not return error")
 	assert.NotEmpty(t, status.CoppiedFiles, "should have copied the target file")
@@ -336,13 +352,15 @@ func TestProcessDirectory_SingleFilePattern(t *testing.T) {
 	mock.AddFile(targetFile, []byte("special content"))
 
 	// Create config to only copy the target file
-	cfg := &Config{
+	cfg := &SingleConfig{
 		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",
 		},
-		DestPath: t.TempDir(),
+		Destination: Destination{
+			Path: t.TempDir(),
+		},
 		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{targetFile}, // Only match this exact file
 		},
@@ -359,7 +377,7 @@ func TestProcessDirectory_SingleFilePattern(t *testing.T) {
 	ctx := NewLoggerInContext(context.Background(), logger)
 
 	var mu sync.Mutex
-	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu, cfg.DestPath)
+	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu)
 
 	require.NoError(t, err, "should not return error")
 	assert.NotEmpty(t, status.CoppiedFiles, "should have copied the target file")
@@ -391,13 +409,15 @@ func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
 	}
 
 	// Create config to match specific patterns
-	cfg := &Config{
+	cfg := &SingleConfig{
 		Source: Source{
 			Repo: "github.com/test/repo",
 			Ref:  "main",
 			Path: ".",
 		},
-		DestPath: t.TempDir(),
+		Destination: Destination{
+			Path: t.TempDir(),
+		},
 		CopyArgs: &CopyEntry_Options{
 			FilePatterns: []string{
 				"src/*.go",      // Match main.go
@@ -418,7 +438,7 @@ func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
 	ctx := NewLoggerInContext(context.Background(), logger)
 
 	var mu sync.Mutex
-	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu, cfg.DestPath)
+	err := processDirectory(ctx, mock, cfg, "test-hash", status, &mu)
 
 	require.NoError(t, err, "should not return error")
 	assert.Len(t, status.CoppiedFiles, len(targetFiles), "should have copied exactly the target files")

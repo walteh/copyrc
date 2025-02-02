@@ -135,7 +135,6 @@ func Other() {}`))
 
 	// Create config
 	cfg := &CopyConfig{
-		Defaults: &DefaultsBlock{},
 		Copies: []*CopyEntry{
 			{
 				Source: Source{
@@ -165,10 +164,11 @@ func Other() {}`))
 				},
 			},
 		},
+		Flags: &FlagsBlock{},
 	}
 
 	// Run all copies
-	require.NoError(t, cfg.RunAll(ctx, false, false, false, false, mock))
+	require.NoError(t, cfg.RunAll(ctx, mock))
 
 	// list out files in tmp dir
 	files, err := os.ReadDir(dest1)
@@ -188,12 +188,12 @@ func Other() {}`))
 	content, err = os.ReadFile(p2)
 	require.NoError(t, err)
 	assert.Contains(t, string(content), "func Bar()")
-
+	cfg.Flags = &FlagsBlock{Status: true}
 	// Test status check
-	require.NoError(t, cfg.RunAll(ctx, false, true, false, false, mock))
-
+	require.NoError(t, cfg.RunAll(ctx, mock))
+	cfg.Flags = &FlagsBlock{RemoteStatus: true}
 	// Test remote status check
-	require.NoError(t, cfg.RunAll(ctx, false, false, true, false, mock))
+	require.NoError(t, cfg.RunAll(ctx, mock))
 
 	// Create a patch file to test clean behavior
 	patchPath := filepath.Join(dest1, "test.copy.patch.go")
@@ -213,8 +213,9 @@ func Other() {}`))
 	}
 	require.NoError(t, writeStatusFile(ctx, status, dir))
 
+	cfg.Flags = &FlagsBlock{Clean: true}
 	// Test clean
-	require.NoError(t, cfg.RunAll(ctx, true, false, false, false, mock))
+	require.NoError(t, cfg.RunAll(ctx, mock))
 	require.NoFileExists(t, filepath.Join(dest1, "test.copy.go"))
 	require.NoFileExists(t, filepath.Join(dest1, ".copyrc.lock"))
 	require.FileExists(t, patchPath)
@@ -230,10 +231,6 @@ func TestLoadHCLConfig(t *testing.T) {
 		{
 			name: "valid_hcl_config",
 			config: `
-
-# Default settings
-defaults {
-}
 
 # Copy configuration
 copy {
@@ -257,7 +254,6 @@ copy {
 }
 `,
 			validate: func(t *testing.T, cfg *CopyConfig) {
-				require.NotNil(t, cfg.Defaults)
 				require.Len(t, cfg.Copies, 1)
 				require.Equal(t, "org/repo", cfg.Copies[0].Source.Repo)
 				require.Equal(t, "main", cfg.Copies[0].Source.Ref)

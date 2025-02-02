@@ -50,7 +50,7 @@ type Input struct {
 }
 
 // 🏭 Create config from input (backward compatibility)
-func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
+func NewConfigFromInput(input Input, provider RepoProvider) (*SingleConfig, error) {
 	replacements := make([]Replacement, 0, len(input.Replacements))
 	for _, r := range input.Replacements {
 		parts := strings.SplitN(r, ":", 2)
@@ -59,23 +59,27 @@ func NewConfigFromInput(input Input, provider RepoProvider) (*Config, error) {
 		}
 	}
 
-	return &Config{
+	return &SingleConfig{
 		Source: Source{
 			Repo:    input.SrcRepo,
 			Ref:     input.SrcRef,
 			Path:    input.SrcPath,
 			RefType: input.SrcRef,
 		},
-		DestPath: input.DestPath,
+		Destination: Destination{
+			Path: input.DestPath,
+		},
 		CopyArgs: &CopyEntry_Options{
 			Replacements: replacements,
 			IgnoreFiles:  []string(input.IgnoreFiles),
 		},
-		Clean:        input.Clean,
-		Status:       input.Status,
-		RemoteStatus: input.RemoteStatus,
-		Force:        input.Force,
-		Async:        input.Async,
+		Flags: FlagsBlock{
+			Clean:        input.Clean,
+			Status:       input.Status,
+			RemoteStatus: input.RemoteStatus,
+			Force:        input.Force,
+			Async:        input.Async,
+		},
 	}, nil
 }
 
@@ -125,7 +129,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		if err := cfg.RunAll(ctx, input.Clean, input.Status, input.RemoteStatus, input.Force, gh); err != nil {
+		if err := cfg.RunAll(ctx, gh); err != nil {
 			logger.Error(err.Error())
 			os.Exit(1)
 		}
