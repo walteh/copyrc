@@ -74,7 +74,7 @@ type CopyEntry_Options struct {
 	FilePatterns     []string      `json:"file_patterns,omitempty" yaml:"file_patterns,omitempty" hcl:"file_patterns,optional" cty:"file_patterns"`
 	Recursive        bool          `json:"recursive,omitempty" yaml:"recursive,omitempty" hcl:"recursive,optional" cty:"recursive"` // 📁 Enable recursive directory copying
 	ExtensionPrefix  string        `json:"extension_prefix,omitempty" yaml:"extension_prefix,omitempty" hcl:"extension_prefix,optional" cty:"extension_prefix"`
-	NoHeaderComments bool          `json:"skip_header_comments,omitempty" yaml:"skip_header_comments,omitempty" hcl:"skip_header_comments,optional" cty:"skip_header_comments"`
+	NoHeaderComments bool          `json:"no_header_comments,omitempty" yaml:"no_header_comments,omitempty" hcl:"no_header_comments,optional" cty:"no_header_comments"`
 }
 
 // 📝 Individual copy entry
