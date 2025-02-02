@@ -53,7 +53,7 @@ func parseGithubRepo(repo string) (org string, name string, err error) {
 	return parts[1], parts[2], nil
 }
 
-func (g *GithubProvider) ListFiles(ctx context.Context, args Source) ([]ProviderFile, error) {
+func (g *GithubProvider) ListFiles(ctx context.Context, args Source, recursive bool) ([]ProviderFile, error) {
 	org, repo, err := parseGithubRepo(args.Repo)
 	if err != nil {
 		return nil, errors.Errorf("parsing github repository: %w", err)
@@ -91,7 +91,7 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source) ([]Provider
 				waitDuration := time.Until(time.Unix(resetTimestamp, 0))
 				if waitDuration > 0 {
 					time.Sleep(waitDuration)
-					return g.ListFiles(ctx, args) // Retry after waiting
+					return g.ListFiles(ctx, args, recursive) // Retry after waiting
 				}
 			}
 		}
@@ -134,13 +134,13 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source) ([]Provider
 			File:     f.Type == "file",
 			Children: make([]ProviderFile, 0),
 		}
-		if f.Type == "dir" && args.Recursive {
+		if f.Type == "dir" && recursive {
 			childs, err := g.ListFiles(ctx, Source{
-				Repo:      args.Repo,
-				Ref:       args.Ref,
-				Path:      f.Path,
-				Recursive: args.Recursive,
-			})
+				Repo:    args.Repo,
+				Ref:     args.Ref,
+				Path:    f.Path,
+				RefType: args.RefType,
+			}, recursive)
 			if err != nil {
 				return nil, errors.Errorf("listing files: %w", err)
 			}

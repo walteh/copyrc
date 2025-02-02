@@ -60,7 +60,7 @@ func (m *MockProvider) ClearFiles() {
 	m.files = make(map[string][]byte)
 }
 
-func (m *MockProvider) ListFiles(ctx context.Context, args Source) ([]ProviderFile, error) {
+func (m *MockProvider) ListFiles(ctx context.Context, args Source, recursive bool) ([]ProviderFile, error) {
 	// Return all files in the map
 	files := make([]ProviderFile, 0, len(m.files))
 	for f := range m.files {

@@ -12,7 +12,7 @@ type ProviderFile struct {
 // 🌐 RepoProvider interface for different Git providers
 type RepoProvider interface {
 	// ListFiles returns a list of files in the given path
-	ListFiles(ctx context.Context, args Source) ([]ProviderFile, error)
+	ListFiles(ctx context.Context, args Source, recursive bool) ([]ProviderFile, error)
 	// GetCommitHash returns the commit hash for the current ref
 	GetCommitHash(ctx context.Context, args Source) (string, error)
 	// GetPermalink returns a permanent link to the file

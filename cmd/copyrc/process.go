@@ -336,14 +336,19 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *Config, c
 
 	var files []ProviderFile
 	var err error
-	if cfg.ArchiveArgs == nil {
+	if cfg.ArchiveArgs != nil {
 		// Get list of files from provider
-		files, err = provider.ListFiles(ctx, cfg.Source)
+		files = []ProviderFile{{Path: "dummy"}}
+	} else if cfg.CopyArgs != nil {
+		files, err = provider.ListFiles(ctx, cfg.Source, cfg.CopyArgs.Recursive)
 		if err != nil {
 			return errors.Errorf("listing files: %w", err)
 		}
 	} else {
-		files = []ProviderFile{{Path: "dummy"}}
+		files, err = provider.ListFiles(ctx, cfg.Source, false)
+		if err != nil {
+			return errors.Errorf("listing files: %w", err)
+		}
 	}
 
 	// Sort files by name
