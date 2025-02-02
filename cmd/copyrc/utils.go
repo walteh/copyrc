@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,6 +29,7 @@ import (
 
 // WriteFileOpts represents options for writing a file
 type WriteFileOpts struct {
+	Destination Destination // Destination path
 	// Required fields
 	Path     string // Path to write the file to
 	Contents []byte // Contents to write to the file
@@ -54,11 +56,11 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 		return false, errors.New("path is required")
 	}
 
-	fileName := filepath.Base(opts.Path)
+	fileName := strings.TrimPrefix(opts.Path, opts.Destination.Path+"/")
 
 	if opts.IsUntracked {
 		logFileOperation(ctx, FileInfo{
-			Name:        fileName,
+			Name:        opts.Path,
 			IsUntracked: true,
 		})
 

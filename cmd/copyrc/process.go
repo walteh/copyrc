@@ -111,6 +111,7 @@ func processArchive(ctx context.Context, provider RepoProvider, src Source, dest
 
 	// Let writeFile handle status determination
 	if _, err := writeFile(ctx, WriteFileOpts{
+		Destination: dest,
 		Path:        tarballPath,
 		Contents:    data,
 		StatusFile:  status,
@@ -149,6 +150,7 @@ func processArchive(ctx context.Context, provider RepoProvider, src Source, dest
 
 		// Let writeFile handle status determination
 		if _, err := writeFile(ctx, WriteFileOpts{
+			Destination:   dest,
 			Path:          embedPath,
 			Contents:      buf.Bytes(),
 			IsManaged:     true,
@@ -244,7 +246,7 @@ func processCopy(ctx context.Context, provider RepoProvider, src Source, dest De
 	base := strings.TrimSuffix(filepath.Base(file.Path), ext)
 
 	// Create output path and ensure its directory exists
-	outPath := filepath.Join(dest.Path, base+".copy"+ext)
+	outPath := filepath.Join(dest.Path, filepath.Dir(file.Path), base+".copy"+ext)
 	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
 		return errors.Errorf("creating output directory: %w", err)
 	}
@@ -310,6 +312,7 @@ func processCopy(ctx context.Context, provider RepoProvider, src Source, dest De
 
 	// Let writeFile handle all status management and logging
 	if _, err := writeFile(ctx, WriteFileOpts{
+		Destination:      dest,
 		Path:             outPath,
 		Contents:         buf.Bytes(),
 		StatusFile:       status,
@@ -395,6 +398,7 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *SingleCon
 					return errors.Errorf("processing file %s: %w", file.Path, err)
 				}
 			} else {
+
 				if err := processCopy(ctx, provider, cfg.Source, cfg.Destination, cfg.CopyArgs, commitHash, status, mu, file); err != nil {
 					return errors.Errorf("processing file %s: %w", file.Path, err)
 				}
@@ -402,16 +406,37 @@ func processDirectory(ctx context.Context, provider RepoProvider, cfg *SingleCon
 		}
 	}
 
-	if err := processUntracked(ctx, status, cfg.Destination.Path); err != nil {
+	if err := processUntracked(ctx, status, cfg.Destination, cfg.CopyArgs != nil && cfg.CopyArgs.Recursive); err != nil {
 		return errors.Errorf("processing untracked files: %w", err)
 	}
 
 	return nil
 }
 
-func processUntracked(ctx context.Context, status *StatusFile, destPath string) error {
+func allEntries(path string, recursive bool) ([]os.DirEntry, error) {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, errors.Errorf("reading directory: %w", err)
+	}
+	addEntries := []os.DirEntry{}
+	for _, entry := range entries {
+		if entry.IsDir() && recursive {
+			subEntries, err := allEntries(filepath.Join(path, entry.Name()), recursive)
+			if err != nil {
+				return nil, errors.Errorf("reading directory: %w", err)
+			}
+			addEntries = append(addEntries, subEntries...)
+		} else {
+			addEntries = append(addEntries, entry)
+		}
+	}
 
-	entries, err := os.ReadDir(destPath)
+	return addEntries, nil
+}
+
+func processUntracked(ctx context.Context, status *StatusFile, dest Destination, recursive bool) error {
+
+	entries, err := allEntries(dest.Path, recursive)
 	if err != nil {
 		return errors.Errorf("reading directory: %w", err)
 	}
@@ -428,7 +453,8 @@ func processUntracked(ctx context.Context, status *StatusFile, destPath string) 
 
 	for _, entry := range entries {
 		if _, err := writeFile(ctx, WriteFileOpts{
-			Path:        filepath.Join(destPath, entry.Name()),
+			Destination: dest,
+			Path:        filepath.Join(dest.Path, entry.Name()),
 			IsUntracked: true,
 		}); err != nil {
 			return errors.Errorf("writing untracked file: %w", err)
@@ -541,7 +567,7 @@ func process(ctx context.Context, cfg *SingleConfig, provider RepoProvider) erro
 			return errors.Errorf("cleaning destination: %w", err)
 		}
 
-		if err := processUntracked(ctx, status, destPath); err != nil {
+		if err := processUntracked(ctx, status, cfg.Destination, cfg.CopyArgs != nil && cfg.CopyArgs.Recursive); err != nil {
 			return errors.Errorf("processing untracked files: %w", err)
 		}
 

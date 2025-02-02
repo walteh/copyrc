@@ -95,6 +95,7 @@ func writeStatusFile(ctx context.Context, status *StatusFile, destPath string) e
 
 	// Write status file if changed
 	_, err = writeFile(ctx, WriteFileOpts{
+		Destination:  Destination{Path: destPath},
 		Path:         statusPath,
 		Contents:     data,
 		StatusFile:   status,

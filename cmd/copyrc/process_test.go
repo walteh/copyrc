@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 
@@ -337,7 +338,7 @@ func TestProcessFile_SingleFilePattern(t *testing.T) {
 
 	// Verify no other files were copied
 	for file := range status.CoppiedFiles {
-		assert.Equal(t, "special.copy.go", file, "only the target file should be copied")
+		assert.Equal(t, "src/internal/special.copy.go", file, "only the target file should be copied")
 	}
 }
 
@@ -385,7 +386,7 @@ func TestProcessDirectory_SingleFilePattern(t *testing.T) {
 
 	// Verify no other files were copied
 	for file := range status.CoppiedFiles {
-		assert.Equal(t, "special.copy.go", file, "only the target file should be copied")
+		assert.Equal(t, "src/internal/special.copy.go", file, "only the target file should be copied")
 	}
 }
 
@@ -445,9 +446,71 @@ func TestProcessDirectory_MultipleFilePatterns(t *testing.T) {
 
 	// Verify each target file was copied
 	expectedFiles := map[string]bool{
-		"main.copy.go":       true,
-		"README.copy.md":     true,
-		"settings.copy.yaml": true,
+		"src/main.copy.go":          true,
+		"docs/README.copy.md":       true,
+		"config/settings.copy.yaml": true,
+	}
+
+	for file := range status.CoppiedFiles {
+		assert.True(t, expectedFiles[file], "file %s should be in expected files", file)
+		delete(expectedFiles, file)
+	}
+	assert.Empty(t, expectedFiles, "all expected files should have been found")
+}
+
+func TestProcessDirectory_RecursiveCopy(t *testing.T) {
+	// Create a mock provider with nested directory structure
+	mock := NewMockProvider(t)
+
+	// Add files in nested directories
+	nestedFiles := []string{
+		"src/main.go",
+		"src/internal/utils.go",
+		"src/internal/deep/helper.go",
+		"src/pkg/types.go",
+	}
+	for _, file := range nestedFiles {
+		mock.AddFile(file, []byte(fmt.Sprintf("content of %s", file)))
+	}
+
+	// Add some files in root for noise
+	mock.AddFile("README.md", []byte("readme content"))
+	mock.AddFile("LICENSE", []byte("license content"))
+
+	// Create config with recursive enabled
+	cfg := &SingleConfig{
+		Source: Source{
+			Repo: "github.com/test/repo",
+			Ref:  "main",
+			Path: ".",
+		},
+		Destination: Destination{
+			Path: t.TempDir(),
+		},
+		CopyArgs: &CopyEntry_Options{
+			FilePatterns: []string{"src/**/*.go"}, // Match all .go files in src recursively
+			Recursive:    true,                    // 📁 Enable recursive copying
+		},
+	}
+
+	// Setup logger in context
+	logger := NewDiscardDebugLogger(os.Stdout)
+	ctx := NewLoggerInContext(context.Background(), logger)
+
+	err := process(ctx, cfg, mock)
+
+	status, err := loadStatusFile(filepath.Join(cfg.Destination.Path, ".copyrc.lock"))
+	require.NoError(t, err, "should not return error")
+
+	require.NoError(t, err, "should not return error")
+	assert.Len(t, status.CoppiedFiles, len(nestedFiles), "should have copied all nested .go files")
+
+	// Verify each nested file was copied
+	expectedFiles := map[string]bool{
+		"src/main.copy.go":                 true,
+		"src/internal/utils.copy.go":       true,
+		"src/internal/deep/helper.copy.go": true,
+		"src/pkg/types.copy.go":            true,
 	}
 
 	for file := range status.CoppiedFiles {
