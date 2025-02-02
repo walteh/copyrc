@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://example.com/cyclicAndRequired1",
+  "type": "object",
+  "properties": {
+    "a": {
+      "$ref": "#/$defs/Foo"
+    }
+  },
+  "$defs": {
+    "Foo": {
+      "type": "object",
+      "required": [
+        "refToBar"
+      ],
+      "properties": {
+        "refToBar": {
+          "$ref": "#/$defs/Bar"
+        }
+      }
+    },
+    "Bar": {
+      "type": "object",
+      "properties": {
+        "refToFoo": {
+          "$ref": "#/$defs/Foo"
+        }
+      }
+    }
+  }
+}

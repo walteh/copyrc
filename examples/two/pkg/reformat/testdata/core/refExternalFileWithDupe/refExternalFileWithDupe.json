@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://example.com/refExternalFileWithDupe",
+  "type": "object",
+  "properties": {
+    "myExternalThing": {
+      "$ref": "../ref/ref.json#/$defs/Thing"
+    },
+    "myThing": {
+      "$ref": "#/$defs/Thing"
+    }
+  },
+  "$defs": {
+    "Thing": {
+      "type": "object",
+      "properties": {
+        "something": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

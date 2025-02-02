@@ -5,7 +5,7 @@ copy {
 		path = "gopls/internal/protocol/generate"
 	}
 	destination {
-		path = "./examples/dirs/gopls-protocol-generator"
+		path = "./examples/exapledirs/gopls-protocol-generator"
 	}
 	options {
 		replacements = [
