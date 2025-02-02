@@ -66,8 +66,6 @@ func (m *MockProvider) ListFiles(ctx context.Context, args Source, recursive boo
 	for f := range m.files {
 		files = append(files, ProviderFile{
 			Path: f,
-			Dir:  false,
-			File: true,
 		})
 	}
 	logger := loggerFromContext(ctx)

@@ -118,37 +118,6 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 			Replacements: opts.ReplacementCount,
 		})
 
-		// Update status entry timestamps even if content hasn't changed
-		// now := time.Now().UTC()
-		// if opts.StatusFile != nil && opts.StatusMutex != nil {
-		// 	opts.StatusMutex.Lock()
-		// 	if opts.IsGenerated {
-		// 		entry, ok := opts.StatusFile.GeneratedFiles[fileName]
-		// 		if !ok {
-		// 			entry = GeneratedFileEntry{
-		// 				File: fileName,
-		// 			}
-		// 		}
-
-		// 		entry.LastUpdated = now
-		// 		opts.StatusFile.GeneratedFiles[fileName] = entry
-		// 	} else {
-		// 		entry, ok := opts.StatusFile.CoppiedFiles[fileName]
-		// 		if !ok {
-		// 			entry = StatusEntry{
-		// 				File: fileName,
-		// 			}
-		// 		}
-
-		// 		entry.LastUpdated = now
-		// 		entry.Source = opts.Source
-		// 		entry.Permalink = opts.Permalink
-		// 		entry.Changes = opts.Changes
-		// 		opts.StatusFile.CoppiedFiles[fileName] = entry
-		// 	}
-		// 	opts.StatusMutex.Unlock()
-		// }
-
 		return false, nil
 	}
 

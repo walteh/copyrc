@@ -3,10 +3,7 @@ package main
 import "context"
 
 type ProviderFile struct {
-	Path     string `json:"path"`
-	Dir      bool   `json:"dir"`
-	File     bool   `json:"file"`
-	Children []ProviderFile
+	Path string `json:"path"`
 }
 
 // 🌐 RepoProvider interface for different Git providers

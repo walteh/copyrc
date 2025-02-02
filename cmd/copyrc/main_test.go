@@ -189,7 +189,7 @@ func Other() {}`))
 
 		// Process the file
 		var mu sync.Mutex
-		err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, mock.commitHash, status, &mu, ProviderFile{Path: "test.go", File: true})
+		err := processCopy(ctx, mock, cfg.Source, cfg.Destination, cfg.CopyArgs, mock.commitHash, status, &mu, ProviderFile{Path: "test.go"})
 		require.NoError(t, err)
 
 		// Verify the output file

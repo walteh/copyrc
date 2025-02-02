@@ -128,12 +128,7 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source, recursive b
 
 	result := make([]ProviderFile, 0, len(files))
 	for _, f := range files {
-		fle := ProviderFile{
-			Path:     f.Path,
-			Dir:      f.Type == "dir",
-			File:     f.Type == "file",
-			Children: make([]ProviderFile, 0),
-		}
+
 		if f.Type == "dir" && recursive {
 			childs, err := g.ListFiles(ctx, Source{
 				Repo:    args.Repo,
@@ -144,9 +139,13 @@ func (g *GithubProvider) ListFiles(ctx context.Context, args Source, recursive b
 			if err != nil {
 				return nil, errors.Errorf("listing files: %w", err)
 			}
-			fle.Children = childs
+			result = append(result, childs...)
 		}
-		result = append(result, fle)
+		if f.Type == "file" {
+			result = append(result, ProviderFile{
+				Path: f.Path,
+			})
+		}
 	}
 	return result, nil
 }
