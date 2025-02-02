@@ -18,4 +18,6 @@ type RepoProvider interface {
 	GetSourceInfo(ctx context.Context, args Source, commitHash string) (string, error)
 	// GetArchiveUrl returns the URL to download the repository archive
 	GetArchiveUrl(ctx context.Context, args Source) (string, error)
+	// GetFile returns the contents of a file
+	GetLicense(ctx context.Context, args Source, commitHash string) (LicenseEntry, error)
 }

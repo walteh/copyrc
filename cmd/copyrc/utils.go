@@ -17,6 +17,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -24,6 +26,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"gitlab.com/tozd/go/errors"
 )
 
@@ -31,8 +34,9 @@ import (
 type WriteFileOpts struct {
 	Destination Destination // Destination path
 	// Required fields
-	Path     string // Path to write the file to
-	Contents []byte // Contents to write to the file
+	Path       string // Path to write the file to
+	SourcePath string // Source path to write the file to
+	Contents   []byte // Contents to write to the file
 	// FileType FileType // Type of file (managed/local/copy)
 
 	// Optional fields
@@ -40,7 +44,7 @@ type WriteFileOpts struct {
 	StatusMutex      *sync.Mutex // Mutex for status file access
 	ReplacementCount int         // Number of replacements made in the file
 	EnsureNewline    bool        // Ensure contents end with a newline
-	Source           string      // Source info for status entry
+	RepoSourceInfo   string      // Source info for status entry
 	Permalink        string      // Permalink for status entry
 	Changes          []string    // Changes made to the file
 	IsStatusFile     bool        // Whether this is a status file
@@ -71,25 +75,72 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 		return false, errors.New("status file is required")
 	}
 
-	if len(opts.Contents) == 0 {
-		return false, errors.Errorf("contents are required for %s", opts.Path)
-	}
-
 	if opts.IsStatusFile {
 		opts.IsManaged = true
 	}
 
-	// Get base name for status entries
+	isCustomized := false
+	// if the file contains the string "copyrc:customized"
 
-	// Ensure the directory exists
-	if err := os.MkdirAll(filepath.Dir(opts.Path), 0755); err != nil {
-		return false, errors.Errorf("creating directory for %s: %w", opts.Path, err)
-	}
+	// Get base name for status entries
 
 	// Try to read existing file
 	existing, err := os.ReadFile(opts.Path)
 	if err != nil && !os.IsNotExist(err) {
-		return false, errors.Errorf("reading existing file %s: %w", opts.Path, err)
+		return false, errors.Errorf("reading file: %w", err)
+	}
+
+	existingHashData := sha256.New()
+	existingHashData.Write(existing)
+	existingHash := base64.URLEncoding.EncodeToString(existingHashData.Sum(nil))
+
+	if len(existing) == 0 {
+		// try the path without the .copy. in the name
+		existing, err = os.ReadFile(opts.SourcePath)
+		if err != nil && !os.IsNotExist(err) {
+			return false, errors.Errorf("reading file: %w", err)
+		}
+	}
+	var rcount = 0
+	var hasEntry bool = false
+	var remoteHash string
+	var customizations string = ""
+	if opts.StatusFile != nil {
+		if opts.IsManaged {
+			_, hasEntryd := opts.StatusFile.GeneratedFiles[fileName]
+			hasEntry = hasEntryd
+		} else {
+			entry, hasEntryd := opts.StatusFile.CoppiedFiles[fileName]
+			hasEntry = hasEntryd
+			if hasEntry {
+				remoteHash = entry.RemoteHash
+				customizations = entry.DiffDelta
+				rcount = len(entry.Changes)
+			}
+		}
+	}
+
+	var encodedCustomizations string
+	if (remoteHash != "" && existingHash != remoteHash) || customizations != "" {
+		isCustomized = true
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(string(existing), string(opts.Contents), false)
+		encodedCustomizations = dmp.DiffToDelta(diffs)
+		rcount = len(diffs)
+	}
+
+	if hasEntry && len(opts.Contents) == 0 {
+		logFileOperation(ctx, FileInfo{
+			Name:         fileName,
+			IsCustomized: isCustomized,
+			IsManaged:    opts.IsManaged,
+			Replacements: rcount,
+		})
+		return false, nil
+	}
+
+	if len(opts.Contents) == 0 {
+		return false, errors.Errorf("contents are required for %s", opts.Path)
 	}
 
 	// Ensure newline at end of file if requested
@@ -100,15 +151,6 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 
 	logger := loggerFromContext(ctx)
 	logger.zlog.Debug().Msgf("👀 Writing file %s with contents length %d, curr len: %d, equal: %t", opts.Path, len(contents), len(existing), bytes.Equal(existing, contents))
-
-	var hasEntry bool = false
-	if opts.StatusFile != nil {
-		if opts.IsManaged {
-			_, hasEntry = opts.StatusFile.GeneratedFiles[fileName]
-		} else {
-			_, hasEntry = opts.StatusFile.CoppiedFiles[fileName]
-		}
-	}
 
 	// If file exists and content is the same, and we have an existing status entry, no need to write
 	if err == nil && bytes.Equal(existing, contents) && (hasEntry || opts.IsStatusFile) {
@@ -134,18 +176,20 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 		opts.Contents = data
 	}
 
-	// fmt.Printf("WRITING FILE %s\n", opts.Path)
-	// Write the file
-	if err := os.WriteFile(opts.Path, contents, 0644); err != nil {
-		return false, errors.Errorf("writing file %s: %w", opts.Path, err)
+	if !isCustomized {
+		// Ensure the directory exists
+		if err := os.MkdirAll(filepath.Dir(opts.Path), 0755); err != nil {
+			return false, errors.Errorf("creating directory for %s: %w", opts.Path, err)
+		}
+
+		if err := os.WriteFile(opts.Path, contents, 0644); err != nil {
+			return false, errors.Errorf("writing file %s: %w", opts.Path, err)
+		}
 	}
 
-	// print out dir files
-	// files, err := os.ReadDir(filepath.Dir(opts.Path))
-	// if err != nil {
-	// 	return false, errors.Errorf("reading directory %s: %w", filepath.Dir(opts.Path), err)
-	// }
-	// fmt.Printf("DIR: %+v\n", files)
+	hashData := sha256.New()
+	hashData.Write(contents)
+	hash := base64.URLEncoding.EncodeToString(hashData.Sum(nil))
 
 	// Update status entries
 	now := time.Now().UTC()
@@ -168,9 +212,11 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 				}
 			}
 			entry.LastUpdated = now
-			entry.Source = opts.Source
+			entry.Source = opts.RepoSourceInfo
 			entry.Permalink = opts.Permalink
 			entry.Changes = opts.Changes
+			entry.DiffDelta = encodedCustomizations
+			entry.RemoteHash = hash
 			opts.StatusFile.CoppiedFiles[fileName] = entry
 		}
 		opts.StatusMutex.Unlock()
@@ -179,8 +225,9 @@ func writeFile(ctx context.Context, opts WriteFileOpts) (bool, error) {
 	// Log the operation based on what changed
 	logFileOperation(ctx, FileInfo{
 		Name:         fileName,
-		IsNew:        os.IsNotExist(err),
+		IsNew:        len(existing) == 0 && len(contents) > 0,
 		IsModified:   true,
+		IsCustomized: isCustomized,
 		IsManaged:    opts.IsManaged,
 		Replacements: opts.ReplacementCount,
 	})

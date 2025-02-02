@@ -234,3 +234,42 @@ func (g *GithubProvider) GetArchiveUrl(ctx context.Context, args Source) (string
 
 	return fmt.Sprintf("https://github.com/%s/%s/archive/%s.tar.gz", org, repo, refPath), nil
 }
+
+func (g *GithubProvider) GetLicense(ctx context.Context, args Source, commitHash string) (LicenseEntry, error) {
+	org, repo, err := parseGithubRepo(args.Repo)
+	if err != nil {
+		return LicenseEntry{}, errors.Errorf("parsing github repository: %w", err)
+	}
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/license?ref=%s", org, repo, commitHash)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return LicenseEntry{}, errors.Errorf("creating request: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return LicenseEntry{}, errors.Errorf("fetching license: %w", err)
+	}
+
+	var data struct {
+		Links struct {
+			Git string `json:"git"`
+		} `json:"_links"`
+		License struct {
+			SPDX string `json:"spdx_id"`
+			Name string `json:"name"`
+		} `json:"license"`
+		Url string `json:"url"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return LicenseEntry{}, errors.Errorf("decoding license: %w", err)
+	}
+
+	return LicenseEntry{
+		SPDX:      data.License.SPDX,
+		Name:      data.License.Name,
+		Permalink: data.Url,
+	}, nil
+}

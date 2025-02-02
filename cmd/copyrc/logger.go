@@ -50,6 +50,7 @@ type FileInfo struct {
 	IsRemoved    bool
 	IsNew        bool
 	IsUntracked  bool
+	IsCustomized bool
 	Replacements int // Number of replacements made to this file
 }
 
@@ -104,6 +105,18 @@ var (
 	LocalColor   = color.FgYellow
 	CopyColor    = color.FgBlue
 	ManagedColor = color.FgCyan
+
+	CustomizedColor = color.FgMagenta
+
+	CustomizedFile = FileStatus{
+		// pencil
+		Symbol: '✎',
+		Style: StatusStyle{
+			SymbolColor: CustomizedColor,
+			TextColor:   color.Faint,
+		},
+		Text: "CUSTOMIZED",
+	}
 
 	UnmodifiedCopyFile = FileStatus{
 		Symbol: '•',
@@ -220,7 +233,9 @@ func NewDiscardDebugLogger(console io.Writer) *Logger {
 }
 
 func (me FileInfo) Status() FileStatus {
-	if me.IsUntracked {
+	if me.IsCustomized {
+		return CustomizedFile
+	} else if me.IsUntracked {
 		return UntrackedFile
 	} else if me.IsRemoved {
 		return RemovedFile

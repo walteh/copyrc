@@ -171,3 +171,11 @@ func (m *MockProvider) GetFile(ctx context.Context, args Source, file string) ([
 	// Return the content directly
 	return content, nil
 }
+
+func (m *MockProvider) GetLicense(ctx context.Context, args Source, commitHash string) (LicenseEntry, error) {
+	return LicenseEntry{
+		SPDX:      "mock license",
+		Permalink: "mock permalink",
+		Name:      "mock name",
+	}, nil
+}

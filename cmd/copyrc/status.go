@@ -31,6 +31,8 @@ type StatusEntry struct {
 	Permalink   string    `json:"permalink"`
 	LastUpdated time.Time `json:"last_updated"`
 	Changes     []string  `json:"changes,omitempty"`
+	DiffDelta   string    `json:"diff_delta,omitempty"`
+	RemoteHash  string    `json:"remote_hash,omitempty"`
 }
 
 type GeneratedFileEntry struct {
@@ -46,10 +48,17 @@ type StatusFileArgs struct {
 	ArchiveArgs *ArchiveEntry_Options `json:"archive_args,omitempty"`
 }
 
+type LicenseEntry struct {
+	SPDX      string `json:"spdx"`
+	Permalink string `json:"permalink"`
+	Name      string `json:"name"`
+}
+
 // 📦 Status file structure
 type StatusFile struct {
 	LastUpdated    time.Time                     `json:"last_updated"`
 	CommitHash     string                        `json:"commit_hash"`
+	License        LicenseEntry                  `json:"license"`
 	Ref            string                        `json:"branch"`
 	CoppiedFiles   map[string]StatusEntry        `json:"coppied_files"`
 	GeneratedFiles map[string]GeneratedFileEntry `json:"generated_files"`
@@ -95,6 +104,7 @@ func writeStatusFile(ctx context.Context, status *StatusFile, destPath string) e
 
 	// Write status file if changed
 	_, err = writeFile(ctx, WriteFileOpts{
+		SourcePath:   statusPath,
 		Destination:  Destination{Path: destPath},
 		Path:         statusPath,
 		Contents:     data,
