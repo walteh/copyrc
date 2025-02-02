@@ -264,25 +264,27 @@ func processCopy(ctx context.Context, provider RepoProvider, src Source, dest De
 	// Process content
 	var buf bytes.Buffer
 
-	// Add file header based on extension
-	switch filepath.Ext(file.Path) {
-	case ".go", ".js", ".ts", ".jsx", ".tsx", ".cpp", ".c", ".h", ".hpp", ".java", ".scala", ".rs", ".php", "jsonc":
-		fmt.Fprintf(&buf, "// 📦 originally copied by copyrc\n")
-		fmt.Fprintf(&buf, "// 🔗 source: %s\n", permalink)
-		fmt.Fprintf(&buf, "// 📝 license: %s\n", status.License.SPDX)
-		fmt.Fprintf(&buf, "// ℹ️ see .copyrc.lock for more details\n\n")
-	case ".py", ".rb", ".pl", ".sh", ".yaml", ".yml":
-		fmt.Fprintf(&buf, "# 📦 originally copied by copyrc\n")
-		fmt.Fprintf(&buf, "# 🔗 source: %s\n", permalink)
-		fmt.Fprintf(&buf, "# 📝 license: %s\n", status.License.SPDX)
-		fmt.Fprintf(&buf, "# ℹ️ see .copyrc.lock for more details\n\n")
-	case ".md", ".xml":
-		fmt.Fprintf(&buf, "<!--\n")
-		fmt.Fprintf(&buf, "📦 originally copied by copyrc\n")
-		fmt.Fprintf(&buf, "🔗 source: %s\n", permalink)
-		fmt.Fprintf(&buf, "📝 license: %s\n", status.License.SPDX)
-		fmt.Fprintf(&buf, "ℹ️ see .copyrc.lock for more details\n")
-		fmt.Fprintf(&buf, "-->\n\n")
+	if args == nil || !args.NoHeaderComments {
+		// Add file header based on extension
+		switch filepath.Ext(file.Path) {
+		case ".go", ".js", ".ts", ".jsx", ".tsx", ".cpp", ".c", ".h", ".hpp", ".java", ".scala", ".rs", ".php", "jsonc":
+			fmt.Fprintf(&buf, "// 📦 originally copied by copyrc\n")
+			fmt.Fprintf(&buf, "// 🔗 source: %s\n", permalink)
+			fmt.Fprintf(&buf, "// 📝 license: %s\n", status.License.SPDX)
+			fmt.Fprintf(&buf, "// ℹ️ see .copyrc.lock for more details\n\n")
+		case ".py", ".rb", ".pl", ".sh", ".yaml", ".yml":
+			fmt.Fprintf(&buf, "# 📦 originally copied by copyrc\n")
+			fmt.Fprintf(&buf, "# 🔗 source: %s\n", permalink)
+			fmt.Fprintf(&buf, "# 📝 license: %s\n", status.License.SPDX)
+			fmt.Fprintf(&buf, "# ℹ️ see .copyrc.lock for more details\n\n")
+		case ".md", ".xml":
+			fmt.Fprintf(&buf, "<!--\n")
+			fmt.Fprintf(&buf, "📦 originally copied by copyrc\n")
+			fmt.Fprintf(&buf, "🔗 source: %s\n", permalink)
+			fmt.Fprintf(&buf, "📝 license: %s\n", status.License.SPDX)
+			fmt.Fprintf(&buf, "ℹ️ see .copyrc.lock for more details\n")
+			fmt.Fprintf(&buf, "-->\n\n")
+		}
 	}
 
 	// Write original content
