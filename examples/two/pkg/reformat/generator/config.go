@@ -7,6 +7,7 @@ package reformat
 
 import "github.com/atombender/go-jsonschema/pkg/schemas"
 
+// change
 type Config struct {
 	SchemaMappings      []SchemaMapping
 	ExtraImports        bool
