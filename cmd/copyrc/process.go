@@ -84,9 +84,10 @@ func processArchive(ctx context.Context, provider RepoProvider, src Source, dest
 	if src.Path != "" {
 		return errors.New("path is not supported in tarball mode")
 	}
-
-	// Ensure cache directory exists
 	repoName := filepath.Base(src.Repo)
+
+	dest = Destination{Path: filepath.Join(dest.Path, repoName)}
+	// Ensure cache directory exists
 	if err := os.MkdirAll(dest.Path, 0755); err != nil {
 		return errors.Errorf("creating repo directory: %w", err)
 	}
