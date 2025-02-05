@@ -56,10 +56,11 @@ type FlagsBlock struct {
 
 // 🎯 Source configuration
 type Source struct {
-	Repo    string `json:"repo" yaml:"repo" hcl:"repo,attr"`
-	Ref     string `json:"ref,omitempty" yaml:"ref,omitempty" hcl:"ref,attr"`
-	Path    string `json:"path" yaml:"path" hcl:"path,optional"`
-	RefType string `json:"ref_type" yaml:"ref_type" hcl:"ref_type,optional"`
+	Repo            string `json:"repo" yaml:"repo" hcl:"repo,attr"`
+	Ref             string `json:"ref,omitempty" yaml:"ref,omitempty" hcl:"ref,attr"`
+	Path            string `json:"path" yaml:"path" hcl:"path,optional"`
+	RefType         string `json:"ref_type" yaml:"ref_type" hcl:"ref_type,optional"`
+	LicenseOverride string `json:"license_override,omitempty" yaml:"license_override,omitempty" hcl:"license_override,optional"`
 }
 
 // 📦 Destination configuration

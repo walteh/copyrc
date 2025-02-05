@@ -267,6 +267,17 @@ func (g *GithubProvider) GetLicense(ctx context.Context, args Source, commitHash
 		return LicenseEntry{}, errors.Errorf("decoding license: %w", err)
 	}
 
+	if data.License.SPDX == "" || data.License.SPDX == "NOASSERTION" {
+		if args.LicenseOverride != "" {
+			return LicenseEntry{
+				SPDX:      args.LicenseOverride,
+				Name:      args.LicenseOverride + " License",
+				Permalink: data.Url,
+			}, nil
+		}
+		return LicenseEntry{}, errors.New("no license found for " + args.Repo + ", specify license_override in the source config to use a custom license")
+	}
+
 	return LicenseEntry{
 		SPDX:      data.License.SPDX,
 		Name:      data.License.Name,
